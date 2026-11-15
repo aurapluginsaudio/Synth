@@ -2,7 +2,11 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "AuraEngine.h"
+#include "Arp.h"
 #include "Presets.h"
+#include "ParamDefs.h"
+
+struct UserPreset { juce::String name; float v[aura::NP]; };
 
 class AuraProcessor : public juce::AudioProcessor {
 public:
@@ -19,21 +23,29 @@ public:
     bool producesMidi() const override { return false; }
     bool isMidiEffect() const override { return false; }
     double getTailLengthSeconds() const override { return 3.0; }
-    int getNumPrograms() override { return aura::kNumFactory; }
+    int getNumPrograms() override { return aura::kNumFactory + (int)user.size(); }
     int getCurrentProgram() override { return program; }
     void setCurrentProgram(int i) override;
     void changeProgramName(int, const juce::String&) override {}
-    const juce::String getProgramName(int i) override { return (i >= 0 && i < aura::kNumFactory) ? juce::String(aura::kFactory[i].name) : juce::String(); }
+    const juce::String getProgramName(int i) override;
     void getStateInformation(juce::MemoryBlock&) override;
     void setStateInformation(const void*, int) override;
+
+    // presets do usuário
+    void saveUserPreset(const juce::String& name);
+    int importJson(const juce::File& f);
+    bool exportJson(const juce::File& f) const;
+    int userCount() const { return (int)user.size(); }
+    std::function<void()> onPresetsChanged;
 
     juce::AudioProcessorValueTreeState apvts;
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout makeLayout();
-    aura::Engine engine;
+    void applyValues(const float* v);
+    aura::Engine engine; aura::Arp arp;
     std::atomic<float>* raw[aura::NP] = {};
-    std::atomic<float> *pVelSens = nullptr, *pVelDest = nullptr, *pPrio = nullptr, *pAtDest = nullptr;
-    int program = 0;
-    double lastSr = 0;
+    std::atomic<float> *pVelSens, *pVelDest, *pPrio, *pAtDest, *pHold, *pArpOn, *pArpPat, *pArpDiv, *pArpOct, *pArpGate, *pArpLatch, *pArpSync, *pArpBpm;
+    std::vector<UserPreset> user;
+    int program = 0; bool pedal = false, lastArpOn = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AuraProcessor)
 };
