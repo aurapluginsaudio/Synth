@@ -1,0 +1,11 @@
+# Testes do AURA
+
+Requisitos: Python com Playwright (Chromium) e um servidor local na raiz do repositório (`python3 -m http.server 8765`).
+
+- `calibra_presets.py SAIDA.json`: toca os 111 presets e grava pico e RMS de cada um (versão web).
+- `motor_cpp_presets.cpp`: faz a mesma medição no motor C++ do plugin
+  (`g++ -O2 -std=c++17 -Ivst/Source tests/motor_cpp_presets.cpp -o t && ./t cpp.json`). Compare os dois JSON: a diferença média deve ficar perto de 0 dB.
+- `ux_setlist_categorias.py`, `feat_test.py`, `arp_test.py`, `prio_test.py`, `imp_test.py`, `final_test.py`: testes funcionais da interface.
+
+## Paridade web e plugin
+O motor existe em dois lugares: `index.html` (AudioWorklet `AuraVoice`/`AuraComp`) e `vst/Source/AuraEngine.h`. Qualquer mudança de som precisa ser feita nos dois e conferida com a comparação acima.

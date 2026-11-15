@@ -115,6 +115,8 @@
   body.learn .pnav .btn.target{box-shadow:0 0 0 4px var(--led),0 0 18px var(--led)}
   .dlg .box.wide{width:min(560px,100%)}
   .lrow{display:flex;gap:8px;align-items:center} .lrow input{margin:0;flex:1;min-width:0;font-size:15px;padding:10px} .dlg .lrow .btn{width:auto;margin:0;flex:0 0 auto}
+  .cats{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px} .dlg .cats .btn{width:auto;margin:0;min-height:34px;padding:0 11px;font-size:11px}
+  .dlg .prow .btn.mini{width:44px;flex:0 0 44px;font-size:15px;letter-spacing:0} .mrow{display:flex;justify-content:space-between;gap:8px;padding:9px 4px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px} .mrow b{color:var(--amber);font-weight:600;white-space:nowrap}
   #pList{max-height:52vh;overflow:auto;margin-top:6px;-webkit-overflow-scrolling:touch}
   .prow{display:flex;gap:6px} .dlg .prow .btn.star{width:48px;flex:0 0 48px;color:#7a7f87;font-size:17px;letter-spacing:0} .dlg .prow .btn.star.cur{color:var(--amber)} .dlg .prow .btn.row{flex:1;min-width:0}
   .sec{flex:1 1 auto;border:1.5px solid rgba(20,22,25,.85);border-radius:9px;padding:15px 8px 5px;position:relative;
@@ -404,9 +406,27 @@
   <button class="x" data-close aria-label="Fechar">×</button>
   <h3 id="pTitle">PRESETS</h3>
   <div class="lrow"><input id="pSearch" type="search" placeholder="BUSCAR" autocomplete="off"><button id="favOnly" class="btn">★ Só favoritos</button></div>
+  <div id="pCats" class="cats" role="group" aria-label="Categorias"></div>
   <div id="pList"></div>
   <button class="btn" data-close>Fechar</button>
-  <p>Toque na estrela para marcar um favorito. Com “Só favoritos” ligado, as setas ◀ ▶ percorrem apenas os favoritos.</p>
+  <p>Categorias são sugeridas pelo som de cada preset. Toque na estrela para marcar um favorito. Com “Só favoritos” ligado, as setas ◀ ▶ percorrem apenas os favoritos.</p>
+</div></div>
+
+<div class="dlg" id="dlgSet" role="dialog" aria-modal="true" aria-label="Setlist"><div class="box wide">
+  <button class="x" data-close aria-label="Fechar">×</button>
+  <h3>SETLIST</h3>
+  <div class="lrow"><button id="setOn" class="btn" aria-pressed="false">Usar setlist</button><button id="setAdd" class="btn">+ Preset atual</button><button id="setClr" class="btn">Limpar</button></div>
+  <div id="setBody"></div>
+  <button class="btn" data-close>Fechar</button>
+  <p>Com a setlist ligada, as setas ◀ ▶ e o Program Change do controlador percorrem só esta lista: Program Change 0 chama o 1º item, 1 o 2º, e assim por diante.</p>
+</div></div>
+
+<div class="dlg" id="dlgMap" role="dialog" aria-modal="true" aria-label="Mapeamentos"><div class="box wide">
+  <button class="x" data-close aria-label="Fechar">×</button>
+  <h3>MAPEAMENTOS MIDI</h3>
+  <div id="mapBody"></div>
+  <button class="btn" data-close>Fechar</button>
+  <p>Para mudar um mapeamento, use “Mapear knobs e botões” no menu.</p>
 </div></div>
 
 <div class="dlg" id="dlgMenu" role="dialog" aria-modal="true" aria-label="Ajustes"><div class="box wide">
@@ -417,6 +437,7 @@
     <button id="mSave" class="btn row">Salvar preset…</button>
     <button id="mImport" class="btn row">Importar arquivos…<em>.syx .mdp .json</em></button>
     <button id="mExport" class="btn row">Exportar backup</button>
+    <button id="mSet" class="btn row">Setlist…<em id="mSetSt">—</em></button>
   </div>
   <h4>SOM</h4>
   <div class="grid2">
@@ -435,6 +456,7 @@
     <button id="mBle" class="btn row">Bluetooth<em id="mBleSt">—</em></button>
     <button id="mMidi" class="btn row">USB / MIDI do sistema<em id="mMidiSt">—</em></button>
     <button id="mLearn" class="btn row">Mapear knobs e botões</button>
+    <button id="mMap" class="btn row">Ver mapeamentos…<em id="mMapSt">—</em></button>
     <button id="mClear" class="btn row">Limpar mapeamento</button>
     <button id="mVel" class="btn row">Sensibilidade ao toque<em id="mVelSt">—</em></button>
   </div>
@@ -812,22 +834,69 @@
   }
   function stepPreset(dir){
     if(learnMode) return;
+    if(setOn){ const ix=setIdx(); if(ix.length){ const pos=ix.indexOf(curPreset); loadPreset(ix[pos<0?(dir>0?0:ix.length-1):(pos+dir+ix.length)%ix.length]); return; } }
     const n=PRESETS.length; let i=curPreset;
     const useFav = favOnly && PRESETS.some(p=>favs.has(p.name));
     for(let c=0;c<n;c++){ i=(i+dir+n)%n; if(!useFav || favs.has(PRESETS[i].name)) break; }
     loadPreset(i);
   }
+  // ---- setlist: lista ordenada de presets para o palco (setas e Program Change)
+  const SLKEY='aura_setlist_v1', SLONKEY='aura_setlist_on_v1';
+  let setlist = asList(LS.get(SLKEY,[])).filter(x=>typeof x==='string').slice(0,200), setOn = !!LS.get(SLONKEY,false);
+  const setIdx = () => setlist.map(n=>PRESETS.findIndex(p=>p.name===n)).filter(i=>i>=0);
+  function saveSet(){ LS.set(SLKEY,setlist); LS.set(SLONKEY,setOn); drawMenuSt(); }
+  function drawSet(){
+    $('setOn').classList.toggle('cur',setOn); $('setOn').setAttribute('aria-pressed',setOn?'true':'false');
+    const b=$('setBody'); b.innerHTML='';
+    setlist.forEach((n,k)=>{
+      const row=document.createElement('div'); row.className='prow';
+      const go=document.createElement('button'); go.className='btn row mono'+(PRESETS[curPreset]&&PRESETS[curPreset].name===n?' cur':''); go.textContent=String(k+1).padStart(2,'0')+'  '+n;
+      go.addEventListener('click',()=>{ const i=PRESETS.findIndex(p=>p.name===n); if(i>=0) loadPreset(i); drawSet(); });
+      const mk=(t,l,fn)=>{ const x=document.createElement('button'); x.className='btn mini'; x.textContent=t; x.setAttribute('aria-label',l); x.addEventListener('click',fn); return x; };
+      row.appendChild(go);
+      row.appendChild(mk('▲','Subir',()=>{ if(k>0){ [setlist[k-1],setlist[k]]=[setlist[k],setlist[k-1]]; saveSet(); drawSet(); } }));
+      row.appendChild(mk('▼','Descer',()=>{ if(k<setlist.length-1){ [setlist[k+1],setlist[k]]=[setlist[k],setlist[k+1]]; saveSet(); drawSet(); } }));
+      row.appendChild(mk('✕','Remover',()=>{ setlist.splice(k,1); saveSet(); drawSet(); }));
+      b.appendChild(row);
+    });
+    if(!setlist.length){ const e=document.createElement('p'); e.textContent='Lista vazia. Escolha um preset e toque em “+ Preset atual”.'; b.appendChild(e); }
+  }
+  $('setOn').addEventListener('click',()=>{ setOn=!setOn; saveSet(); drawSet(); });
+  $('setAdd').addEventListener('click',()=>{ const n=PRESETS[curPreset].name; if(setlist.length<200){ setlist.push(n); saveSet(); drawSet(); const b=$('setBody'); b.scrollTop=b.scrollHeight; } });
+  $('setClr').addEventListener('click',()=>{ setlist=[]; saveSet(); drawSet(); });
+  $('mSet').addEventListener('click',()=>{ closeD('dlgMenu'); drawSet(); openD('dlgSet'); });
+  function pcPreset(n){ const ix=setOn?setIdx():[]; if(ix.length){ if(n<ix.length) loadPreset(ix[n]); } else if(n<PRESETS.length) loadPreset(n); }
   $('pPrev').addEventListener('click',()=>{ if(learnMode) setTarget('act:prev'); else stepPreset(-1); });
   $('pNext').addEventListener('click',()=>{ if(learnMode) setTarget('act:next'); else stepPreset(1); });
   $('lHold').addEventListener('click',()=>setTarget('act:hold'));
   $('lArp').addEventListener('click',()=>setTarget('act:arp'));
 
+  // ---- categorias sugeridas pelo som (calculadas dos parâmetros)
+  const CATS=['TODOS','SUB','PLUCK','LEAD','PAD','FX','MEUS'];
+  function catsOf(p){
+    const c=[]; const lowCut=cutHz(p.cut)<250;
+    if(p.sub>=0.6 || (p.fenv<1 && cutHz(p.cut)<200 && p.res<0.3)) c.push('SUB');
+    if(p.fd<0.45 && p.fs<0.3 && p.a<0.03) c.push('PLUCK');
+    if(p.a>=0.15 || (p.r>=1 && p.s>0.6)) c.push('PAD');
+    if(p.oct>=0 || (p.res>0.5 && p.fenv>1.5 && !lowCut) || p.wave==='sawtooth' && p.sync) c.push('LEAD');
+    if(p.pa>3 || p.lsr>0 || p.ovl>0.3 || p.nz>0.3 || p.sync || p.lf>0.5) c.push('FX');
+    if(!p.factory) c.push('MEUS');
+    return c;
+  }
+  let catSel='TODOS';
+  function drawCats(){
+    const box=$('pCats'); box.innerHTML='';
+    CATS.forEach(n=>{ const b=document.createElement('button'); b.className='btn chip'+(n===catSel?' cur':''); b.textContent=n; b.setAttribute('aria-pressed',n===catSel?'true':'false');
+      b.addEventListener('click',()=>{ catSel=n; drawList(); }); box.appendChild(b); });
+  }
   function drawList(){
     const box=$('pList'), q=($('pSearch').value||'').trim().toUpperCase(); box.innerHTML='';
+    drawCats();
     $('favOnly').classList.toggle('cur',favOnly); $('favOnly').setAttribute('aria-pressed',favOnly?'true':'false');
     $('pTitle').textContent='PRESETS · '+PRESETS.length+(favs.size?' · ★ '+favs.size:'');
     PRESETS.forEach((p,i)=>{
       if(q && !p.name.toUpperCase().includes(q)) return;
+      if(catSel!=='TODOS' && !catsOf(p).includes(catSel)) return;
       if(favOnly && !q && !favs.has(p.name)) return;
       const row=document.createElement('div'); row.className='prow';
       const s=document.createElement('button'); s.className='btn star'+(favs.has(p.name)?' cur':''); s.textContent='★'; s.setAttribute('aria-label','Favorito');
@@ -839,7 +908,7 @@
       b.addEventListener('click',()=>{ loadPreset(i); closeD('dlgList'); });
       row.appendChild(s); row.appendChild(b); box.appendChild(row);
     });
-    if(!box.children.length){ const e=document.createElement('p'); e.textContent=favOnly&&!q?'Nenhum favorito marcado ainda.':'Nenhum preset com esse nome.'; box.appendChild(e); }
+    if(!box.children.length){ const e=document.createElement('p'); e.textContent=favOnly&&!q?'Nenhum favorito marcado ainda.':'Nenhum preset encontrado.'; box.appendChild(e); }
   }
   $('oled').addEventListener('click',()=>{ if(learnMode) return; $('pSearch').value=''; drawList(); openD('dlgList'); const c=$('pCur'); if(c) c.scrollIntoView({block:'center'}); });
   $('oled').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('oled').click(); } });
@@ -870,7 +939,7 @@
 
   // ====================== Exportar e importar ======================
   function exportAll(){
-    const data={aura:1, origem:AURA_ID+' © '+AURA_ANO+' '+AURA_AUTOR, presets:USER, favs:[...favs], ccMap:ccMap, actMap:actMap};
+    const data={aura:1, origem:AURA_ID+' © '+AURA_ANO+' '+AURA_AUTOR, presets:USER, favs:[...favs], ccMap:ccMap, actMap:actMap, setlist:setlist};
     try{
       const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:'application/json'}));
       a.download='aura-synth-bass-backup.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
@@ -932,7 +1001,7 @@
           if(j && j.aura){
             got=asList(j.presets).filter(p=>p&&typeof p==='object'&&typeof p.name==='string').slice(0,500);
             asList(j.favs).forEach(x=>{ if(typeof x==='string') favs.add(x); }); LS.set(FKEY,[...favs]);
-            if(j.ccMap){ ccMap=cleanCC(j.ccMap); LS.set(MAPKEY,ccMap); } if(j.actMap){ actMap=cleanAct(j.actMap); LS.set(ACTKEY,actMap); } drawMap(); extra=' + ajustes';
+            if(j.ccMap){ ccMap=cleanCC(j.ccMap); LS.set(MAPKEY,ccMap); } if(j.actMap){ actMap=cleanAct(j.actMap); LS.set(ACTKEY,actMap); } drawMap(); if(j.setlist){ setlist=asList(j.setlist).filter(x=>typeof x==='string').slice(0,200); saveSet(); } extra=' + ajustes';
           } else { const p=fromMdp(txt); if(p) got=[p]; }
         }
         if(!got.length){ bad++; continue; }
@@ -1264,7 +1333,7 @@
   // ====================== Menu: toque, delay e arpejador ======================
   const PRIOS=['ÚLTIMA NOTA','MAIS GRAVE','MAIS AGUDA'], VDS=['VOLUME E BRILHO','SÓ VOLUME','SÓ BRILHO'], ATS=['DESLIGADO','VIBRATO','FILTRO','VOLUME'];
   function drawMenuSt(){
-    $('mPrioSt').textContent=PRIOS[prio]; $('mVelDSt').textContent=VDS[velDest]; $('mAtSt').textContent=ATS[atDest]; $('mHoldSt').textContent=holdOn?'LIGADO':'DESLIGADO';
+    $('mPrioSt').textContent=PRIOS[prio]; $('mVelDSt').textContent=VDS[velDest]; $('mAtSt').textContent=ATS[atDest]; $('mHoldSt').textContent=holdOn?'LIGADO':'DESLIGADO'; $('mSetSt').textContent=setlist.length?(setOn?'LIGADA · ':'')+setlist.length+' ITENS':'VAZIA'; $('mMapSt').textContent=(Object.keys(ccMap).length+Object.keys(actMap).length)+' MAPEADOS';
     $('mArpSt').textContent=arp.on?'LIGADO · '+APAT[arp.pat]:'DESLIGADO'; $('mDlySt').textContent=P.dm>0.005?Math.round(P.dt*1000)+' ms · '+Math.round(P.dm*100)+'%':'DESLIGADO';
   }
   $('mPrio').addEventListener('click',()=>{ prio=(prio+1)%3; LS.set(PRIOK,prio); drawMenuSt(); });
@@ -1294,6 +1363,16 @@
     arpRows.push(mkSlider(b,'ANDAMENTO',()=>(arp.bpm-40)/200,p=>Math.round(40+p*200)+' BPM',p=>{ arp.bpm=Math.round(40+p*200); arpSave(); }));
     arpRows.push(mkSlider(b,'DURAÇÃO',()=>(arp.gate-0.1)/0.85,p=>Math.round((0.1+p*0.85)*100)+'%',p=>{ arp.gate=+(0.1+p*0.85).toFixed(2); arpSave(); }));
     arpRows.push(mkChips(b,'TRAVA',['DESLIGADA','LIGADA'],()=>arp.latch?1:0,i=>{ arp.latch=i===1; if(!arp.latch && arp.down.size===0){ arp.notes=[]; arpSilence(); } arpSave(); })); }
+  // ---- lista de mapeamentos MIDI
+  function drawMapList(){
+    const b=$('mapBody'); b.innerHTML=''; let n=0;
+    const add=(what,src,del)=>{ n++; const r=document.createElement('div'); r.className='mrow'; const l=document.createElement('span'); l.textContent=what; const v=document.createElement('b'); v.textContent=src; r.appendChild(l); r.appendChild(v);
+      const x=document.createElement('button'); x.className='btn mini'; x.textContent='✕'; x.setAttribute('aria-label','Remover'); x.addEventListener('click',()=>{ del(); drawMap(); drawMenuSt(); drawMapList(); }); r.appendChild(x); b.appendChild(r); };
+    Object.keys(ccMap).sort((a,c)=>a-c).forEach(cc=>{ const k=KN[ccMap[cc]]; add(k.full||k.label,'CC '+cc,()=>{ delete ccMap[cc]; LS.set(MAPKEY,ccMap); }); });
+    Object.keys(actMap).forEach(key=>add(ACTS[actMap[key]].name,(key[0]==='c'?'CC ':'NOTA ')+key.slice(1),()=>{ delete actMap[key]; LS.set(ACTKEY,actMap); }));
+    if(!n){ const e=document.createElement('p'); e.textContent='Nada mapeado ainda. Use “Mapear knobs e botões” no menu.'; b.appendChild(e); }
+  }
+  $('mMap').addEventListener('click',()=>{ closeD('dlgMenu'); drawMapList(); openD('dlgMap'); });
   $('mDly').addEventListener('click',()=>{ closeD('dlgMenu'); dlyRows.forEach(r=>r.draw()); openD('dlgDly'); });
   $('mArp').addEventListener('click',()=>{ closeD('dlgMenu'); arpRows.forEach(r=>r.draw()); openD('dlgArp'); });
 
@@ -1391,7 +1470,7 @@
     else if(cmd===0x80 || (cmd===0x90&&d2===0)){ if(actMap['n'+d1]) return; noteOff(d1); }
     else if(cmd===0xD0){ setAT(d1/127); }
     else if(cmd===0xA0){ setAT((d2||0)/127); }
-    else if(cmd===0xC0){ if(d1<PRESETS.length) loadPreset(d1); }
+    else if(cmd===0xC0){ pcPreset(d1); }
     else if(cmd===0xE0){ setBend((((d2<<7)|d1)-8192)/8192); }
     else if(cmd===0xB0){
       if(learnMode && learnTarget){ learnMsgIn('c',d1); return; }
