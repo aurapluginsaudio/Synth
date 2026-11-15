@@ -412,6 +412,24 @@
   <p>Categorias são sugeridas pelo som de cada preset. Toque na estrela para marcar um favorito. Com “Só favoritos” ligado, as setas ◀ ▶ percorrem apenas os favoritos.</p>
 </div></div>
 
+<div class="dlg" id="dlgCloud" role="dialog" aria-modal="true" aria-label="Nuvem"><div class="box wide">
+  <button class="x" data-close aria-label="Fechar">×</button>
+  <h3>NUVEM</h3>
+  <p id="cloudSt">—</p>
+  <div id="cloudIn">
+    <input id="cEmail" type="email" placeholder="E-MAIL" autocomplete="username" autocapitalize="off" spellcheck="false">
+    <input id="cPass" type="password" placeholder="SENHA" autocomplete="current-password">
+    <button id="cLogin" class="btn">Entrar</button>
+  </div>
+  <div id="cloudOut" hidden>
+    <button id="cSync" class="btn">Sincronizar agora</button>
+    <button id="cEr" class="btn">Enviar presets de fábrica extras (uma vez)</button>
+    <button id="cLogout" class="btn">Sair</button>
+  </div>
+  <button class="btn" data-close>Fechar</button>
+  <p>Seus presets salvos são gravados na nuvem e aparecem em todos os aparelhos em que você entrar. Sem internet, o app continua funcionando com a cópia do aparelho.</p>
+</div></div>
+
 <div class="dlg" id="dlgSet" role="dialog" aria-modal="true" aria-label="Setlist"><div class="box wide">
   <button class="x" data-close aria-label="Fechar">×</button>
   <h3>SETLIST</h3>
@@ -438,6 +456,7 @@
     <button id="mImport" class="btn row">Importar arquivos…<em>.syx .mdp .json</em></button>
     <button id="mExport" class="btn row">Exportar backup</button>
     <button id="mSet" class="btn row">Setlist…<em id="mSetSt">—</em></button>
+    <button id="mCloud" class="btn row">Nuvem…<em id="mCloudSt">—</em></button>
   </div>
   <h4>SOM</h4>
   <div class="grid2">
@@ -648,7 +667,8 @@
   const UKEY='aura_user_presets_v1', LKEY='aura_last_preset_v1', FKEY='aura_favs_v1', FOKEY='aura_fav_only_v1';
   const asList = v => Array.isArray(v) ? v : [];
   let USER = asList(LS.get(UKEY,[])).filter(p=>p&&typeof p==='object'&&typeof p.name==='string').map(p=>{ const q=norm(p); delete q.factory; return q; });
-  let PRESETS = FACTORY.concat(USER);
+  let ER = asList(LS.get('aura_er_cache_v1',[])).filter(p=>p&&typeof p==='object'&&typeof p.name==='string').slice(0,300).map(p=>Object.assign(norm(p),{factory:true}));
+  let PRESETS = FACTORY.concat(ER,USER);
   let favs = new Set(asList(LS.get(FKEY,[])).filter(x=>typeof x==='string')), favOnly = !!LS.get(FOKEY,false);
   let curPreset = 0, dirty = false;
   { const l=LS.get(LKEY,0); if(Number.isInteger(l) && l>=0 && l<PRESETS.length) curPreset=l; }
@@ -916,7 +936,7 @@
   $('favOnly').addEventListener('click',()=>{ favOnly=!favOnly; LS.set(FOKEY,favOnly); drawList(); });
 
   const pName=$('pName');
-  function persistUser(){ USER=PRESETS.filter(p=>!p.factory); return LS.set(UKEY,USER); }
+  function persistUser(){ USER=PRESETS.filter(p=>!p.factory); const ok=LS.set(UKEY,USER); if(typeof cloudSoon==='function') cloudSoon(); return ok; }
   function snapshot(name){ const o={name:name}; PKEYS.forEach(k=>o[k]=P[k]); return o; }
   function cleanName(skip){
     const base=(pName.value||'').trim().toUpperCase().slice(0,18) || 'MEU PRESET'; let name=base, i=2;
@@ -936,6 +956,87 @@
   $('dNew').addEventListener('click',()=>{ const p=snapshot(cleanName()); PRESETS.push(p); const ok=persistUser(); loadPreset(PRESETS.length-1); doneSave(ok?'Preset salvo':'Não gravou neste navegador'); });
   $('dOver').addEventListener('click',()=>{ if(PRESETS[curPreset].factory) return; { const old=PRESETS[curPreset].name, nn=cleanName(curPreset); if(favs.delete(old)){ favs.add(nn); LS.set(FKEY,[...favs]); } PRESETS[curPreset]=snapshot(nn); } const ok=persistUser(); loadPreset(curPreset); doneSave(ok?'Preset atualizado':'Não gravou neste navegador'); });
   confirmTap($('dDel'),()=>{ if(PRESETS[curPreset].factory) return; if(favs.delete(PRESETS[curPreset].name)) LS.set(FKEY,[...favs]); PRESETS.splice(curPreset,1); persistUser(); loadPreset(Math.min(curPreset,PRESETS.length-1)); doneSave('Preset excluído'); });
+
+  // ====================== Nuvem (Supabase): presets em todos os aparelhos ======================
+  const SB_URL='https://hofrthndlstofytlapzk.supabase.co', SB_KEY='sb_publishable_Hmstttzx95SEN24Olsuk0g_AuPGnkX7', CKEY='aura_cloud_v1', CNKEY='aura_cloud_names_v1', ERKEY='aura_er_cache_v1';
+  let cloud = LS.get(CKEY,null); if(!cloud || typeof cloud!=='object' || !cloud.rt) cloud=null;
+  let cloudNames = new Set(asList(LS.get(CNKEY,[])).filter(x=>typeof x==='string')), cloudHash = {}, cloudTimer=0, cloudBusy=false, cloudNote='';
+  const J = o => JSON.stringify(o);
+  function saveSession(j,email){ cloud={email:email,at:j.access_token,rt:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1000}; LS.set(CKEY,cloud); }
+  async function authCall(grant,body){
+    const r=await fetch(SB_URL+'/auth/v1/token?grant_type='+grant,{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:J(body)});
+    if(!r.ok){ const e=new Error(r.status===400?'E-mail ou senha incorretos':'Falha no login ('+r.status+')'); e.status=r.status; throw e; }
+    return r.json();
+  }
+  async function cloudToken(){
+    if(!cloud) throw new Error('Sem login');
+    if(Date.now()<cloud.exp-60000) return;
+    try{ saveSession(await authCall('refresh_token',{refresh_token:cloud.rt}),cloud.email); }
+    catch(e){ if(e.status===400||e.status===401){ cloud=null; LS.set(CKEY,null); } throw new Error('Sessão expirada, entre de novo'); }
+  }
+  async function sb(path,opt){
+    await cloudToken(); opt=opt||{};
+    const r=await fetch(SB_URL+path,{method:opt.method||'GET',body:opt.body,headers:Object.assign({apikey:SB_KEY,Authorization:'Bearer '+cloud.at,'Content-Type':'application/json'},opt.headers||{})});
+    if(!r.ok) throw new Error('Nuvem respondeu '+r.status);
+    return r.status===204?null:r.json().catch(()=>null);
+  }
+  const userRow = p => { const d=Object.assign({},p); delete d.factory; return {name:p.name,data:d,updated_at:new Date().toISOString()}; };
+  async function cloudPull(){
+    const rows=asList(await sb('/rest/v1/aura_presets?select=name,data&order=name&limit=1000'));
+    const names=new Set(rows.map(r=>r.name)), er=[], got=[];
+    rows.forEach(r=>{ if(!r||!r.data||typeof r.data!=='object') return; if(r.data.er) er.push(Object.assign(norm(r.data),{factory:true})); else got.push(r); });
+    // apagados em outro aparelho: estavam na nuvem na última sincronização e sumiram
+    let changed=false; const before=USER.length;
+    USER=USER.filter(p=>!(cloudNames.has(p.name) && !names.has(p.name)));
+    if(USER.length!==before) changed=true;
+    got.forEach(r=>{ const q=norm(r.data); delete q.factory; cloudHash[r.name]=J(q); if(!USER.some(p=>p.name===r.name)){ USER.push(q); changed=true; } });
+    const key=J(er.map(p=>p.name)); const erChanged = key!==J(ER.map(p=>p.name));
+    if(erChanged){ ER=er; LS.set(ERKEY,ER); }
+    cloudNames=names; LS.set(CNKEY,[...names]);
+    if(changed||erChanged){ const cur=PRESETS[curPreset]?PRESETS[curPreset].name:null; LS.set(UKEY,USER); PRESETS=FACTORY.concat(ER,USER); const i=PRESETS.findIndex(p=>p.name===cur); curPreset=i>=0?i:0; LS.set(LKEY,curPreset); renderOled(); }
+    return {added:got.length, er:er.length};
+  }
+  async function cloudPush(){
+    const rows=USER.map(userRow).filter(r=>cloudHash[r.name]!==J(r.data));
+    if(rows.length) await sb('/rest/v1/aura_presets?on_conflict=owner,name',{method:'POST',body:J(rows),headers:{Prefer:'resolution=merge-duplicates,return=minimal'}});
+    rows.forEach(r=>{ cloudHash[r.name]=J(r.data); cloudNames.add(r.name); });
+    const have=new Set(USER.map(p=>p.name));
+    for(const n of [...cloudNames]){ if(!have.has(n) && !ER.some(p=>p.name===n)){ await sb('/rest/v1/aura_presets?name=eq.'+encodeURIComponent(n),{method:'DELETE'}); cloudNames.delete(n); delete cloudHash[n]; } }
+    LS.set(CNKEY,[...cloudNames]);
+    return rows.length;
+  }
+  async function cloudSync(){
+    if(!cloud || cloudBusy) return; cloudBusy=true; drawCloud('Sincronizando…');
+    try{ const r=await cloudPull(); const n=await cloudPush(); cloudNote='Sincronizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+(r.added?' · '+r.added+' baixado(s)':'')+(n?' · '+n+' enviado(s)':''); }
+    catch(e){ cloudNote='Erro: '+(e&&e.message||e); }
+    cloudBusy=false; drawCloud(); drawMenuSt();
+  }
+  function cloudSoon(){ if(!cloud) return; clearTimeout(cloudTimer); cloudTimer=setTimeout(async()=>{ if(cloudBusy){ cloudSoon(); return; } cloudBusy=true; try{ await cloudPush(); cloudNote='Enviado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }catch(e){ cloudNote='Erro ao enviar: '+(e&&e.message||e); } cloudBusy=false; drawCloud(); },1500); }
+  function drawCloud(msg){
+    const on=!!cloud; $('cloudIn').hidden=on; $('cloudOut').hidden=!on;
+    $('cloudSt').textContent=msg||(on?'Conectado como '+cloud.email+'. '+cloudNote:'Entre com o e-mail e a senha da sua conta na nuvem.');
+    $('mCloudSt').textContent=on?'CONECTADO':'DESCONECTADO';
+  }
+  $('mCloud').addEventListener('click',()=>{ closeD('dlgMenu'); drawCloud(); openD('dlgCloud'); if(cloud && !cloudBusy) cloudSync(); });
+  $('cLogin').addEventListener('click',async()=>{
+    const em=$('cEmail').value.trim(), pw=$('cPass').value; if(!em||!pw){ $('cloudSt').textContent='Preencha o e-mail e a senha.'; return; }
+    $('cloudSt').textContent='Entrando…';
+    try{ saveSession(await authCall('password',{email:em,password:pw}),em); $('cPass').value=''; await cloudSync(); }
+    catch(e){ $('cloudSt').textContent=(e&&e.message)||'Não foi possível entrar'; }
+  });
+  $('cPass').addEventListener('keydown',e=>{ if(e.key==='Enter') $('cLogin').click(); });
+  $('cLogout').addEventListener('click',()=>{ cloud=null; LS.set(CKEY,null); cloudNote=''; drawCloud(); });
+  $('cSync').addEventListener('click',cloudSync);
+  $('cEr').addEventListener('click',async()=>{
+    if(!cloud||cloudBusy) return; cloudBusy=true; drawCloud('Enviando…');
+    try{
+      const ex=FACTORY.slice(5).map(p=>{ const d=Object.assign({},p); delete d.factory; d.er=true; return {name:p.name,data:d,updated_at:new Date().toISOString()}; });
+      for(let i=0;i<ex.length;i+=40) await sb('/rest/v1/aura_presets?on_conflict=owner,name',{method:'POST',body:J(ex.slice(i,i+40)),headers:{Prefer:'resolution=merge-duplicates,return=minimal'}});
+      cloudNote=ex.length+' presets de fábrica extras enviados.';
+    }catch(e){ cloudNote='Erro: '+(e&&e.message||e); }
+    cloudBusy=false; cloudBusy=false; drawCloud();
+  });
+  if(cloud) setTimeout(cloudSync,2500);
 
   // ====================== Exportar e importar ======================
   function exportAll(){
