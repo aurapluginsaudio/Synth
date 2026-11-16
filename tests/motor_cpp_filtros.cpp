@@ -1,3 +1,4 @@
+#include <functional>
 #include "AuraEngine.h"
 #include <cstdio>
 using namespace aura;

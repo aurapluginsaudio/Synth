@@ -9,3 +9,6 @@ Requisitos: Python com Playwright (Chromium) e um servidor local na raiz do repo
 
 ## Paridade web e plugin
 O motor existe em dois lugares: `index.html` (AudioWorklet `AuraVoice`/`AuraComp`) e `vst/Source/AuraEngine.h`. Qualquer mudança de som precisa ser feita nos dois e conferida com a comparação acima.
+
+## Rodar tudo antes de publicar
+`tests/rodar_tudo.sh` executa os testes do motor (Node e C++) e da interface (Playwright) e mostra um resumo. `tests/ao_vivo.py` cobre o botão de pânico, o preset de emergência, o modo leve e a linha de efeitos do painel.

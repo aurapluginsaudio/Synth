@@ -476,6 +476,27 @@
     background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.20) 55%,rgba(255,255,255,.42) 57%,rgba(0,0,0,.12))}
   html:not(.light) .k.b::after{content:"";position:absolute;left:9%;right:9%;bottom:0;height:17%;border-radius:0 0 4px 4px;pointer-events:none;background:linear-gradient(180deg,#53555b,#1f2023)}
   @media (max-width:959px){ html:not(.light) .sec{border-left:0;border-bottom:1px solid rgba(233,228,212,.18)} }
+
+  /* ===== v9: linha de efeitos, alvos de toque maiores, estados ===== */
+  .fxpanel{flex-wrap:nowrap}
+  .fxpanel .sec{flex:1 1 0;min-width:0;padding-bottom:23px}
+  .fxpanel .sec>.ctrls{display:flex;align-items:flex-end;justify-content:center;gap:clamp(10px,1.6vw,26px);height:auto;flex-wrap:nowrap}
+  .fxpanel .ctrls .ctrls{flex:0 0 auto;gap:clamp(4px,.7vw,12px);align-items:flex-end}
+  .fxpanel .sel{flex:0 0 auto}
+  .fxb{min-width:62px;font-size:10px;letter-spacing:.1em}
+  html:not(.light) .fxb.on{color:var(--amber);border-color:var(--amber);box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(255,171,46,.3)}
+  body.noaudio #lPwr i{background:#ff6a3d;box-shadow:0 0 8px #ff6a3d}
+  #panicBtn{font-size:10px;letter-spacing:.12em;white-space:nowrap}
+  html:not(.light) #panicBtn{border-color:#c0452b;color:#ff8a6d}
+  html:not(.light) #panicBtn:active{background:#6b1f10}
+  @media (pointer:coarse){
+    .btn{min-height:38px} .pnav .btn{min-width:46px} .seg button{min-height:28px}
+    html:not(.light) .seg.lever.rk button,html:not(.light) .seg.lever.rk button.txt{height:21px}
+    html:not(.light) .kn label{font-size:10px;color:#f4efde}
+  }
+  html:not(.light) .sec h2{color:#f4efde}
+  @media (max-height:789px),(max-width:959px){ .fxpanel{display:none !important} }
+  @media (min-height:790px) and (min-width:960px){ :root{--k:clamp(34px,min(calc(5.2vw - 8px),calc((100vh - 560px)/6.6)),64px)} }
   [hidden]{display:none !important}
 </style>
 </head>
@@ -500,6 +521,7 @@
           <button id="pNext" class="btn" aria-label="Próximo preset">▶</button>
         </div>
         <div class="tools">
+          <button id="panicBtn" class="btn" title="Silenciar tudo (também: CC123)" aria-label="Pânico: silenciar tudo">■ PÂNICO</button>
           <button id="lockBtn" class="btn icon" title="Travar os controles da tela" aria-label="Travar controles"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
           <button id="menuBtn" class="btn icon" title="Ajustes" aria-label="Ajustes"><svg viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></button>
           <button id="fsBtn" class="btn icon" title="Modo tocar (tela cheia)" aria-label="Modo tocar"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
@@ -565,6 +587,11 @@
           <div class="sel"><div class="seg lever" data-key="ec" data-num><button data-v="0" class="txt nar">EXP</button><button data-v="1" class="txt nar">LIN</button></div><div class="cap2">CURVA</div></div>
         </div></div>
       </div>
+      <div class="sections fxpanel" id="fxRow">
+        <div class="sec"><h2>EFEITO 1</h2><div class="ctrls"><div class="sel"><button id="fxT1" class="btn fxb">OFF</button><div class="cap2">TIPO</div></div><div id="sec_fx1" class="ctrls"></div></div></div>
+        <div class="sec"><h2>EFEITO 2</h2><div class="ctrls"><div class="sel"><button id="fxT2" class="btn fxb">OFF</button><div class="cap2">TIPO</div></div><div id="sec_fx2" class="ctrls"></div></div></div>
+        <div class="sec"><h2>REVERB</h2><div class="ctrls"><div class="sel"><button id="fxT3" class="btn fxb">OFF</button><div class="cap2">REVERB</div></div><div id="sec_fx3" class="ctrls"></div></div></div>
+      </div>
     </div>
     <div class="arm" aria-hidden="true"><div class="plate"><b>AURA</b><small>SYNTH BASS</small></div></div>
     <div class="keysWrap">
@@ -581,7 +608,7 @@
   <div class="cheek"></div>
 </div>
 
-<div id="learnBar"><span id="learnTxt">Toque em um knob ou numa seta de preset.</span><button id="lHold" class="btn">HOLD</button><button id="lArp" class="btn">ARP</button><button id="learnDone" class="btn">Concluir</button></div>
+<div id="learnBar"><span id="learnTxt">Toque em um knob ou numa seta de preset.</span><button id="lHold" class="btn">HOLD</button><button id="lArp" class="btn">ARP</button><button id="lPanic" class="btn">PÂNICO</button><button id="lSafe" class="btn">SEGURO</button><button id="learnDone" class="btn">Concluir</button></div>
 
 <div class="dlg" id="dlgList" role="dialog" aria-modal="true" aria-label="Presets"><div class="box wide">
   <button class="x" data-close aria-label="Fechar">×</button>
@@ -661,6 +688,8 @@
     <button id="mLearn" class="btn row">Mapear knobs e botões</button>
     <button id="mMap" class="btn row">Ver mapeamentos…<em id="mMapSt">—</em></button>
     <button id="mClear" class="btn row">Limpar mapeamento</button>
+    <button id="mLite" class="btn row">Modo leve (poupa CPU)<em id="mLiteSt">AUTO</em></button>
+    <button id="mSafe" class="btn row">Preset de emergência</button>
     <button id="mVel" class="btn row">Sensibilidade ao toque<em id="mVelSt">—</em></button>
   </div>
   <button class="btn" data-close>Fechar</button>
@@ -890,7 +919,7 @@
 
   // ====================== Mapeamento MIDI (knobs e setas de preset) ======================
   const MAPKEY='aura_cc_map_v1', ACTKEY='aura_act_map_v1', RESERVED=[64,120,123];
-  const ACTS = {prev:{el:'pPrev',name:'PRESET ANTERIOR'}, next:{el:'pNext',name:'PRÓXIMO PRESET'}, hold:{el:'lHold',name:'HOLD'}, arp:{el:'lArp',name:'ARPEJADOR'}};
+  const ACTS = {prev:{el:'pPrev',name:'PRESET ANTERIOR'}, next:{el:'pNext',name:'PRÓXIMO PRESET'}, hold:{el:'lHold',name:'HOLD'}, arp:{el:'lArp',name:'ARPEJADOR'}, panic:{el:'lPanic',name:'PÂNICO'}, safe:{el:'lSafe',name:'PRESET DE EMERGÊNCIA'}};
   function cleanCC(m){ const o={}; if(m&&typeof m==='object') for(const c in m){ if(/^\d{1,3}$/.test(c) && +c<128 && KN[m[c]]) o[c]=m[c]; } return o; }
   function cleanAct(m){ const o={}; if(m&&typeof m==='object') for(const c in m){ if(/^[cn]\d{1,3}$/.test(c) && ACTS[m[c]]) o[c]=m[c]; } return o; }
   let ccMap = cleanCC(LS.get(MAPKEY,{})), actMap = cleanAct(LS.get(ACTKEY,{})), learnTarget=null;
@@ -928,10 +957,13 @@
   function clearTarget(){ learnTarget=null; document.querySelectorAll('.target').forEach(e=>e.classList.remove('target')); }
   function applyCC(cc,val){
     const k=KN[ccMap[cc]]; if(!k) return false;
-    P[k.id]=toVal(k,val/127); knobChanged(k); return true;
+    P[k.id]=toVal(k,val/127); pendK.add(k); if(!pendRaf) pendRaf=requestAnimationFrame(flushK); return true;
   }
+  const pendK=new Set(); let pendRaf=0;      // várias mensagens de CC por quadro viram uma só atualização de tela e de áudio
+  function flushK(){ pendRaf=0; const a=[...pendK]; pendK.clear(); a.forEach(k=>knobChanged(k)); }
   const lastCC = {}, lastActT = {};
-  function doAct(a){ if(a==='prev') stepPreset(-1); else if(a==='next') stepPreset(1); else if(a==='hold') setHold(!holdOn); else if(a==='arp') setArp(!arp.on); }
+  const liteOn=()=>G.lite===1||(G.lite!==2&&liteAuto); let liteAuto=false;
+  function doAct(a){ if(a==='prev') stepPreset(-1); else if(a==='next') stepPreset(1); else if(a==='hold') setHold(!holdOn); else if(a==='arp') setArp(!arp.on); else if(a==='panic') panicAll(); else if(a==='safe') safePreset(); }
   $('learnDone').addEventListener('click',()=>setLearn(false));
   drawMap();
 
@@ -1173,7 +1205,7 @@
 
   // ====================== Exportar e importar ======================
   function exportAll(){
-    const data={aura:1, origem:AURA_ID+' © '+AURA_ANO+' '+AURA_AUTOR, presets:USER, favs:[...favs], ccMap:ccMap, actMap:actMap, setlist:setlist};
+    const data={aura:1, ver:2, origem:AURA_ID+' © '+AURA_ANO+' '+AURA_AUTOR, presets:USER, favs:[...favs], ccMap:ccMap, actMap:actMap, setlist:setlist};
     try{
       const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:'application/json'}));
       a.download='aura-synth-bass-backup.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
@@ -1233,6 +1265,7 @@
         else{
           const txt=new TextDecoder().decode(buf); let j=null; try{ j=JSON.parse(txt); }catch(e){}
           if(j && j.aura){
+            if(j.ver>2) extra+=' · arquivo de versão mais nova: parâmetros desconhecidos foram ignorados';
             got=asList(j.presets).filter(p=>p&&typeof p==='object'&&typeof p.name==='string').slice(0,500);
             asList(j.favs).forEach(x=>{ if(typeof x==='string') favs.add(x); }); LS.set(FKEY,[...favs]);
             if(j.ccMap){ ccMap=cleanCC(j.ccMap); LS.set(MAPKEY,ccMap); } if(j.actMap){ actMap=cleanAct(j.actMap); LS.set(ACTKEY,actMap); } drawMap(); if(j.setlist){ setlist=asList(j.setlist).filter(x=>typeof x==='string').slice(0,200); saveSet(); } extra=' + ajustes';
@@ -1453,7 +1486,7 @@
   function initAudio(){
     if(ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
-    ctx = new AC({latencyHint:'interactive'});
+    ctx = new AC({latencyHint:'interactive'}); ctx.onstatechange=()=>audioState();
     amp = ctx.createGain(); amp.gain.value = 0;
     comp = ctx.createDynamicsCompressor();
     comp.threshold.value=-14; comp.knee.value=10; comp.ratio.value=5; comp.attack.value=0.004; comp.release.value=0.15;
@@ -1467,10 +1500,10 @@
     lfo = ctx.createOscillator(); lfoP = ctx.createGain(); lfoC = ctx.createGain(); lfoW = ctx.createGain();
     lfoP.gain.value = lfoC.gain.value = lfoW.gain.value = 0; lfo.connect(lfoP); lfo.connect(lfoC); lfo.connect(lfoW); lfo.start();
     atG = ctx.createGain(); atG.gain.value = 0; try{ const cs=ctx.createConstantSource(); cs.connect(atG); cs.start(); }catch(e){}
-    // delay em paralelo: o som direto não passa por ele, então não soma atraso
+    // delay em paralelo (antes dos efeitos, igual ao plugin): o som direto não passa por ele, então não soma atraso
     dly=ctx.createDelay(1.5); dlyW=ctx.createGain(); dlyW.gain.value=0; dlyFb=ctx.createGain(); dlyFb.gain.value=0;
     const dlp=ctx.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=4200;
-    const fxOut=buildFx(); fxOut.connect(pre); fxOut.connect(dly); dly.connect(dlp); dlp.connect(dlyFb); dlyFb.connect(dly); dlp.connect(dlyW); dlyW.connect(pre);
+    const fxOut=buildFx(); fxOut.connect(pre); master.connect(dly); dly.connect(dlp); dlp.connect(dlyFb); dlyFb.connect(dly); dlp.connect(dlyW); dlyW.connect(fx.i1);   // o eco passa pelos efeitos, como no plugin
     tone=ctx.createOscillator(); toneG=ctx.createGain(); tone.frequency.value=440; toneG.gain.value=0; tone.connect(toneG); toneG.connect(pre); tone.start();
     V = nativeVoice(); applyAll(); V.cut.forEach(p=>{ p.value=baseCut(); }); renderOled();
     if(ctx.audioWorklet && window.AudioWorkletNode){
@@ -1535,6 +1568,10 @@
       const k=1/Math.sqrt(e||1)*1.6; for(let i=0;i<len;i++) d[i]*=k; }
     fx.conv.buffer=buf; }
   function fxApply(init){
+    const sv=liteOn()?{d:FX.d,m:FX.m,rv:FX.rv}:null; if(sv){ FX.d=0; FX.m=0; FX.rv=0; }
+    try{ fxApplyCore(init); } finally{ if(sv) Object.assign(FX,sv); }
+  }
+  function fxApplyCore(init){
     if(!ctx||!fx.i1) return; const t=ctx.currentTime, S=(p,v,tc)=>p.setTargetAtTime(v,t,tc||0.02);
     // EFX1
     const d=FX.d|0; S(fx.dry1.gain,d===0||(d===3&&!fx.crush)?1:0);
@@ -2023,6 +2060,72 @@
   async function keepAwake(){ try{ if('wakeLock' in navigator && !wake){ wake=await navigator.wakeLock.request('screen'); wake.addEventListener('release',()=>{wake=null;}); } }catch(e){} }
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) allOff(); else if(ctx){ keepAwake(); if(ctx.state!=='running') ctx.resume().catch(()=>{}); } });
   if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+
+  // ====================== Estabilidade ao vivo ======================
+  function panicAll(){
+    allOff(); setBend(0); setMod(0);
+    if(ctx){ const t=ctx.currentTime;           // corta o rabo do delay e do reverb por um instante
+      try{ dlyFb.gain.cancelScheduledValues(t); dlyFb.gain.setTargetAtTime(0,t,0.01); dlyW.gain.setTargetAtTime(0,t,0.01); }catch(e){}
+      const sv=FX.rv; FX.rv=0; try{ fxApplyCore(); }catch(e){} FX.rv=sv;
+      setTimeout(()=>{ try{ applyAll(); fxApply(); }catch(e){} },700); }
+    say('TUDO SILENCIADO',1500);
+  }
+  $('panicBtn').addEventListener('click',panicAll);
+  function audioState(){ if(!ctx) return; const ok=ctx.state==='running'; document.body.classList.toggle('noaudio',!ok); if(!ok&&!document.hidden&&ctx.state!=='closed') say('ÁUDIO PAUSADO · TOQUE NA TELA',4000); else if(ok) renderOled(); }
+  const wake1=()=>{ if(ctx&&ctx.state!=='running'&&ctx.state!=='closed') ctx.resume().catch(()=>{}); };
+  ['pointerdown','touchend','keydown'].forEach(e=>document.addEventListener(e,wake1,{capture:true,passive:true}));
+  window.addEventListener('pageshow',()=>{ wake1(); keepAwake(); });
+  // monitor de CPU: se o relógio do áudio anda mais devagar que o relógio real, o motor está engasgando
+  let cpuT=0,cpuC=0,cpuStrike=0;
+  setInterval(()=>{
+    if(!ctx||ctx.state!=='running'||document.hidden){ cpuT=0; return; }
+    const n=performance.now(), c=ctx.currentTime;
+    if(cpuT){ const r=(c-cpuC)/((n-cpuT)/1000);
+      if(r<0.96){ if(++cpuStrike>=3 && !liteAuto && G.lite!==2 && G.lite!==1){ liteAuto=true; fxApply(); say('CPU ALTA · MODO LEVE',4500); drawLite(); } }
+      else if(cpuStrike>0) cpuStrike--; }
+    cpuT=n; cpuC=c; },1000);
+  const LITE_N=['AUTO','LIGADO','DESLIG.'];
+  function drawLite(){ $('mLiteSt').textContent=LITE_N[G.lite|0]+(G.lite===0&&liteAuto?' · ATIVO':''); }
+  $('mLite').addEventListener('click',()=>{ G.lite=((G.lite|0)+1)%3; liteAuto=false; cpuStrike=0; gSave(); drawLite(); fxApply(); say('MODO LEVE: '+LITE_N[G.lite],1800); });
+  $('menuBtn').addEventListener('click',drawLite); drawLite();
+  // preset de emergência: baixo simples e seguro, sem efeitos, que não depende da lista
+  function safePreset(){
+    PKEYS.forEach(k=>{ P[k]=DEF[k]; });
+    Object.assign(P,{wave:'sawtooth',pw1:0.5,oct:-1,lvl:0.85,l2:0,l3:0,nz:0,cut:0.5,res:0.1,fenv:1,kt:0.5,fa:0.002,fd:0.25,fs:0.2,a:0.003,d:0.3,s:0.85,r:0.12,glide:0,lp:0,lf:0,lw:0,vol:1.2,leg:1});
+    Object.assign(FX,{d:0,m:0,rv:0}); setArp(false); setHold(false); allOff(); setBend(0); setMod(0); fxApply();
+    KNOBS.forEach(drawKnob); drawSelectors(); applyAll(); retune(); setDirty(true); renderOled(); say('PRESET DE EMERGÊNCIA',2500);
+  }
+  $('mSafe').addEventListener('click',()=>{ closeD('dlgMenu'); safePreset(); });
+  window.__live={panicAll,safePreset,liteOn:()=>liteOn(),setLite:v=>{ G.lite=v; fxApply(); }};
+
+  // ====================== Linha de efeitos no painel ======================
+  { const TY={1:['OFF','DIST','FUZZ','CRUSH'],2:['OFF','CHORUS','FLANGER','PHASER','ANEL'],3:['OFF','ON']};
+    const KEYT={1:'d',2:'m',3:'rv'}, HOST={1:'sec_fx1',2:'sec_fx2',3:'sec_fx3'};
+    const DEFK=[[1,'dr','DRIVE',v=>Math.round(v*100)+'%'],[1,'dl','NÍVEL',v=>Math.round(v*100)+'%'],
+                [2,'mb','MIX',v=>Math.round(v*100)+'%'],[2,'mr','VELOC.',v=>expMap(v,0.05,8).toFixed(2)+' Hz'],[2,'md','PROF.',v=>Math.round(v*100)+'%'],
+                [3,'rm','TEMPO',v=>Math.round(v*100)+'%'],[3,'rl','NÍVEL',v=>Math.round(v*100)+'%']];
+    const fxK=[];
+    const upd=()=>{ fxSave(); fxApply(); drawFxRow(); drawMenuSt(); fxRows.forEach(r=>{ r.draw&&r.draw(); r.vis&&r.vis(); }); };
+    DEFK.forEach(([g,key,lab,fmt])=>{
+      const w=document.createElement('div'); w.className='kn sm';
+      w.innerHTML='<div class="dial"><div class="mk"></div><div class="cap"></div></div><label>'+lab+'</label><output></output>';
+      $(HOST[g]).appendChild(w);
+      const dial=w.querySelector('.dial'), cap=w.querySelector('.cap'), out=w.querySelector('output'); dial.tabIndex=0; dial.setAttribute('role','slider'); dial.setAttribute('aria-label','Efeito '+lab);
+      const draw=()=>{ cap.style.transform='rotate('+(-135+FX[key]*270)+'deg)'; out.textContent=fmt(FX[key]); };
+      let drag=false,y0=0,p0=0,last=0;
+      dial.addEventListener('pointerdown',e=>{ if(learnMode) return; const n=Date.now(); if(n-last<320){ FX[key]=FXD[key]; upd(); last=0; return; } last=n; drag=true; y0=e.clientY; p0=FX[key]; dial.setPointerCapture(e.pointerId); e.preventDefault(); });
+      dial.addEventListener('pointermove',e=>{ if(!drag) return; FX[key]=Math.min(1,Math.max(0,+(p0+(y0-e.clientY)/220).toFixed(3))); upd(); });
+      dial.addEventListener('keydown',e=>{ const d=(e.key==='ArrowUp'||e.key==='ArrowRight')?1:((e.key==='ArrowDown'||e.key==='ArrowLeft')?-1:0); if(!d) return; e.preventDefault(); FX[key]=Math.min(1,Math.max(0,+(FX[key]+d*0.02).toFixed(3))); upd(); });
+      const end=()=>{drag=false;}; dial.addEventListener('pointerup',end); dial.addEventListener('pointercancel',end);
+      fxK.push({g,draw,w});
+    });
+    window.drawFxRow=drawFxRow;
+    function drawFxRow(){ [1,2,3].forEach(g=>{ const b=$('fxT'+g), v=FX[KEYT[g]]|0; b.textContent=TY[g][v]; b.classList.toggle('on',v>0); });
+      fxK.forEach(k=>{ k.draw(); const v=FX[KEYT[k.g]]|0; k.w.style.opacity=v>0?'1':'.45'; }); }
+    [1,2,3].forEach(g=>$('fxT'+g).addEventListener('click',()=>{ const key=KEYT[g]; FX[key]=((FX[key]|0)+1)%TY[g].length; upd(); }));
+    drawFxRow();
+    const oldUp=window.__fx; if(oldUp) oldUp.drawFxRow=drawFxRow;
+  }
 
   drawSelectors(); renderOled();
 })();
