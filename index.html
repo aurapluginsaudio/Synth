@@ -497,6 +497,64 @@
   html:not(.light) .sec h2{color:#f4efde}
   @media (max-height:789px),(max-width:959px){ .fxpanel{display:none !important} }
   @media (min-height:790px) and (min-width:960px){ :root{--k:clamp(34px,min(calc(5.2vw - 8px),calc((100vh - 560px)/6.6)),64px)} }
+
+  /* ===== v10: Ajustes no estilo iOS (só este menu) ===== */
+  #dlgMenu{background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  #dlgMenu .box.ios{--ig:#1c1c1e;--ib:rgba(255,255,255,.09);--it:#f5f5f7;--is:#98989f;--ibg:rgba(18,18,20,.9);--ifield:#2c2c2e;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    width:min(540px,100%);padding:0 16px 22px;border-radius:18px;background:var(--ibg);-webkit-backdrop-filter:saturate(1.6) blur(28px);backdrop-filter:saturate(1.6) blur(28px);
+    border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.65);color:var(--it);animation:iosIn .22s ease-out}
+  html.light #dlgMenu .box.ios{--ig:#fff;--ib:rgba(0,0,0,.09);--it:#111;--is:#6c6c70;--ibg:rgba(242,242,247,.92);--ifield:rgba(118,118,128,.12);border-color:rgba(0,0,0,.1)}
+  @keyframes iosIn{from{transform:translateY(18px) scale(.985);opacity:0}to{transform:none;opacity:1}}
+  .ios-bar{position:sticky;top:0;z-index:3;display:flex;justify-content:flex-end;padding:12px 0 2px;margin:0 -16px;padding-right:16px;background:linear-gradient(var(--ibg) 70%,transparent)}
+  .dlg .ios-done{width:auto;margin:0;min-height:36px;padding:0 16px;border:0;border-radius:18px;background:var(--ifield);color:var(--amber);font-family:inherit;font-size:16px;font-weight:600;line-height:1;text-transform:none;letter-spacing:0;box-shadow:none;text-shadow:none;background-image:none}
+  .dlg .ios-title{margin:2px 0 10px;font-size:34px;line-height:1.1;font-weight:700;letter-spacing:-.4px;color:var(--it)}
+  .dlg .ios-search{font:inherit;font-family:inherit;font-size:17px;padding:9px 12px 9px 34px;border-radius:10px;border:0;background:var(--ifield) url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M16 16l4.5 4.5'/%3E%3C/svg%3E") 10px 50%/16px no-repeat;color:var(--it);margin-bottom:6px}
+  .dlg .ios-search::placeholder{color:var(--is)}
+  .dlg .ios-s h4{margin:22px 0 7px 16px;font-size:13px;font-weight:400;letter-spacing:.2px;text-transform:uppercase;color:var(--is)}
+  .ios-g{background:var(--ig);border-radius:12px;overflow:hidden}
+  .dlg .ios-g .btn.row{display:flex;flex-direction:row;align-items:center;gap:12px;width:100%;margin:0;min-height:50px;padding:0 14px 0 14px;border:0;border-radius:0;background-color:transparent;box-shadow:none;
+    color:var(--it);font-family:inherit;font-size:17px;font-weight:400;line-height:1.2;text-transform:none;letter-spacing:0;text-align:left;text-shadow:none;white-space:normal;position:relative;background-image:none}
+  .dlg .ios-g .btn.row:not(:first-child){background-image:linear-gradient(var(--ib),var(--ib));background-repeat:no-repeat;background-position:54px 0;background-size:calc(100% - 54px) 1px}
+  .dlg .ios-g .btn.row:active{background-color:rgba(128,128,128,.22)}
+  .dlg .ios-g .btn.row::before{content:"";flex:0 0 28px;width:28px;height:28px;border-radius:7px}
+  .dlg .ios-g .btn.row em{margin:0 0 0 auto;padding-right:18px;font-style:normal;font-size:16px;font-weight:400;text-transform:none;letter-spacing:0;opacity:1;color:var(--is);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48%;position:relative}
+  .dlg .ios-g .btn.row em::after{content:"";position:absolute;right:0;top:50%;width:7px;height:7px;margin-top:-4px;border-right:2px solid #5c5c62;border-top:2px solid #5c5c62;transform:rotate(45deg)}
+  .dlg .ios-g .btn.row em#mVelSt,.dlg .ios-g .btn.row em#mBleSt,.dlg .ios-g .btn.row em#mMidiSt{color:var(--amber);font-size:16px}
+  .dlg .ios-g .btn.row.danger{color:#ff453a;background-color:transparent}
+  .dlg .ios-g .btn.row.armed{background-color:#ff453a;color:#fff}
+  .dlg .ios-g .btn.row[hidden]{display:none}
+  .ios-s[hidden]{display:none}
+  .dlg .ios-f{margin:8px 16px 0;font-size:13px;line-height:1.4;color:var(--is)}
+  .dlg #engineInfo,.dlg .about{color:var(--is);font-size:12px;margin:14px 16px 0}
+  .dlg .about{text-align:center;margin-top:10px}
+  @media (max-width:640px),(max-aspect-ratio:1/1) and (max-width:900px){
+    #dlgMenu{align-items:flex-end;padding:0}
+    #dlgMenu .box.ios{width:100%;max-height:calc(92vh / var(--dz,1));border-radius:18px 18px 0 0;animation:iosUp .26s ease-out;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+    @keyframes iosUp{from{transform:translateY(100%)}to{transform:none}}
+  }
+  #mSave::before{background:#0a84ff url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v10m0 0l-4-4m4 4l4-4M5 19h14'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mImport::before{background:#0a84ff url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V4m0 0L8 8m4-4l4 4M5 14v5h14v-5'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mExport::before{background:#0a84ff url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11m0-11L8 8m4-4l4 4M5 14v5h14v-5'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mSet::before{background:#0a84ff url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7h14M5 12h14M5 17h9'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mCloud::before{background:#32ade6 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 18a4 4 0 0 1-.5-8 5.5 5.5 0 0 1 10.6 1.3A3.4 3.4 0 0 1 17 18z'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mFx::before{background:#ff9f0a url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM18 16l.8 2.2L21 19l-2.2.8L18 22l-.8-2.2L15 19l2.2-.8z'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mDly::before{background:#ff9f0a url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12h3l2-6 3 12 3-9 2 3h5'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mArp::before{background:#ff9f0a url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l4-5 4 3 4-8 4 6'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mAdv::before{background:#ff9f0a url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7h8M17 7h2M5 12h2M11 12h8M5 17h11M20 17h-1M15 5v4M9 10v4M18 15v4'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mTheme::before{background:#8e8e93 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4a8 8 0 1 0 0 16z'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mPrio::before{background:#30d158 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 18V8m6 10V5m6 13v-7'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mVelD::before{background:#30d158 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 20v-6l-3-3V6a1.5 1.5 0 0 1 3 0v4m0-1.5a1.5 1.5 0 0 1 3 0V10m0-1a1.5 1.5 0 0 1 3 0v3.5a6 6 0 0 1-2 4.5V20'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mVel::before{background:#30d158 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 18a8 8 0 0 1 16 0M12 18l4-6'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mAt::before{background:#30d158 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M5 12h14M8 8l8 8M16 8l-8 8'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mHold::before{background:#30d158 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 5v14M16 5v14'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mLite::before{background:#ffd60a url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 3L5 13h6l-1 8 8-10h-6z'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mSafe::before{background:#ff453a url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mBle::before{background:#5e5ce6 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 8l10 8-5 4V4l5 4-10 8'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mMidi::before{background:#5e5ce6 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9h16v9H4zM8 9V5m8 4V5M8 14h.01M12 14h.01M16 14h.01'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mLearn::before{background:#bf5af2 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 12m-8 0a8 8 0 1 0 16 0a8 8 0 1 0-16 0M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mMap::before{background:#bf5af2 url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l5-2 6 2 5-2v14l-5 2-6-2-5 2zM9 4v14M15 6v14'/%3E%3C/svg%3E") center/17px 17px no-repeat}
+  #mClear::before{background:#ff453a url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12'/%3E%3C/svg%3E") center/17px 17px no-repeat}
   [hidden]{display:none !important}
 </style>
 </head>
@@ -655,45 +713,44 @@
   <p>Para mudar um mapeamento, use “Mapear knobs e botões” no menu.</p>
 </div></div>
 
-<div class="dlg" id="dlgMenu" role="dialog" aria-modal="true" aria-label="Ajustes"><div class="box wide">
-  <button class="x" data-close aria-label="Fechar">×</button>
-  <h3>AJUSTES</h3>
-  <h4>PRESETS</h4>
-  <div class="grid2">
-    <button id="mSave" class="btn row">Salvar preset…</button>
-    <button id="mImport" class="btn row">Importar arquivos…<em>.syx .mdp .json</em></button>
-    <button id="mExport" class="btn row">Exportar backup</button>
-    <button id="mSet" class="btn row">Setlist…<em id="mSetSt">—</em></button>
-    <button id="mCloud" class="btn row">Nuvem…<em id="mCloudSt">—</em></button>
-  </div>
-  <h4>SOM</h4>
-  <div class="grid2">
-    <button id="mDly" class="btn row">Delay…<em id="mDlySt">—</em></button>
-    <button id="mArp" class="btn row">Arpejador…<em id="mArpSt">—</em></button>
-    <button id="mTheme" class="btn row">Tema<em id="mThemeSt">—</em></button>
-    <button id="mFx" class="btn row">Efeitos…<em id="mFxSt">—</em></button>
-    <button id="mAdv" class="btn row">Avançado…<em id="mAdvSt">—</em></button>
-  </div>
-  <h4>TOQUE</h4>
-  <div class="grid2">
-    <button id="mPrio" class="btn row">Prioridade de nota<em id="mPrioSt">—</em></button>
-    <button id="mVelD" class="btn row">Força da tecla<em id="mVelDSt">—</em></button>
-    <button id="mAt" class="btn row">Aftertouch<em id="mAtSt">—</em></button>
-    <button id="mHold" class="btn row">Hold<em id="mHoldSt">—</em></button>
-  </div>
-  <h4>CONTROLADOR</h4>
-  <div class="grid2">
-    <button id="mBle" class="btn row">Bluetooth<em id="mBleSt">—</em></button>
-    <button id="mMidi" class="btn row">USB / MIDI do sistema<em id="mMidiSt">—</em></button>
-    <button id="mLearn" class="btn row">Mapear knobs e botões</button>
-    <button id="mMap" class="btn row">Ver mapeamentos…<em id="mMapSt">—</em></button>
-    <button id="mClear" class="btn row">Limpar mapeamento</button>
-    <button id="mLite" class="btn row">Modo leve (poupa CPU)<em id="mLiteSt">AUTO</em></button>
-    <button id="mSafe" class="btn row">Preset de emergência</button>
-    <button id="mVel" class="btn row">Sensibilidade ao toque<em id="mVelSt">—</em></button>
-  </div>
-  <button class="btn" data-close>Fechar</button>
-  <p>Gire os knobs arrastando para cima e para baixo. Toque duplo volta ao valor salvo, marcado pelo ponto vermelho. Toque no visor para abrir a lista de presets. Pitch bend: +2 semitons acima, −12 abaixo. A roda MOD (CC1) adiciona vibrato. O cadeado trava os controles da tela.</p>
+<div class="dlg" id="dlgMenu" role="dialog" aria-modal="true" aria-label="Ajustes"><div class="box wide ios">
+  <div class="ios-bar"><button class="ios-done" data-close>OK</button></div>
+  <h3 class="ios-title">Ajustes</h3>
+  <input id="mSearch" class="ios-search" type="search" placeholder="Buscar ajuste" aria-label="Buscar ajuste" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <section class="ios-s"><h4>Presets</h4><div class="ios-g">
+      <button id="mSave" class="btn row">Salvar preset</button>
+      <button id="mImport" class="btn row">Importar arquivos<em id="mImpSt">.syx .mdp .json</em></button>
+      <button id="mExport" class="btn row">Exportar backup</button>
+      <button id="mSet" class="btn row">Setlist<em id="mSetSt">—</em></button>
+      <button id="mCloud" class="btn row">Nuvem<em id="mCloudSt">—</em></button>
+  </div></section>
+  <section class="ios-s"><h4>Som e aparência</h4><div class="ios-g">
+      <button id="mFx" class="btn row">Efeitos<em id="mFxSt">—</em></button>
+      <button id="mDly" class="btn row">Delay<em id="mDlySt">—</em></button>
+      <button id="mArp" class="btn row">Arpejador<em id="mArpSt">—</em></button>
+      <button id="mAdv" class="btn row">Avançado<em id="mAdvSt">—</em></button>
+      <button id="mTheme" class="btn row">Tema<em id="mThemeSt">—</em></button>
+  </div></section>
+  <section class="ios-s"><h4>Toque</h4><div class="ios-g">
+      <button id="mPrio" class="btn row">Prioridade de nota<em id="mPrioSt">—</em></button>
+      <button id="mVelD" class="btn row">Força da tecla<em id="mVelDSt">—</em></button>
+      <button id="mVel" class="btn row">Sensibilidade ao toque<em id="mVelSt">—</em></button>
+      <button id="mAt" class="btn row">Aftertouch<em id="mAtSt">—</em></button>
+      <button id="mHold" class="btn row">Hold<em id="mHoldSt">—</em></button>
+  </div></section>
+  <section class="ios-s"><h4>Ao vivo</h4><div class="ios-g">
+      <button id="mLite" class="btn row">Modo leve (poupa CPU)<em id="mLiteSt">AUTO</em></button>
+      <button id="mSafe" class="btn row">Preset de emergência</button>
+  </div><div class="ios-f">O modo leve desliga reverb e efeitos quando o aparelho não dá conta. O preset de emergência carrega um baixo simples e seguro.</div></section>
+  <section class="ios-s"><h4>Controlador</h4><div class="ios-g">
+      <button id="mBle" class="btn row">Bluetooth<em id="mBleSt">—</em></button>
+      <button id="mMidi" class="btn row">USB / MIDI do sistema<em id="mMidiSt">—</em></button>
+      <button id="mLearn" class="btn row">Mapear knobs e botões</button>
+      <button id="mMap" class="btn row">Ver mapeamentos<em id="mMapSt">—</em></button>
+      <button id="mClear" class="btn row danger">Limpar mapeamento</button>
+  </div></section>
+  <div id="mNone" class="ios-f" hidden>Nenhum ajuste encontrado.</div>
+  <p class="ios-f">Gire os knobs arrastando para cima e para baixo. Toque duplo volta ao valor salvo, marcado pelo ponto vermelho. Toque no visor para abrir a lista de presets. Pitch bend: +2 semitons acima, −12 abaixo. A roda MOD (CC1) adiciona vibrato. O cadeado trava os controles da tela.</p>
   <p id="engineInfo"></p>
   <p class="about">AURA SYNTH BASS · criado por Thiago R. Galvão · © 2026 · Todos os direitos reservados</p>
   <input id="fileIn" type="file" accept=".syx,.mdp,.json,application/json" multiple hidden>
@@ -2125,6 +2182,14 @@
     [1,2,3].forEach(g=>$('fxT'+g).addEventListener('click',()=>{ const key=KEYT[g]; FX[key]=((FX[key]|0)+1)%TY[g].length; upd(); }));
     drawFxRow();
     const oldUp=window.__fx; if(oldUp) oldUp.drawFxRow=drawFxRow;
+  }
+
+  // busca nos Ajustes
+  { const inp=$('mSearch'), norm=t=>String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    inp.addEventListener('input',()=>{ const q=norm(inp.value.trim()); let any=false;
+      document.querySelectorAll('#dlgMenu .ios-s').forEach(sec=>{ let n=0; sec.querySelectorAll('.btn.row').forEach(r=>{ const on=!q||norm(r.textContent).includes(q); r.hidden=!on; if(on) n++; }); sec.hidden=!n; if(n) any=true; });
+      $('mNone').hidden=any||!q; });
+    $('menuBtn').addEventListener('click',()=>{ inp.value=''; inp.dispatchEvent(new Event('input')); const bx=document.querySelector('#dlgMenu .box'); if(bx) bx.scrollTop=0; });
   }
 
   drawSelectors(); renderOled();
