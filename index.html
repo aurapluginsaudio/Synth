@@ -339,6 +339,16 @@
   html:not(.light) .dlg p,html:not(.light) .dlg h4{color:#9aa1ab}
   html:not(.light) .dlg .x{background:#34373c}
   html:not(.light) .fxrow{color:var(--ink)}
+
+  /* madeira nas laterais (de volta) */
+  .cheek{
+    background:
+      linear-gradient(90deg,rgba(0,0,0,.55) 0,rgba(0,0,0,0) 22%,rgba(255,225,180,.20) 48%,rgba(0,0,0,0) 72%,rgba(0,0,0,.6) 100%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='900' preserveAspectRatio='none'><filter id='w' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.32 0.006' numOctaves='5' seed='11'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.07  0 0 0 0 0.02  2.6 0 0 0 -0.75'/></filter><filter id='p' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.9 0.05' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.04  0 0 0 0 0.01  0.9 0 0 0 -0.38'/></filter><rect width='100%' height='100%' fill='%238b5427'/><rect width='100%' height='100%' filter='url(%23w)'/><rect width='100%' height='100%' filter='url(%23p)'/></svg>") center/100% 100%,
+      #6b3f1f;
+    box-shadow:inset 0 2px 2px rgba(255,220,170,.35),inset 0 -3px 4px rgba(0,0,0,.6)}
+  :root{--cheek:clamp(16px,2.4vw,34px)}
+  html:not(.light) .cheek{background-blend-mode:normal;filter:brightness(.62) saturate(.9)}
 </style>
 </head>
 <body>
