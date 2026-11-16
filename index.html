@@ -612,14 +612,15 @@
                lr:5.5, lwv:'triangle', lp:0, lf:0, lw:0,
                fa:0.002, fd:0.3, fs:0, fr:0.2, a:0.004, d:0.3, s:1, r:0.1, leg:1, vol:1.3,
                l3:0, w3:'sawtooth', o3:0, d3:0, k3:1, nc:0, ovl:0, lsr:0, ec:0, dt:0.3, df:0.35, dm:0,
-               mm:0, ma:0, mb:1, mx:0.5, mo:1, mf:1, e1:1, e2:1, e3:1, kts:0, rg:0, un:0, ud:0.4};
+               mm:0, ma:0, mb:1, mx:0.5, mo:1, mf:1, e1:1, e2:1, e3:1, kts:0, rg:0, un:0, ud:0.4,
+               fm:0, fk:0, l2r:4, l2w:0, l2d:0, l2k:0, l2f:0, l2p:0, l2m:0, of:0, pwe:0, pe:0};
   const PKEYS = Object.keys(DEF);
   // limites de cada parâmetro: qualquer preset (de fábrica, salvo ou importado) passa por aqui antes de chegar ao motor de som
-  const LIM = {pw1:[0.05,0.5], pw2:[0.05,0.5], lvl:[0,1], l2:[0,1], sub:[0,1], nz:[0,1], cut:[0,1], res:[0,1], kt:[0,1], drv:[0,1], fs:[0,1], s:[0,1], lw:[0,1], ud:[0,1],
+  const LIM = {pw1:[0.05,0.5], pw2:[0.05,0.5], lvl:[0,1], l2:[0,1], sub:[0,1], nz:[0,1], cut:[0,1], res:[0,1], kt:[0,1], drv:[0,1], fs:[0,1], s:[0,1], lw:[0,1], ud:[0,1], l2r:[0.05,30], l2d:[0,3], l2f:[0,1], l2p:[0,1], l2m:[0,1], of:[0,1], pwe:[0,1], pe:[0,1],
                d2:[-7,7], fenv:[0,4], glide:[0,0.4], pa:[0,48], pd:[0.01,1.5], lr:[0.1,30], lp:[0,12], lf:[0,3],
                fa:[0.002,1], a:[0.002,1], fd:[0.02,2], d:[0.02,2], fr:[0.02,2], r:[0.02,2], vol:[0,3],
                l3:[0,1], d3:[-7,7], ovl:[0,1], dt:[0.02,1], df:[0,0.9], dm:[0,1], mx:[0,1]};
-  const LIMI = {oct:[-3,1], o2:[-2,3], sync:[0,1], sw:[0,1], leg:[0,1], pol:[1,4], o3:[-3,3], k3:[0,1], nc:[0,1], lsr:[0,2], ec:[0,1], mm:[0,1], ma:[0,1], mb:[0,1], mo:[0,1], mf:[0,1], e1:[0,1], e2:[0,1], e3:[0,1], kts:[0,1], rg:[0,1], un:[0,3]};
+  const LIMI = {oct:[-3,1], o2:[-2,3], sync:[0,1], sw:[0,1], leg:[0,1], pol:[1,4], o3:[-3,3], k3:[0,1], nc:[0,1], lsr:[0,2], ec:[0,1], mm:[0,1], ma:[0,1], mb:[0,1], mo:[0,1], mf:[0,1], e1:[0,1], e2:[0,1], e3:[0,1], kts:[0,1], rg:[0,1], un:[0,3], fm:[0,2], fk:[0,1], l2w:[0,3], l2k:[0,1]};
   const WAVES=['square','sawtooth','triangle','rsaw','tsaw'];
   const ENUM = {wave:WAVES, w2:WAVES, w3:WAVES, lwv:['triangle','square']};
   function norm(p){
@@ -1143,11 +1144,12 @@
       {name:'lfoin',defaultValue:0,automationRate:'a-rate'} ]; }
     constructor(){ super(); this.p1=0; this.p2=0; this.ps=0; this.p3=0; this.y1=0; this.y2=0; this.y3=0; this.y4=0;
       this.b0=0; this.b1=0; this.b2=0; this.hx=0; this.hy=0; this.mv=0; this.shT=0; this.shV=0; this.ha=Math.exp(-6.283185307*25/sampleRate);
-      this.c={w1:2,w2:1,pw1:.5,pw2:.5,ratio:1,sync:0,l1:.75,l2:0,ls:0,sm:0,nz:0,res:0,drv:0,pol:4,w3:1,r3:1,fx3:5,k3:1,l3:0,nc:0,ovl:0,lsr:0,lp:0,lf:0,lw:0,lr:5,mm:0,ma:0,mb:1,mx:.5,mo:1,mf:1,md:0,xl:0,xm:0,xthr:.15,rg:0,un:0,ud:0};
+      this.c={w1:2,w2:1,pw1:.5,pw2:.5,ratio:1,sync:0,l1:.75,l2:0,ls:0,sm:0,nz:0,res:0,drv:0,pol:4,w3:1,r3:1,fx3:5,k3:1,l3:0,nc:0,ovl:0,lsr:0,lp:0,lf:0,lw:0,lr:5,mm:0,ma:0,mb:1,mx:.5,mo:1,mf:1,md:0,xl:0,xm:0,xthr:.15,rg:0,un:0,ud:0,fm:0,fk:0,l2r:4,l2w:0,l2d:0,l2k:0,l2f:0,l2p:0,l2m:0,of:0,pwe:0,pr:0};
+      this.q2p=0; this.q2s=0; this.q2t=1e9;
       this.pu=[0,0,0]; this.ur=[1,1,1];
       this.mvm=0; this.n0=0; this.n1=0; this.n2=0; this.rd=0; this.xe=0; this.xtr=0; this.xh=0;
       this.m={l1:.75,l2:0,ls:0,nz:0,l3:0,ovl:0,res:0,drv:0,first:true};     // valores suavizados, para não estalar ao girar um knob
-      this.port.onmessage=e=>{ Object.assign(this.c,e.data); }; }
+      this.port.onmessage=e=>{ const d=e.data; if(d.l2n){ this.q2t=0; if(this.c.l2k) this.q2p=0; return; } Object.assign(this.c,d); }; }
     blep(t,dt){ if(t<dt){ t/=dt; return t+t-t*t-1; } if(t>1-dt){ t=(t-1)/dt; return t*t+t+t+1; } return 0; }
     osc(w,p,dt,pw){
       if(w===0) return 1-4*Math.abs(p-0.5);
@@ -1162,6 +1164,7 @@
       const F=pr.freq, D=pr.detune, PT=pr.pitch, C=pr.cutoff, CM=pr.cutmod, PW=pr.pwmod, FE=pr.fe, LI=pr.lfoin;
       let p1=this.p1,p2=this.p2,ps=this.ps,p3=this.p3,y1=this.y1,y2=this.y2,y3=this.y3,y4=this.y4,b0=this.b0,b1=this.b1,b2=this.b2,hx=this.hx,hy=this.hy,mv=this.mv,shT=this.shT,shV=this.shV;
       const lsr=c.lsr|0, ha=this.ha, mm=c.mm|0, md=c.md, gA=Math.min(1,2*(1-c.mx)), gB=Math.min(1,2*c.mx), mo=c.mo, mf=c.mf;
+      let q2p=this.q2p, q2s=this.q2s, q2t=this.q2t;
       let mvm=this.mvm, n0=this.n0, n1=this.n1, n2=this.n2, rd=this.rd, xe=this.xe, xtr=this.xtr, xh=this.xh;
       const rg=c.rg|0, un=Math.min(3,c.un|0), pu=this.pu, ur=this.ur, ug=1/Math.sqrt(1+un);
       for(let k=0;k<un;k++){ const off=(k%2?1:-1)*(Math.floor(k/2)+1)/Math.ceil((un+1)/2)*c.ud*40; ur[k]=Math.pow(2,off/1200); }
@@ -1169,14 +1172,16 @@
       const m=this.m; if(m.first){ m.first=false; m.l1=c.l1; m.l2=c.l2; m.ls=c.ls; m.nz=c.nz; m.l3=c.l3; m.ovl=c.ovl; m.res=c.res; m.drv=c.drv; }
       m.res+=0.35*(c.res-m.res); m.drv+=0.35*(c.drv-m.drv); m.ovl+=0.35*(c.ovl-m.ovl);
       const ovg=m.ovl*0.6;
-      const k=m.res*4.25, dg=1+m.drv*7, comp=1+k*0.55, og=1/(1+1.5*m.drv);
+      const acid=c.fk|0, fmo=c.fm|0, k=m.res*4.25, dg=1+m.drv*7, comp=acid?1+k*0.2:1+k*0.55, og=1/(1+1.5*m.drv), p12=c.pol<=2;
       let l1=m.l1, l2=m.l2, ls=m.ls, nz=m.nz, l3=m.l3;
       for(let i=0;i<n;i++){
         l1+=0.004*(c.l1-l1); l2+=0.004*(c.l2-l2); ls+=0.004*(c.ls-ls); nz+=0.004*(c.nz-nz); l3+=0.004*(c.l3-l3);
-        let cents=(D.length>1?D[i]:D[0])+(PT.length>1?PT[i]:PT[0]); if(lsr>0) cents+=mv*c.lp*100; else if(mm&&mo) cents+=mvm*md*(100+c.lp*100);
+        q2p+=c.l2r/sr; if(q2p>=1){ q2p-=1; q2s=Math.random()*2-1; } q2t+=1/sr;
+        const lw2=c.l2w|0, L2=(lw2===0?1-4*Math.abs(q2p-0.5):(lw2===1?2*q2p-1:(lw2===2?(q2p<0.5?1:-1):q2s)))*(c.l2d>0?Math.min(1,q2t/c.l2d):1);
+        let cents=(D.length>1?D[i]:D[0])+(PT.length>1?PT[i]:PT[0])+c.pr+L2*c.l2p*200; if(lsr>0) cents+=mv*c.lp*100; else if(mm&&mo) cents+=mvm*md*(100+c.lp*100);
         let f=(F.length>1?F[i]:F[0]); if(cents!==0) f*=Math.pow(2,cents/1200);
         const dt1=Math.min(f/sr,0.45), dt2=Math.min(f*c.ratio/sr,0.45);
-        const pm=(PW.length>1?PW[i]:PW[0])+(lsr>0?mv*c.lw*0.4:0)+((mm&&mo)?mvm*md*c.lw*0.4:0);
+        const pm=(FE.length>1?FE[i]:FE[0])*c.pwe*0.4+L2*c.l2m*0.4+(PW.length>1?PW[i]:PW[0])+(lsr>0?mv*c.lw*0.4:0)+((mm&&mo)?mvm*md*c.lw*0.4:0);
         p1+=dt1; let wrap=false; if(p1>=1){ p1-=1; wrap=true; }
         p2+=dt2; if(p2>=1) p2-=1;
         if(wrap && c.sync){ p2=p1*dt2/dt1; if(p2>=1) p2-=Math.floor(p2); }
@@ -1185,13 +1190,14 @@
         if(lsr===1) mv=s3; else if(lsr===2){ shT-=c.lr/sr; if(shT<=0){ shT+=1; shV=Math.random()*2-1; } mv=shV; }
         let s=0;
         const pw1v=Math.min(0.95,Math.max(0.05,c.pw1+pm)), pw2v=Math.min(0.95,Math.max(0.05,c.pw2+pm));
+        const o2s=(l2>1e-4||rg||c.of>0.001)?this.osc(c.w2,p2,dt2,pw2v):0;
         if(rg){      // anel (ring): OSC 1 x OSC 2, no nível do maior dos dois
-          if(l1>1e-4||l2>1e-4) s+=(l1>l2?l1:l2)*this.osc(c.w1,p1,dt1,pw1v)*this.osc(c.w2,p2,dt2,pw2v);
+          if(l1>1e-4||l2>1e-4) s+=(l1>l2?l1:l2)*this.osc(c.w1,p1,dt1,pw1v)*o2s;
         } else {
           if(l1>1e-4){ let o1=this.osc(c.w1,p1,dt1,pw1v);
             if(un>0){ for(let k=0;k<un;k++){ const dk=Math.min(dt1*ur[k],0.45); pu[k]+=dk; if(pu[k]>=1) pu[k]-=1; o1+=this.osc(c.w1,pu[k],dk,pw1v); } o1*=ug; }
             s+=l1*o1; }
-          if(l2>1e-4) s+=l2*this.osc(c.w2,p2,dt2,pw2v);
+          if(l2>1e-4) s+=l2*o2s;
         }
         if(ls>1e-4){
           if(c.sm){ ps+=dt1*0.5; if(ps>=1) ps-=1; s+=ls*0.75*((ps<0.5?1:-1)+this.blep(ps,dt1*0.5)-this.blep(ps<0.5?ps+0.5:ps-0.5,dt1*0.5)); }
@@ -1212,17 +1218,23 @@
         }
         s*=0.6;
         if(ovg>1e-4) s+=ovg*hy;
-        const cm=(CM.length>1?CM[i]:CM[0])+(lsr>0?mv*c.lf:0)+((mm&&mf)?mvm*md*(1+c.lf):0);
+        const cm=(CM.length>1?CM[i]:CM[0])+L2*c.l2f*2+o2s*c.of*2+(lsr>0?mv*c.lf:0)+((mm&&mf)?mvm*md*(1+c.lf):0);
         let fc=(C.length>1?C[i]:C[0]); if(cm!==0) fc*=Math.pow(2,cm);
         if(fc>sr*0.3) fc=sr*0.3; else if(fc<5) fc=5;
         const g=1-Math.exp(-6.283185307*fc/sr);
-        const x=1.4286*Math.tanh(0.7*s*dg)*comp-k*Math.tanh(y4)+1e-9*(Math.random()-0.5);
-        y1+=g*(x-y1); y2+=g*(y1-y2); y3+=g*(y2-y3); y4+=g*(y3-y4);
-        const ov=(c.pol===1?y1:(c.pol===2?y2:(c.pol===3?y3:y4)))*og; o[i]=ov;
+        const x=1.4286*Math.tanh(0.7*s*dg)*comp-k*(acid?0.85:1)*Math.tanh(y4)+1e-9*(Math.random()-0.5);
+        if(acid){ y1+=g*(Math.tanh(0.9*x)-Math.tanh(0.9*y1))*1.111; y2+=g*(Math.tanh(0.9*y1)-Math.tanh(0.9*y2))*1.111; y3+=g*(Math.tanh(0.9*y2)-Math.tanh(0.9*y3))*1.111; y4+=g*(Math.tanh(0.9*y3)-Math.tanh(0.9*y4))*1.111; }
+        else { y1+=g*(x-y1); y2+=g*(y1-y2); y3+=g*(y2-y3); y4+=g*(y3-y4); }
+        let fo;
+        if(acid) fo=y4;
+        else if(fmo===1) fo=p12?(y1-y2)*4:(y2-2*y3+y4)*16;        // passa-faixa (12 / 24 dB)
+        else if(fmo===2) fo=p12?(x-2*y1+y2):(x-4*y1+6*y2-4*y3+y4);   // passa-alta (12 / 24 dB)
+        else fo=c.pol===1?y1:(c.pol===2?y2:(c.pol===3?y3:y4));
+        const ov=fo*og; o[i]=ov;
         hy=ha*(hy+ov-hx); hx=ov;       // retorno da saída sem componente contínua (overload)
       }
       if(Math.abs(y4)<1e-18){ y1=y2=y3=y4=0; }
-      m.l1=l1; m.l2=l2; m.ls=ls; m.nz=nz; m.l3=l3;
+      m.l1=l1; m.l2=l2; m.ls=ls; m.nz=nz; m.l3=l3; this.q2p=q2p; this.q2s=q2s; this.q2t=q2t;
       this.b0=b0;this.b1=b1;this.b2=b2;this.hx=hx;this.hy=Math.abs(hy)<1e-18?0:hy;this.mv=mv;this.shT=shT;this.shV=shV;this.p3=p3; this.mvm=mvm; this.n0=n0; this.n1=n1; this.n2=n2; this.rd=rd; this.xe=xe; this.xtr=xtr; this.xh=xh;
       this.p1=p1;this.p2=p2;this.ps=ps;this.y1=y1;this.y2=y2;this.y3=y3;this.y4=y4; return true;
     }
@@ -1300,7 +1312,7 @@
       detune(c){ q('detune').value=c; },
       freq(fr,tc,now){ const t=ctx.currentTime, p=q('freq'); p.cancelScheduledValues(t); if(now) p.setValueAtTime(fr,t); else p.setTargetAtTime(fr,t,tc); },
       apply(){ node.port.postMessage({w1:WI[P.wave],w2:WI[P.w2],pw1:P.pw1,pw2:P.pw2,ratio:ratio2(),sync:P.sync?1:0,l1:P.lvl*P.e1,l2:P.l2*P.e2,ls:P.sub,sm:P.sw?1:0,nz:P.nz,res:P.res,drv:P.drv,pol:P.pol,
-        w3:WI[P.w3],r3:ratio3(),fx3:P.lr*Math.pow(2,P.d3/12),k3:P.k3,l3:P.l3*P.e3,nc:P.nc,ovl:P.ovl,lsr:P.mm?0:P.lsr,lp:P.lp,lf:P.lf,lw:P.lw,lr:P.lr,mm:P.mm,ma:P.ma,mb:P.mb,mx:P.mx,mo:P.mo,mf:P.mf,md:modDepth(),xl:G.xon?G.xlvl:0,xm:G.xmode,xthr:G.xthr,rg:P.rg,un:P.un,ud:P.ud}); },
+        w3:WI[P.w3],r3:ratio3(),fx3:P.lr*Math.pow(2,P.d3/12),k3:P.k3,l3:P.l3*P.e3,nc:P.nc,ovl:P.ovl,lsr:P.mm?0:P.lsr,lp:P.lp,lf:P.lf,lw:P.lw,lr:P.lr,mm:P.mm,ma:P.ma,mb:P.mb,mx:P.mx,mo:P.mo,mf:P.mf,md:modDepth(),xl:G.xon?G.xlvl:0,xm:G.xmode,xthr:G.xthr,rg:P.rg,un:P.un,ud:P.ud,fm:P.fm,fk:P.fk,l2r:P.l2r,l2w:P.l2w,l2d:P.l2d,l2k:P.l2k,l2f:P.l2f,l2p:P.l2p,l2m:P.l2m,of:P.of,pwe:P.pwe}); },
       pitchEnv(t){ const p=q('pitch'); p.cancelScheduledValues(t); if(P.pa>0.05){ p.setValueAtTime(P.pa*100,t); p.setTargetAtTime(0,t,Math.max(P.pd,0.01)/3); } else p.setValueAtTime(0,t); },
       kill(){}
     };
@@ -1491,14 +1503,15 @@
   }
   function retune(){ if(ctx && stack.length) setPitch(stack[stack.length-1], true); }
   const pickNote = () => !stack.length ? null : (prio===1 ? Math.min(...stack) : (prio===2 ? Math.max(...stack) : stack[stack.length-1]));
+  function noteStart(){ if(!V||!V.node) return; const pe=P.pe>0?(Math.random()*2-1)*P.pe*100:0; V.node.port.postMessage({l2n:1}); V.node.port.postMessage({pr:pe}); }
   function coreOn(n, vel, fromArp){
     if(!ctx) return; if(ctx.state!=='running') ctx.resume();
     held.delete(n); stack = stack.filter(x=>x!==n); stack.push(n);
     if(!fromArp) markKey(n,true);
     if(gate && pickNote()!==n) return;                    // prioridade grave/aguda: esta nota não assume a voz
     lastNote = n;
-    if(!gate){ setPitch(n,true); triggerEnv(vel||100); }
-    else if(!P.leg){ setPitch(n,false); triggerEnv(vel||100); }          // legato desligado: cada nota redispara os envelopes
+    if(!gate){ setPitch(n,true); noteStart(); triggerEnv(vel||100); }
+    else if(!P.leg){ setPitch(n,false); noteStart(); triggerEnv(vel||100); }          // legato desligado: cada nota redispara os envelopes
     else { setPitch(n,false); velApply(vel||100); trackFilter(); }
   }
   function coreOff(n, fromArp){ realOff(n, fromArp); }
@@ -1516,10 +1529,10 @@
 
   // ---- arpejador (configuração global, não faz parte do preset)
   const AKEY='aura_arp_v1', ADIV=[1,0.5,1/3,0.25], ADIVN=['1/4','1/8','1/8T','1/16'], APAT=['SOBE','DESCE','SOBE E DESCE','ALEATÓRIO','ORDEM'];
-  const arp = {on:false, pat:0, div:1, oct:1, bpm:100, gate:0.6, latch:false, notes:[], down:new Set(), k:0, cur:null, vel:100, t0:0, timer:0, gt:0};
+  const arp = {on:false, pat:0, div:1, oct:1, bpm:100, gate:0.6, sw:0, sc:0, latch:false, notes:[], down:new Set(), k:0, cur:null, vel:100, t0:0, timer:0, gt:0};
   { const sv=LS.get(AKEY,{}); if(sv && typeof sv==='object'){ const ri=(k,lo,hi)=>{ if(Number.isInteger(sv[k])&&sv[k]>=lo&&sv[k]<=hi) arp[k]=sv[k]; }; ri('pat',0,4); ri('div',0,3); ri('oct',1,3);
-    if(Number.isFinite(sv.bpm)) arp.bpm=Math.min(240,Math.max(40,sv.bpm)); if(Number.isFinite(sv.gate)) arp.gate=Math.min(0.95,Math.max(0.1,sv.gate)); arp.latch=!!sv.latch; } }
-  const arpSave = () => LS.set(AKEY,{pat:arp.pat,div:arp.div,oct:arp.oct,bpm:arp.bpm,gate:arp.gate,latch:arp.latch});
+    if(Number.isFinite(sv.bpm)) arp.bpm=Math.min(240,Math.max(40,sv.bpm)); if(Number.isFinite(sv.gate)) arp.gate=Math.min(0.95,Math.max(0.1,sv.gate)); arp.latch=!!sv.latch; if(Number.isFinite(sv.sw)) arp.sw=Math.min(1,Math.max(0,sv.sw)); } }
+  const arpSave = () => LS.set(AKEY,{pat:arp.pat,div:arp.div,oct:arp.oct,bpm:arp.bpm,gate:arp.gate,sw:arp.sw,latch:arp.latch});
   function arpSeq(){ const b=arp.pat===4?arp.notes.slice():arp.notes.slice().sort((a,c)=>a-c), o=[]; for(let i=0;i<arp.oct;i++) b.forEach(n=>o.push(n+12*i)); return o; }
   function arpIdx(L){
     const k=arp.k++;
@@ -1533,13 +1546,13 @@
   function arpTick(){
     arp.timer=0;
     if(!arp.on || !arp.notes.length){ arpSilence(); return; }
-    const sq=arpSeq(), n=sq[arpIdx(sq.length)], step=60000/arp.bpm*ADIV[arp.div];
+    const sq=arpSeq(), n=sq[arpIdx(sq.length)], step=60000/arp.bpm*ADIV[arp.div]*(1+(arp.sc++%2===0?1:-1)*arp.sw*0.33);
     if(arp.cur!==null){ const c=arp.cur; arp.cur=null; coreOff(c,true); }
     coreOn(n,arp.vel,true); arp.cur=n;
     clearTimeout(arp.gt); arp.gt=setTimeout(()=>{ if(arp.cur===n){ arp.cur=null; coreOff(n,true); } }, step*arp.gate);
     arp.t0+=step; arp.timer=setTimeout(arpTick, Math.max(0,arp.t0-performance.now()));
   }
-  function arpStart(){ if(arp.timer || !arp.on) return; arp.k=0; arp.t0=performance.now(); arpTick(); }
+  function arpStart(){ if(arp.timer || !arp.on) return; arp.k=0; arp.sc=0; arp.t0=performance.now(); arpTick(); }
   function arpPress(n,vel){
     if(!ctx) return; if(ctx.state!=='running') ctx.resume();
     if(arp.latch && arp.down.size===0) arp.notes=[];        // com trava, a nota nova substitui o grupo anterior
@@ -1596,6 +1609,7 @@
     arpRows.push(mkChips(b,'PADRÃO',APAT,()=>arp.pat,i=>{ arp.pat=i; arp.k=0; arpSave(); drawMenuSt(); }));
     arpRows.push(mkChips(b,'DIVISÃO',ADIVN,()=>arp.div,i=>{ arp.div=i; arpSave(); }));
     arpRows.push(mkChips(b,'OITAVAS',['1','2','3'],()=>arp.oct-1,i=>{ arp.oct=i+1; arpSave(); }));
+    arpRows.push(mkSlider(b,'SWING',()=>arp.sw,p=>Math.round(p*100)+'%',p=>{ arp.sw=+p.toFixed(2); arpSave(); }));
     arpRows.push(mkSlider(b,'ANDAMENTO',()=>(arp.bpm-40)/200,p=>Math.round(40+p*200)+' BPM',p=>{ arp.bpm=Math.round(40+p*200); arpSave(); }));
     arpRows.push(mkSlider(b,'DURAÇÃO',()=>(arp.gate-0.1)/0.85,p=>Math.round((0.1+p*0.85)*100)+'%',p=>{ arp.gate=+(0.1+p*0.85).toFixed(2); arpSave(); }));
     arpRows.push(mkChips(b,'TRAVA',['DESLIGADA','LIGADA'],()=>arp.latch?1:0,i=>{ arp.latch=i===1; if(!arp.latch && arp.down.size===0){ arp.notes=[]; arpSilence(); } arpSave(); })); }
@@ -1634,6 +1648,21 @@
     H('OSCILADORES E TECLADO');
     [['OSC 1','e1'],['OSC 2','e2'],['OSC 3','e3']].forEach(([n,k])=>advRows.push(mkChips(b,n,['MUDO','LIGADO'],()=>P[k],i=>{ P[k]=i; drawMutes(); pc(); })));
     advRows.push(mkChips(b,'TECLADO NO FILTRO',['CONTÍNUO','1/3 · 2/3 · TOTAL'],()=>P.kts,i=>{ P.kts=i; pc(); if(ctx&&gate) trackFilter(); }));
+    H('FILTRO (Bass Station II)');
+    advRows.push(mkChips(b,'TIPO',['CLÁSSICO','ÁCIDO (DIODO 4 POLOS)'],()=>P.fk,i=>{ P.fk=i; pc(); }));
+    advRows.push(mkChips(b,'FORMA (CLÁSSICO)',['PASSA-BAIXA','PASSA-FAIXA','PASSA-ALTA'],()=>P.fm,i=>{ P.fm=i; pc(); }));
+    advRows.push(mkSlider(b,'OSC 2 → FILTRO (FM)',()=>P.of,p=>Math.round(p*100)+'%',p=>{ P.of=+p.toFixed(3); pc(); }));
+    H('LFO 2');
+    advRows.push(mkSlider(b,'VELOCIDADE',()=>Math.log(P.l2r/0.05)/Math.log(600),p=>(0.05*Math.pow(600,p)).toFixed(2)+' Hz',p=>{ P.l2r=+(0.05*Math.pow(600,p)).toFixed(3); pc(); }));
+    advRows.push(mkChips(b,'ONDA',['TRIÂNGULO','SERRA','QUADRADA','S&H'],()=>P.l2w,i=>{ P.l2w=i; pc(); }));
+    advRows.push(mkSlider(b,'ATRASO (ENTRADA GRADUAL)',()=>P.l2d/3,p=>(p*3).toFixed(2)+' s',p=>{ P.l2d=+(p*3).toFixed(3); pc(); }));
+    advRows.push(mkChips(b,'REINICIAR A CADA TECLA',['NÃO','SIM'],()=>P.l2k,i=>{ P.l2k=i; pc(); }));
+    advRows.push(mkSlider(b,'→ FILTRO',()=>P.l2f,p=>Math.round(p*100)+'%',p=>{ P.l2f=+p.toFixed(3); pc(); }));
+    advRows.push(mkSlider(b,'→ PITCH (VIBRATO)',()=>P.l2p,p=>'±'+Math.round(p*200)+' cent',p=>{ P.l2p=+p.toFixed(3); pc(); }));
+    advRows.push(mkSlider(b,'→ LARGURA DE PULSO',()=>P.l2m,p=>Math.round(p*100)+'%',p=>{ P.l2m=+p.toFixed(3); pc(); }));
+    H('MODULAÇÕES (Bass Station II)');
+    advRows.push(mkSlider(b,'ENVELOPE → LARGURA DE PULSO',()=>P.pwe,p=>Math.round(p*100)+'%',p=>{ P.pwe=+p.toFixed(3); pc(); }));
+    advRows.push(mkSlider(b,'ERRO ALEATÓRIO DE AFINAÇÃO',()=>P.pe,p=>'±'+Math.round(p*100)+' cent',p=>{ P.pe=+p.toFixed(3); pc(); }));
     H('OSCILADORES (JD-Xi)');
     advRows.push(mkChips(b,'ANEL OSC1 × OSC2',['DESLIGADO','LIGADO'],()=>P.rg,i=>{ P.rg=i; pc(); }));
     advRows.push(mkChips(b,'UNÍSSONO (OSC 1)',['DESLIGADO','+1','+2','+3'],()=>P.un,i=>{ P.un=i; pc(); }));
