@@ -359,44 +359,43 @@
   .lamp.a.on i{background:radial-gradient(circle at 38% 32%,#fff1d0,#ffab2e 55%,#a85d00);box-shadow:0 0 0 2px #2c2e33,0 0 0 3px #000,0 0 10px 2px rgba(255,171,46,.75)}
   .lamp.r.on i{background:radial-gradient(circle at 38% 32%,#ffe0d6,#ff4a22 55%,#9a1a00);box-shadow:0 0 0 2px #2c2e33,0 0 0 3px #000,0 0 12px 3px rgba(255,74,34,.85)}
   html:not(.light) .leds{gap:clamp(6px,.7vw,12px);margin:0 auto 0 0} html:not(.light) .lamp b{font-size:7px;letter-spacing:.8px}
-  html.light .leds{display:none}
   @media (max-width:1359px),(max-height:560px){ .leds{display:none} }
 
-  html:not(.light) .panel{background:
+  html:not(.zz) .panel{background:
       repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,rgba(0,0,0,.02) 1px 3px),
       linear-gradient(100deg,rgba(255,255,255,0) 20%,rgba(255,255,255,.05) 36%,rgba(255,255,255,0) 52%,rgba(255,255,255,.025) 90%),
       linear-gradient(180deg,#1d1f23 0,#14161a 55%,#0e0f12 100%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -3px 0 rgba(0,0,0,.7),inset 0 0 0 1px #000}
-  html:not(.light) .sec h2{display:flex;align-items:center;gap:7px;color:#e9e4d4;border-bottom:0;box-shadow:none;padding:0 0 3px}
-  html:not(.light) .sec h2::before,html:not(.light) .sec h2::after{content:"";flex:1 1 0;height:2px;background:#d9d3c0;opacity:.85;border-radius:1px}
-  html:not(.light) .sec h2::before{flex:0 0 12px}
-  html:not(.light) .kn label,html:not(.light) .sel .cap2{color:#e9e4d4}
-  html:not(.light) .lamp b{color:#cfc9b6}
-  html:not(.light) .brand b{color:#e9e4d4}
+  html:not(.zz) .sec h2{display:flex;align-items:center;gap:7px;color:#e9e4d4;border-bottom:0;box-shadow:none;padding:0 0 3px}
+  html:not(.zz) .sec h2::before,html:not(.zz) .sec h2::after{content:"";flex:1 1 0;height:2px;background:#d9d3c0;opacity:.85;border-radius:1px}
+  html:not(.zz) .sec h2::before{flex:0 0 12px}
+  html:not(.zz) .kn label,html:not(.zz) .sel .cap2{color:#e9e4d4}
+  html:not(.zz) .lamp b{color:#cfc9b6}
+  html:not(.zz) .brand b{color:#e9e4d4}
   /* escala impressa 0–10 em volta dos knobs */
-  html:not(.light) .kn::before,html:not(.light) .kn::after{position:absolute;top:calc(var(--ks)*.80);font:800 7.5px/1 "SF Mono",Menlo,Consolas,monospace;color:#bdb7a5;pointer-events:none}
-  html:not(.light) .kn::before{content:"0";left:calc(var(--ks)*.02)} html:not(.light) .kn::after{content:"10";right:-1px}
-  html:not(.light) .kn.sm::before,html:not(.light) .kn.sm::after{display:none}
+  html:not(.zz) .kn::before,html:not(.zz) .kn::after{position:absolute;top:calc(var(--ks)*.80);font:800 7.5px/1 "SF Mono",Menlo,Consolas,monospace;color:#bdb7a5;pointer-events:none}
+  html:not(.zz) .kn::before{content:"0";left:calc(var(--ks)*.02)} html:not(.zz) .kn::after{content:"10";right:-1px}
+  html:not(.zz) .kn.sm::before,html:not(.zz) .kn.sm::after{display:none}
   /* knob com borda serrilhada (knurling) e topo liso */
-  html:not(.light) .cap{background:repeating-conic-gradient(from 0deg,#0a0b0c 0 3.2deg,#34363b 3.2deg 6.4deg);box-shadow:0 6px 9px rgba(0,0,0,.75),0 1px 2px #000,inset 0 0 0 1.5px #000}
-  html:not(.light) .cap::before{inset:15%;background:radial-gradient(circle at 50% 30%,#4a4c52,#1b1c20 60%,#101113);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.18),inset 0 -2px 3px rgba(0,0,0,.6),0 0 0 1.5px rgba(0,0,0,.85)}
-  html:not(.light) .cap::after,html:not(.light) .kn.big .cap::after{width:7%;margin-left:-3.5%;top:4%;height:42%;border-radius:1.5px;box-shadow:0 0 3px rgba(255,255,255,.35)}
+  html:not(.zz) .cap{background:repeating-conic-gradient(from 0deg,#0a0b0c 0 3.2deg,#34363b 3.2deg 6.4deg);box-shadow:0 6px 9px rgba(0,0,0,.75),0 1px 2px #000,inset 0 0 0 1.5px #000}
+  html:not(.zz) .cap::before{inset:15%;background:radial-gradient(circle at 50% 30%,#4a4c52,#1b1c20 60%,#101113);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.18),inset 0 -2px 3px rgba(0,0,0,.6),0 0 0 1.5px rgba(0,0,0,.85)}
+  html:not(.zz) .cap::after,html:not(.zz) .kn.big .cap::after{width:7%;margin-left:-3.5%;top:4%;height:42%;border-radius:1.5px;box-shadow:0 0 3px rgba(255,255,255,.35)}
   /* teclado: borda frontal sombreada e pretas com brilho */
-  html:not(.light) .k.w{box-shadow:inset 0 -9px 8px -4px rgba(0,0,0,.28),inset 1px 0 0 rgba(255,255,255,.5),inset -1px 0 1px rgba(0,0,0,.25),0 2px 3px rgba(0,0,0,.6)}
-  html:not(.light) .k.b{box-shadow:inset 0 -6px 6px rgba(255,255,255,.07),inset 2px 0 1px rgba(255,255,255,.1),0 4px 5px rgba(0,0,0,.8)}
-  html:not(.light) .felt{background:linear-gradient(180deg,#4a0b0e,#7a1519 55%,#2c0709)}
+  html:not(.zz) .k.w{box-shadow:inset 0 -9px 8px -4px rgba(0,0,0,.28),inset 1px 0 0 rgba(255,255,255,.5),inset -1px 0 1px rgba(0,0,0,.25),0 2px 3px rgba(0,0,0,.6)}
+  html:not(.zz) .k.b{box-shadow:inset 0 -6px 6px rgba(255,255,255,.07),inset 2px 0 1px rgba(255,255,255,.1),0 4px 5px rgba(0,0,0,.8)}
+  html:not(.zz) .felt{background:linear-gradient(180deg,#4a0b0e,#7a1519 55%,#2c0709)}
 
   /* ===== v8: instrumento de verdade — moldura de madeira, painel fosco, knobs de alumínio, chaves de balancim ===== */
   :root{--k:clamp(36px,min(calc(5.2vw - 8px),calc((100vh - 470px)/6.6)),64px)}
   @media (max-height:560px){ :root{--k:clamp(30px,5.4vh,42px)} }
   .woodtop,.arm{display:none}
-  html:not(.light) .woodtop,html:not(.light) .arm{display:block;position:relative;flex:0 0 auto;
+  html:not(.zz) .woodtop,html:not(.zz) .arm{display:block;position:relative;flex:0 0 auto;
     background:
       linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.34)),
       linear-gradient(180deg,rgba(255,230,190,.20),rgba(0,0,0,0) 45%,rgba(0,0,0,.38)),
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='80' preserveAspectRatio='none'><filter id='w' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.32' numOctaves='5' seed='11'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.07  0 0 0 0 0.02  2.6 0 0 0 -0.75'/></filter><filter id='p' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.04  0 0 0 0 0.01  0.9 0 0 0 -0.38'/></filter><rect width='100%' height='100%' fill='%238b5427'/><rect width='100%' height='100%' filter='url(%23w)'/><rect width='100%' height='100%' filter='url(%23p)'/></svg>") center/100% 100%,
       #6b3f1f}
-  html:not(.light) .woodtop{height:clamp(12px,1.9vh,18px);box-shadow:inset 0 1px 1px rgba(255,220,170,.4),0 3px 5px rgba(0,0,0,.8);z-index:2;
+  html:not(.zz) .woodtop{height:clamp(12px,1.9vh,18px);box-shadow:inset 0 1px 1px rgba(255,220,170,.4),0 3px 5px rgba(0,0,0,.8);z-index:2;
     background-image:
       radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),
       radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),
@@ -404,78 +403,78 @@
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='80' preserveAspectRatio='none'><filter id='w' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.32' numOctaves='5' seed='11'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.07  0 0 0 0 0.02  2.6 0 0 0 -0.75'/></filter><rect width='100%' height='100%' fill='%238b5427'/><rect width='100%' height='100%' filter='url(%23w)'/></svg>");
     background-repeat:no-repeat;background-size:10px 10px,10px 10px,10px 10px,10px 10px,100% 100%,100% 100%,100% 100%;
     background-position:7% 50%,36% 50%,64% 50%,93% 50%,0 0,0 0,0 0}
-  html:not(.light) .arm{height:clamp(24px,3.6vh,36px);margin-top:-1px;box-shadow:inset 0 1px 0 rgba(0,0,0,.7),inset 0 2px 2px rgba(255,220,170,.25),0 4px 8px rgba(0,0,0,.85);z-index:2}
-  html:not(.light) .arm::after{content:"";position:absolute;left:3%;right:22%;bottom:22%;height:2px;background:rgba(20,8,0,.7);box-shadow:0 1px 0 rgba(255,220,170,.22)}
-  html:not(.light) .arm .plate{position:absolute;right:3%;top:50%;transform:translateY(-50%);height:82%;min-height:20px;padding:0 14px;display:flex;align-items:baseline;gap:8px;
+  html:not(.zz) .arm{height:clamp(24px,3.6vh,36px);margin-top:-1px;box-shadow:inset 0 1px 0 rgba(0,0,0,.7),inset 0 2px 2px rgba(255,220,170,.25),0 4px 8px rgba(0,0,0,.85);z-index:2}
+  html:not(.zz) .arm::after{content:"";position:absolute;left:3%;right:22%;bottom:22%;height:2px;background:rgba(20,8,0,.7);box-shadow:0 1px 0 rgba(255,220,170,.22)}
+  html:not(.zz) .arm .plate{position:absolute;right:3%;top:50%;transform:translateY(-50%);height:82%;min-height:20px;padding:0 14px;display:flex;align-items:baseline;gap:8px;
     background:linear-gradient(180deg,#26282c,#0b0c0d);border-radius:4px;box-shadow:0 0 0 1px #000,inset 0 1px 0 rgba(255,255,255,.14),0 2px 5px rgba(0,0,0,.8);align-items:center}
   .arm .plate b{font-size:clamp(11px,1.5vh,15px);letter-spacing:.42em;font-weight:800;color:#ece7d6}
   .arm .plate small{font-size:clamp(6.5px,.9vh,8.5px);letter-spacing:.3em;font-weight:700;color:#9b9686}
 
   /* painel preto fosco com moldura de metal */
-  html:not(.light) .panel{padding:14px calc(var(--pad) + 14px) 10px;
+  html:not(.zz) .panel{padding:14px calc(var(--pad) + 14px) 10px;
     background:
       url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
       linear-gradient(180deg,#1b1d21 0,#131518 60%,#0e1013 100%);
     box-shadow:inset 0 0 0 1px #000,inset 0 0 0 3px #858a92,inset 0 0 0 4px #000,inset 0 8px 16px rgba(0,0,0,.55),0 0 0 1px #000}
-  html:not(.light) .screw{width:11px;height:11px}
-  html:not(.light) .screw.tl{top:9px;left:9px} html:not(.light) .screw.tr{top:9px;right:9px} html:not(.light) .screw.bl{bottom:9px;left:9px} html:not(.light) .screw.br{bottom:9px;right:9px}
+  html:not(.zz) .screw{width:11px;height:11px}
+  html:not(.zz) .screw.tl{top:9px;left:9px} html:not(.zz) .screw.tr{top:9px;right:9px} html:not(.zz) .screw.bl{bottom:9px;left:9px} html:not(.zz) .screw.br{bottom:9px;right:9px}
   /* serigrafia: título grande embaixo, divisórias verticais finas */
-  html:not(.light) .sec{padding:4px 7px 25px;border-left:1.5px solid rgba(233,228,212,.42)}
-  html:not(.light) .sections > .sec:first-child{border-left:0}
-  html:not(.light) .sections + .sections{border-top:1.5px solid rgba(233,228,212,.32);padding-top:7px;margin-top:5px}
-  html:not(.light) .sec h2{top:auto;bottom:3px;left:0;right:0;justify-content:center;text-align:center;padding:0;font-size:clamp(9.5px,.95vw,13px);letter-spacing:.3em;font-weight:700;color:#ece7d6}
-  html:not(.light) .sec h2::before,html:not(.light) .sec h2::after{display:none}
+  html:not(.zz) .sec{padding:4px 7px 25px;border-left:1.5px solid rgba(233,228,212,.42)}
+  html:not(.zz) .sections > .sec:first-child{border-left:0}
+  html:not(.zz) .sections + .sections{border-top:1.5px solid rgba(233,228,212,.32);padding-top:7px;margin-top:5px}
+  html:not(.zz) .sec h2{top:auto;bottom:3px;left:0;right:0;justify-content:center;text-align:center;padding:0;font-size:clamp(9.5px,.95vw,13px);letter-spacing:.3em;font-weight:700;color:#ece7d6}
+  html:not(.zz) .sec h2::before,html:not(.zz) .sec h2::after{display:none}
   /* knobs: saia serrilhada preta + tampa de alumínio escovado + escala de 270° */
-  html:not(.light) .dial{background:
+  html:not(.zz) .dial{background:
       conic-gradient(from 137deg,#14161a 0 86deg,transparent 86deg),
       repeating-conic-gradient(from -135deg,#ece7d6 0 2deg,transparent 2deg 27deg)}
-  html:not(.light) .dial::before{inset:11%;background:#0b0c0d;box-shadow:none}
-  html:not(.light) .dial::after{content:"";position:absolute;inset:24%;border-radius:50%;pointer-events:none;z-index:3;
+  html:not(.zz) .dial::before{inset:11%;background:#0b0c0d;box-shadow:none}
+  html:not(.zz) .dial::after{content:"";position:absolute;inset:24%;border-radius:50%;pointer-events:none;z-index:3;
     background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.65),rgba(255,255,255,0) 52%),radial-gradient(circle at 70% 85%,rgba(0,0,0,.28),rgba(0,0,0,0) 55%)}
-  html:not(.light) .cap{inset:15%;background:repeating-conic-gradient(from 0deg,#050506 0 3deg,#3a3c41 3deg 6deg);box-shadow:3px 6px 8px rgba(0,0,0,.85),0 1px 2px #000,inset 0 0 0 1.5px #000}
-  html:not(.light) .cap::before{inset:11%;background:
+  html:not(.zz) .cap{inset:15%;background:repeating-conic-gradient(from 0deg,#050506 0 3deg,#3a3c41 3deg 6deg);box-shadow:3px 6px 8px rgba(0,0,0,.85),0 1px 2px #000,inset 0 0 0 1.5px #000}
+  html:not(.zz) .cap::before{inset:11%;background:
       repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.10) 0 .6px,rgba(0,0,0,.06) .6px 1.3px),
       conic-gradient(from 20deg,#f1f2f4,#a9adb4 12%,#e6e8eb 25%,#9a9ea6 38%,#f3f4f6 50%,#a2a6ad 63%,#e4e6e9 75%,#979ba3 88%,#f1f2f4);
     box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),inset 0 -2px 3px rgba(0,0,0,.35),0 0 0 1.5px #000}
-  html:not(.light) .cap::after,html:not(.light) .kn.big .cap::after{top:6%;width:7%;margin-left:-3.5%;height:40%;border-radius:2px;background:#0b0c0d;box-shadow:none;z-index:2}
-  html:not(.light) .kn.big .cap::after{background:var(--red)}
-  html:not(.light) .mk::after{top:-3px;width:6px;height:6px;margin-left:-3px;box-shadow:0 0 0 1px #000,0 0 5px rgba(255,106,61,.8)}
-  html:not(.light) .kn::before,html:not(.light) .kn::after{top:calc(var(--ks)*.86);color:#cfc9b6;font-size:8px}
-  html:not(.light) .kn label{font-size:9px;letter-spacing:.14em;font-weight:700}
+  html:not(.zz) .cap::after,html:not(.zz) .kn.big .cap::after{top:6%;width:7%;margin-left:-3.5%;height:40%;border-radius:2px;background:#0b0c0d;box-shadow:none;z-index:2}
+  html:not(.zz) .kn.big .cap::after{background:var(--red)}
+  html:not(.zz) .mk::after{top:-3px;width:6px;height:6px;margin-left:-3px;box-shadow:0 0 0 1px #000,0 0 5px rgba(255,106,61,.8)}
+  html:not(.zz) .kn::before,html:not(.zz) .kn::after{top:calc(var(--ks)*.86);color:#cfc9b6;font-size:8px}
+  html:not(.zz) .kn label{font-size:9px;letter-spacing:.14em;font-weight:700}
   /* botões planos com contorno, como o teclado de comandos de um instrumento */
-  html:not(.light) .btn{background:linear-gradient(180deg,#17191c,#0d0e10);border:1px solid rgba(233,228,212,.55);border-radius:2px;color:#ece7d6;letter-spacing:.14em;
+  html:not(.zz) .btn{background:linear-gradient(180deg,#17191c,#0d0e10);border:1px solid rgba(233,228,212,.55);border-radius:2px;color:#ece7d6;letter-spacing:.14em;
     box-shadow:inset 0 0 0 1px #000,0 1px 0 rgba(0,0,0,.9)}
-  html:not(.light) .btn:active{background:#2a2c30;box-shadow:inset 0 1px 4px #000}
-  html:not(.light) .btn.icon.on{color:var(--amber);border-color:var(--amber);box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(255,171,46,.35)}
-  html:not(.light) .oled{border-radius:3px;box-shadow:0 0 0 2px #000,0 0 0 3px #858a92,0 0 0 5px #000,inset 0 0 14px #000}
-  html:not(.light) .seg{border-radius:2px;border-color:rgba(233,228,212,.55)}
+  html:not(.zz) .btn:active{background:#2a2c30;box-shadow:inset 0 1px 4px #000}
+  html:not(.zz) .btn.icon.on{color:var(--amber);border-color:var(--amber);box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(255,171,46,.35)}
+  html:not(.zz) .oled{border-radius:3px;box-shadow:0 0 0 2px #000,0 0 0 3px #858a92,0 0 0 5px #000,inset 0 0 14px #000}
+  html:not(.zz) .seg{border-radius:2px;border-color:rgba(233,228,212,.55)}
   /* chaves de balancim (2 posições) */
-  html:not(.light) .seg.lever.rk{--r1:#ffa062;--r2:#e2621f;--r3:#7a3109;--r4:#a8480f;align-items:stretch;width:40px;padding:2px;border-radius:5px;background:#050506;box-shadow:0 0 0 1px #000,0 3px 4px rgba(0,0,0,.85),inset 0 0 0 1px #2a2c30}
-  html:not(.light) .seg.lever.rk[data-key=sw],html:not(.light) .seg.lever.rk[data-key=nc]{--r1:#9bd6f5;--r2:#4b9ecf;--r3:#235f82;--r4:#3787b4}
-  html:not(.light) .seg.lever.rk button,html:not(.light) .seg.lever.rk button.txt{justify-content:center;gap:0;width:100%;height:17px;padding:0;font-size:7.5px;letter-spacing:.3px;font-weight:800;color:rgba(255,255,255,.8);
+  html:not(.zz) .seg.lever.rk{--r1:#ffa062;--r2:#e2621f;--r3:#7a3109;--r4:#a8480f;align-items:stretch;width:40px;padding:2px;border-radius:5px;background:#050506;box-shadow:0 0 0 1px #000,0 3px 4px rgba(0,0,0,.85),inset 0 0 0 1px #2a2c30}
+  html:not(.zz) .seg.lever.rk[data-key=sw],html:not(.zz) .seg.lever.rk[data-key=nc]{--r1:#9bd6f5;--r2:#4b9ecf;--r3:#235f82;--r4:#3787b4}
+  html:not(.zz) .seg.lever.rk button,html:not(.zz) .seg.lever.rk button.txt{justify-content:center;gap:0;width:100%;height:17px;padding:0;font-size:7.5px;letter-spacing:.3px;font-weight:800;color:rgba(255,255,255,.8);
     background:linear-gradient(180deg,var(--r1),var(--r2));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.25);text-shadow:0 1px 0 rgba(0,0,0,.35)}
-  html:not(.light) .seg.lever.rk button::after{display:none}
-  html:not(.light) .seg.lever.rk button:first-child{border-radius:3px 3px 0 0} html:not(.light) .seg.lever.rk button:last-child{border-radius:0 0 3px 3px}
-  html:not(.light) .seg.lever.rk button.on,html:not(.light) .seg.lever.rk button.txt.on{color:#fff;background:linear-gradient(180deg,var(--r3),var(--r4));box-shadow:inset 0 3px 5px rgba(0,0,0,.6);text-shadow:0 0 6px rgba(255,255,255,.5)}
+  html:not(.zz) .seg.lever.rk button::after{display:none}
+  html:not(.zz) .seg.lever.rk button:first-child{border-radius:3px 3px 0 0} html:not(.zz) .seg.lever.rk button:last-child{border-radius:0 0 3px 3px}
+  html:not(.zz) .seg.lever.rk button.on,html:not(.zz) .seg.lever.rk button.txt.on{color:#fff;background:linear-gradient(180deg,var(--r3),var(--r4));box-shadow:inset 0 3px 5px rgba(0,0,0,.6);text-shadow:0 0 6px rgba(255,255,255,.5)}
   /* seletores de 3 ou mais posições: cursor de metal numa canaleta */
-  html:not(.light) .seg.lever:not(.rk){padding:2px 0}
-  html:not(.light) .seg.lever:not(.rk) button.on{color:#fff}
+  html:not(.zz) .seg.lever:not(.rk){padding:2px 0}
+  html:not(.zz) .seg.lever:not(.rk) button.on{color:#fff}
   /* rodas num módulo parafusado, com o apoio de madeira acima */
-  html:not(.light) .wheels{position:relative;gap:12px;padding:12px 16px 10px;margin-left:calc(-1*clamp(6px,1vw,14px));border-right:1px solid #000;
+  html:not(.zz) .wheels{position:relative;gap:12px;padding:12px 16px 10px;margin-left:calc(-1*clamp(6px,1vw,14px));border-right:1px solid #000;
     background:
       radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) 5px 5px/10px 10px no-repeat,
       radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) right 5px top 5px/10px 10px no-repeat,
       radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) 5px bottom 5px/10px 10px no-repeat,
       radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) right 5px bottom 5px/10px 10px no-repeat,
       linear-gradient(180deg,#1b1d21,#0e1013);box-shadow:inset 0 0 0 1px #000,inset 0 0 0 2px #3a3d43,4px 0 8px rgba(0,0,0,.6)}
-  html:not(.light) .whc small{color:#ece7d6;letter-spacing:.2em;font-weight:700}
-  html:not(.light) .felt{display:none}
-  html:not(.light) .keysWrap{padding-top:0}
+  html:not(.zz) .whc small{color:#ece7d6;letter-spacing:.2em;font-weight:700}
+  html:not(.zz) .felt{display:none}
+  html:not(.zz) .keysWrap{padding-top:0}
   /* teclas com chanfro frontal */
-  html:not(.light) .k.w::after{content:"";position:absolute;left:0;right:0;bottom:0;height:13px;border-radius:0 0 5px 5px;pointer-events:none;
+  html:not(.zz) .k.w::after{content:"";position:absolute;left:0;right:0;bottom:0;height:13px;border-radius:0 0 5px 5px;pointer-events:none;
     background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.20) 55%,rgba(255,255,255,.42) 57%,rgba(0,0,0,.12))}
-  html:not(.light) .k.b::after{content:"";position:absolute;left:9%;right:9%;bottom:0;height:17%;border-radius:0 0 4px 4px;pointer-events:none;background:linear-gradient(180deg,#53555b,#1f2023)}
-  @media (max-width:959px){ html:not(.light) .sec{border-left:0;border-bottom:1px solid rgba(233,228,212,.18)} }
+  html:not(.zz) .k.b::after{content:"";position:absolute;left:9%;right:9%;bottom:0;height:17%;border-radius:0 0 4px 4px;pointer-events:none;background:linear-gradient(180deg,#53555b,#1f2023)}
+  @media (max-width:959px){ html:not(.zz) .sec{border-left:0;border-bottom:1px solid rgba(233,228,212,.18)} }
 
   /* ===== v9: linha de efeitos, alvos de toque maiores, estados ===== */
   .fxpanel{flex-wrap:nowrap}
@@ -484,17 +483,17 @@
   .fxpanel .ctrls .ctrls{flex:0 0 auto;gap:clamp(4px,.7vw,12px);align-items:flex-end}
   .fxpanel .sel{flex:0 0 auto}
   .fxb{min-width:62px;font-size:10px;letter-spacing:.1em}
-  html:not(.light) .fxb.on{color:var(--amber);border-color:var(--amber);box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(255,171,46,.3)}
+  html:not(.zz) .fxb.on{color:var(--amber);border-color:var(--amber);box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(255,171,46,.3)}
   body.noaudio #lPwr i{background:#ff6a3d;box-shadow:0 0 8px #ff6a3d}
   #panicBtn{font-size:10px;letter-spacing:.12em;white-space:nowrap}
-  html:not(.light) #panicBtn{border-color:#c0452b;color:#ff8a6d}
-  html:not(.light) #panicBtn:active{background:#6b1f10}
+  html:not(.zz) #panicBtn{border-color:#c0452b;color:#ff8a6d}
+  html:not(.zz) #panicBtn:active{background:#6b1f10}
   @media (pointer:coarse){
     .btn{min-height:38px} .pnav .btn{min-width:46px} .seg button{min-height:28px}
-    html:not(.light) .seg.lever.rk button,html:not(.light) .seg.lever.rk button.txt{height:21px}
-    html:not(.light) .kn label{font-size:10px;color:#f4efde}
+    html:not(.zz) .seg.lever.rk button,html:not(.zz) .seg.lever.rk button.txt{height:21px}
+    html:not(.zz) .kn label{font-size:10px;color:#f4efde}
   }
-  html:not(.light) .sec h2{color:#f4efde}
+  html:not(.zz) .sec h2{color:#f4efde}
   /* mais espaço para o teclado: cabeçalho numa linha só e fileiras mais juntas em telas baixas */
   @media (min-width:701px) and (max-width:1100px){ .brand span{display:none} }
   @media (min-width:701px) and (max-width:1200px){ .top{flex-wrap:nowrap} .brand{flex:0 0 auto} .pnav{flex:1 1 0;min-width:0} .pnav .oled{flex:1 1 0;min-width:0;width:auto} .tools{flex:0 0 auto} }
@@ -502,6 +501,25 @@
   /* a fileira de efeitos só aparece em telas altas; nas demais o teclado ganha o espaço (efeitos: Ajustes → Efeitos) */
   @media (max-height:1099px),(max-width:959px){ .fxpanel{display:none !important} }
   @media (min-height:1100px) and (min-width:960px){ :root{--k:clamp(34px,min(calc(5.2vw - 8px),calc((100vh - 560px)/6.6)),64px)} }
+
+
+  /* ===== tema claro (prateado): mesma estrutura e funções do escuro, só muda a cor ===== */
+  html.light .panel{background:
+      linear-gradient(100deg,rgba(255,255,255,0) 18%,rgba(255,255,255,.42) 34%,rgba(255,255,255,0) 50%,rgba(0,0,0,.07) 72%,rgba(255,255,255,.22) 92%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='300' preserveAspectRatio='none'><filter id='m' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.003 0.95' numOctaves='4' seed='5'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='1.9' intercept='-0.45'/><feFuncG type='linear' slope='1.9' intercept='-0.45'/><feFuncB type='linear' slope='1.9' intercept='-0.45'/><feFuncA type='discrete' tableValues='1'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23m)'/></svg>") center/100% 100%,
+      linear-gradient(180deg,#e3e5e8 0,#c9ccd1 45%,#aeb2b8 100%);
+    background-blend-mode:normal,overlay,normal;
+    box-shadow:inset 0 0 0 1px #000,inset 0 0 0 3px #6f747b,inset 0 0 0 4px #000,inset 0 8px 16px rgba(0,0,0,.22),0 0 0 1px #000}
+  html.light .brand b{color:#1b1d20;text-shadow:0 1px 0 rgba(255,255,255,.7)} html.light .brand span{color:#4a4e55}
+  html.light .sec{border-left-color:rgba(20,22,26,.5)} html.light .sections + .sections{border-top-color:rgba(20,22,26,.4)}
+  html.light .sec h2,html.light .kn label,html.light .sel .cap2,html.light .lamp b{color:#1b1d20;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+  html.light .kn::before,html.light .kn::after{color:#2a2d31}
+  html.light .dial{background:conic-gradient(from 137deg,#14161a 0 86deg,transparent 86deg),repeating-conic-gradient(from -135deg,#17191c 0 2deg,transparent 2deg 27deg)}
+  html.light .seg{border-color:#050506}
+  html.light .seg.lever:not(.rk) button,html.light .seg.lever:not(.rk) button.txt{color:#3a3d42} html.light .seg.lever:not(.rk) button.on{color:#000;font-weight:900}
+  html.light .fxrow{color:#1b1d20}
+  @media (max-width:959px){ html.light .sec{border-bottom-color:rgba(20,22,26,.25)} }
+  @media (pointer:coarse){ html.light .kn label,html.light .sec h2{color:#1b1d20} }
 
   /* ===== v10: Ajustes no estilo iOS (só este menu) ===== */
   #dlgMenu{background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
