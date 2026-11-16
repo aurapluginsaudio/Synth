@@ -1,0 +1,34 @@
+
+> aura-synth-bass@1.0.0 dist:mac
+> npm run prepare-app && electron-builder --mac dir --universal
+
+
+> aura-synth-bass@1.0.0 prepare-app
+> node scripts/prepare-app.js
+
+app preparado em /Users/runner/work/SynthBass/SynthBass/desktop/app
+  • electron-builder  version=25.1.8 os=25.6.0
+  • artifacts will be published if draft release exists  reason=CI detected
+  • loaded configuration  file=package.json ("build" field)
+  • executing @electron/rebuild  electronVersion=33.4.11 arch=x64 buildFromSource=false appDir=./
+  • installing native dependencies  arch=x64
+  • completed installing native dependencies
+  • packaging       platform=darwin arch=x64 electron=33.4.11 appOutDir=dist/mac-universal-x64-temp
+  • downloading     url=https://github.com/electron/electron/releases/download/v33.4.11/electron-v33.4.11-darwin-x64.zip size=104 MB parts=6
+  • downloaded      url=https://github.com/electron/electron/releases/download/v33.4.11/electron-v33.4.11-darwin-x64.zip duration=1.31s
+  • executing @electron/rebuild  electronVersion=33.4.11 arch=arm64 buildFromSource=false appDir=./
+  • installing native dependencies  arch=arm64
+  • completed installing native dependencies
+  • packaging       platform=darwin arch=arm64 electron=33.4.11 appOutDir=dist/mac-universal-arm64-temp
+  • downloading     url=https://github.com/electron/electron/releases/download/v33.4.11/electron-v33.4.11-darwin-arm64.zip size=100 MB parts=6
+  • downloaded      url=https://github.com/electron/electron/releases/download/v33.4.11/electron-v33.4.11-darwin-arm64.zip duration=1.049s
+  • packaging       platform=darwin arch=universal electron=33.4.11 appOutDir=dist/mac-universal
+  ⨯ Detected file "Contents/Resources/plugins/AURA Synth Bass.component/Contents/MacOS/AURA Synth Bass" that's the same in both x64 and arm64 builds and not covered by the x64ArchFiles rule: "undefined"  failedTask=build stackTrace=Error: Detected file "Contents/Resources/plugins/AURA Synth Bass.component/Contents/MacOS/AURA Synth Bass" that's the same in both x64 and arm64 builds and not covered by the x64ArchFiles rule: "undefined"
+    at makeUniversalApp (/Users/runner/work/SynthBass/SynthBass/desktop/node_modules/@electron/universal/src/index.ts:148:17)
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at MacPackager.doPack (/Users/runner/work/SynthBass/SynthBass/desktop/node_modules/app-builder-lib/src/macPackager.ts:153:9)
+    at MacPackager.pack (/Users/runner/work/SynthBass/SynthBass/desktop/node_modules/app-builder-lib/src/macPackager.ts:215:9)
+    at Packager.doBuild (/Users/runner/work/SynthBass/SynthBass/desktop/node_modules/app-builder-lib/src/packager.ts:459:9)
+    at executeFinally (/Users/runner/work/SynthBass/SynthBass/desktop/node_modules/builder-util/src/promise.ts:12:14)
+    at Packager.build (/Users/runner/work/SynthBass/SynthBass/desktop/node_modules/app-builder-lib/src/packager.ts:393:31)
+    at executeFinally (/Users/runner/work/SynthBass/SynthBass/desktop/node_modules/builder-util/src/promise.ts:12:14)
