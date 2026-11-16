@@ -6,7 +6,7 @@ static const char* const kParamIds[kNumParams] = {"oct","wave","pw1","lvl","w2",
 struct FactoryPreset { const char* name; float v[kNumParams]; };
 static const int kNumFactory = 2;
 static const FactoryPreset kFactory[kNumFactory] = {
-{"DEEP SUB BASS",{-1.0f,2.0f,0.5f,0.75f,1.0f,0.5f,0.0f,0.0f,0.0f,0.0f,0.35f,0.0f,0.0f,0.41f,0.0f,0.8f,0.0f,0.0f,4.0f,0.03f,0.0f,0.15f,5.5f,0.0f,0.0f,0.0f,0.0f,0.008f,0.295f,0.59f,0.19f,0.008f,0.295f,0.59f,0.19f,1.0f,1.57f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.3f,0.35f,0.0f,0.0f,0.0f,1.0f,0.5f,1.0f,1.0f,1.0f,1.0f,1.0f,0.0f}},
 {"CHURCH SYNTH BASS",{-2.0f,2.0f,0.5f,1.0f,1.0f,0.5f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.056f,0.0f,1.04f,0.667f,0.0f,4.0f,0.0f,0.0f,0.15f,5.5f,0.0f,0.0f,0.0f,0.0f,0.002f,0.25f,0.6f,0.25f,0.002f,0.25f,0.6f,0.25f,1.0f,1.69f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.3f,0.35f,0.0f,0.0f,0.0f,1.0f,0.5f,1.0f,1.0f,1.0f,1.0f,1.0f,0.0f}},
+{"DEEP SUB BASS",{-1.0f,2.0f,0.5f,0.75f,1.0f,0.5f,0.0f,0.0f,0.0f,0.0f,0.35f,0.0f,0.0f,0.41f,0.0f,0.8f,0.0f,0.0f,4.0f,0.03f,0.0f,0.15f,5.5f,0.0f,0.0f,0.0f,0.0f,0.008f,0.295f,0.59f,0.19f,0.008f,0.295f,0.59f,0.19f,1.0f,1.57f,0.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,0.0f,0.3f,0.35f,0.0f,0.0f,0.0f,1.0f,0.5f,1.0f,1.0f,1.0f,1.0f,1.0f,0.0f}},
 };
 }
