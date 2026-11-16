@@ -6,7 +6,7 @@ Abra em: https://thiagorgalvao-sketch.github.io/SynthBass/
 
 - Três osciladores (o terceiro pode servir de fonte de modulação), sync e largura de pulso, sub-oscilador, ruído branco ou rosa, overload, filtro de 6 a 24 dB com ressonância e drive, LFO com fonte LFO, OSC 3 ou aleatória, envelopes de filtro, volume e afinação, com curva exponencial ou linear.
 - Delay por preset, arpejador, hold, prioridade de nota (última, mais grave ou mais aguda), aftertouch e força da tecla com destinos à escolha.
-- 5 presets de fábrica (mais os da sua conta na nuvem), favoritos, busca, presets do usuário com exportação e importação.
+- 2 presets de fábrica (mais os da sua conta na nuvem), favoritos, busca, presets do usuário com exportação e importação.
 - Importa presets `.syx` (Moog Sub Phatty) e `.mdp` (Minimoog Model D para iPad) por aproximação.
 - Mapeamento de knobs e botões do controlador, modo tocar em tela cheia e uso sem internet depois da primeira visita.
 
