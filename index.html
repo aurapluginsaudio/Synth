@@ -303,6 +303,42 @@
   @media (max-width:900px){ .ctrls{flex-wrap:wrap} }
   @media (max-width:700px){ :root{--k:clamp(50px,15vw,70px)} .brand{flex:1;min-width:0} .brand span{display:none} .pnav{order:3;width:100%} .oled{flex:1 1 0;width:auto;min-width:0} .wheels{display:none} }
 #dlgMenu .about{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;letter-spacing:.06em;opacity:.62;text-align:center}
+
+  /* ===== tema escuro (padrão, para palco); html.light volta ao alumínio claro ===== */
+  html:not(.light){--ink:#e2e5ea;--ink2:#9aa1ab;--red:#ff6a3d;color-scheme:dark}
+  html:not(.light) .panel{background:linear-gradient(100deg,rgba(255,255,255,0) 20%,rgba(255,255,255,.045) 36%,rgba(255,255,255,0) 52%,rgba(255,255,255,.025) 90%),linear-gradient(180deg,#202226 0,#17191c 55%,#101113 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -2px 0 rgba(0,0,0,.6)}
+  html:not(.light) .screw{box-shadow:inset 0 0 0 1px rgba(0,0,0,.6);background:linear-gradient(45deg,transparent 44%,#0c0d0e 44% 56%,transparent 56%),conic-gradient(#5a5e65,#2e3136,#52565d,#2a2d31,#5a5e65)}
+  html:not(.light) .brand b{color:#e9ebee;text-shadow:none} html:not(.light) .brand span{color:#8c929b;text-shadow:none}
+  html:not(.light) .brand .wordmark{filter:invert(.9) hue-rotate(180deg) brightness(1.1)}
+  html:not(.light) .oled{box-shadow:0 0 0 3px #26282c,inset 0 0 14px #000}
+  html:not(.light) .btn{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 4px rgba(0,0,0,.6);background:linear-gradient(180deg,#34373c 0,#212327 48%,#141517 52%,#1a1c1f 100%);border-color:#000}
+  html:not(.light) .btn:active{box-shadow:inset 0 2px 5px rgba(0,0,0,.8)}
+  html:not(.light) .seg{box-shadow:0 2px 4px rgba(0,0,0,.6)}
+  html:not(.light) .sec h2{color:#c4c9d0;border-bottom-color:#4a4e55;box-shadow:none;text-shadow:none}
+  html:not(.light) .dial{background:repeating-conic-gradient(from -135deg,#8d939c 0 1.5deg,transparent 1.5deg 27deg)}
+  html:not(.light) .dial::before{background:radial-gradient(circle,#2a2c31 62%,#1c1e21);box-shadow:inset 0 2px 4px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.06)}
+  html:not(.light) .mk::after{box-shadow:0 0 0 1.5px #0c0d0e,0 0 6px rgba(255,106,61,.7)}
+  html:not(.light) .cap{background:radial-gradient(circle at 50% 28%,#3a3c41,#16171a 55%,#08090a);box-shadow:0 5px 8px rgba(0,0,0,.7),inset 0 0 0 1.5px #000,inset 0 2px 2px rgba(255,255,255,.1)}
+  html:not(.light) .cap::after,html:not(.light) .kn.big .cap::after{background:#e8eaed}
+  html:not(.light) .kn.big .cap::after{background:var(--amber)}
+  html:not(.light) .kn label,html:not(.light) .sel .cap2{color:#d3d7dd;text-shadow:none}
+  html:not(.light) .kn output{color:#f0c27a;text-shadow:none}
+  html:not(.light) .kn .cc{background:#3a3d43;color:#fff}
+  html:not(.light) .seg.lever button,html:not(.light) .seg.lever button.txt,html:not(.light) .seg.lever button.on{color:#aab0b8}
+  html:not(.light) .seg.lever button.on{color:#fff}
+  html:not(.light) .seg.lever button::after{background:linear-gradient(90deg,#000,#2d3035 50%,#000);box-shadow:0 0 0 1px #3a3d43}
+  html:not(.light) .seg.lever button.on::after{background:radial-gradient(circle at 50% 50%,#fff 0 2.5px,#aeb3ba 3.5px 5px,#4a4d53 6px,rgba(0,0,0,0) 7px),linear-gradient(90deg,#000,#2d3035 50%,#000)}
+  html:not(.light) .keysWrap{background:linear-gradient(180deg,#000,#0c0d0e)}
+  html:not(.light) .k.w{background:linear-gradient(180deg,#a9a69d 0,#cfccc3 7%,#d8d5cc 60%,#bdbab1 100%);border-color:#000}
+  html:not(.light) .k.w.d{background:linear-gradient(180deg,#f2b86a,#ffd089 30%,#ffab2e)}
+  html:not(.light) .kl{color:#6d6a63}
+  html:not(.light) .dlg{background:rgba(0,0,0,.78)}
+  html:not(.light) .dlg .box{background:linear-gradient(180deg,#26282c,#17191c);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.1)}
+  html:not(.light) .dlg h3,html:not(.light) .dlg label{color:var(--ink)}
+  html:not(.light) .dlg p,html:not(.light) .dlg h4{color:#9aa1ab}
+  html:not(.light) .dlg .x{background:#34373c}
+  html:not(.light) .fxrow{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -463,6 +499,7 @@
   <div class="grid2">
     <button id="mDly" class="btn row">Delay…<em id="mDlySt">—</em></button>
     <button id="mArp" class="btn row">Arpejador…<em id="mArpSt">—</em></button>
+    <button id="mTheme" class="btn row">Tema<em id="mThemeSt">—</em></button>
     <button id="mAdv" class="btn row">Avançado…<em id="mAdvSt">—</em></button>
   </div>
   <h4>TOQUE</h4>
@@ -1461,6 +1498,10 @@
   [['lvl','e1'],['l2','e2'],['l3','e3']].forEach(([id,k])=>{ const kn=KNOBS.find(x=>x.id===id); if(!kn||!kn.dial) return; const w=kn.dial.closest('.kn'), lb=w&&w.querySelector('label'); if(!lb) return;
     lb.style.cursor='pointer'; lb.setAttribute('role','button'); lb.title='Toque para silenciar / ligar';
     lb.addEventListener('click',()=>{ if(learnMode) return; P[k]=P[k]?0:1; drawMutes(); applyAll(); setDirty(true); advRows.forEach(r=>r.draw()); }); });
+  const THK='aura_theme_v1';
+  function applyTheme(){ let l=false; try{ l=localStorage.getItem(THK)==='light'; }catch(e){} document.documentElement.classList.toggle('light',l); const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=l?'#0b0a09':'#000000'; const t=$('mThemeSt'); if(t) t.textContent=l?'CLARO':'ESCURO'; }
+  $('mTheme').addEventListener('click',()=>{ let l=false; try{ l=localStorage.getItem(THK)==='light'; localStorage.setItem(THK,l?'dark':'light'); }catch(e){} applyTheme(); });
+  applyTheme();
   $('mAdv').addEventListener('click',()=>{ closeD('dlgMenu'); advRows.forEach(r=>r.draw()); openD('dlgAdv'); });
   // ---- lista de mapeamentos MIDI
   function drawMapList(){
