@@ -1542,6 +1542,7 @@
 
   function initAudio(){
     if(ctx) return;
+    if(window.AuraLic && !window.AuraLic.ok()){ window.AuraLic.show(); return; }
     const AC = window.AudioContext || window.webkitAudioContext;
     ctx = new AC({latencyHint:'interactive'}); ctx.onstatechange=()=>audioState();
     amp = ctx.createGain(); amp.gain.value = 0;
@@ -1799,7 +1800,7 @@
   // primeiro toque em qualquer lugar liga o áudio e tenta o MIDI
   let triedMidi=false;
   function unlock(){
-    initAudio(); if(ctx.state!=='running') ctx.resume(); keepAwake();
+    initAudio(); if(!ctx) return; if(ctx.state!=='running') ctx.resume(); keepAwake();
     if(!triedMidi){ triedMidi=true; connectMidi(true); }
   }
   ['pointerdown','touchend','click'].forEach(ev=>document.addEventListener(ev,unlock,{passive:true}));
@@ -1848,7 +1849,7 @@
   }
   async function setExt(on){
     if(!on){ G.xon=0; if(xStream){ xStream.getTracks().forEach(t=>t.stop()); xStream=null; } try{ if(xSrc) xSrc.disconnect(); if(xG) xG.disconnect(); }catch(e){} xSrc=xG=null; if(xNote!=null) extTrig(0); if(ctx) V.apply(); advRows.forEach(r=>r.draw()); drawMenuSt(); return; }
-    if(!ctx) initAudio(); if(ctx.state!=='running') ctx.resume();
+    if(!ctx) initAudio(); if(!ctx) return; if(ctx.state!=='running') ctx.resume();
     if(!V || V.kind!=='worklet'){ say('PRECISA DO MOTOR COMPLETO'); advRows.forEach(r=>r.draw()); return; }
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ say('SEM SUPORTE A ENTRADA DE ÁUDIO'); advRows.forEach(r=>r.draw()); return; }
     try{ xStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:1,latency:0}}); }
@@ -1874,7 +1875,7 @@
     H('OSCILADORES E TECLADO');
     [['OSC 1','e1'],['OSC 2','e2'],['OSC 3','e3']].forEach(([n,k])=>advRows.push(mkChips(b,n,['MUDO','LIGADO'],()=>P[k],i=>{ P[k]=i; drawMutes(); pc(); })));
     advRows.push(mkChips(b,'TECLADO NO FILTRO',['CONTÍNUO','1/3 · 2/3 · TOTAL'],()=>P.kts,i=>{ P.kts=i; pc(); if(ctx&&gate) trackFilter(); }));
-    H('FILTRO (Bass Station II)');
+    H('FILTRO AVANÇADO');
     advRows.push(mkChips(b,'TIPO',['CLÁSSICO','ÁCIDO (DIODO 4 POLOS)'],()=>P.fk,i=>{ P.fk=i; pc(); }));
     advRows.push(mkChips(b,'FORMA (CLÁSSICO)',['PASSA-BAIXA','PASSA-FAIXA','PASSA-ALTA'],()=>P.fm,i=>{ P.fm=i; pc(); }));
     advRows.push(mkSlider(b,'OSC 2 → FILTRO (FM)',()=>P.of,p=>Math.round(p*100)+'%',p=>{ P.of=+p.toFixed(3); pc(); }));
@@ -1886,10 +1887,10 @@
     advRows.push(mkSlider(b,'→ FILTRO',()=>P.l2f,p=>Math.round(p*100)+'%',p=>{ P.l2f=+p.toFixed(3); pc(); }));
     advRows.push(mkSlider(b,'→ PITCH (VIBRATO)',()=>P.l2p,p=>'±'+Math.round(p*200)+' cent',p=>{ P.l2p=+p.toFixed(3); pc(); }));
     advRows.push(mkSlider(b,'→ LARGURA DE PULSO',()=>P.l2m,p=>Math.round(p*100)+'%',p=>{ P.l2m=+p.toFixed(3); pc(); }));
-    H('MODULAÇÕES (Bass Station II)');
+    H('MODULAÇÕES EXTRAS');
     advRows.push(mkSlider(b,'ENVELOPE → LARGURA DE PULSO',()=>P.pwe,p=>Math.round(p*100)+'%',p=>{ P.pwe=+p.toFixed(3); pc(); }));
     advRows.push(mkSlider(b,'ERRO ALEATÓRIO DE AFINAÇÃO',()=>P.pe,p=>'±'+Math.round(p*100)+' cent',p=>{ P.pe=+p.toFixed(3); pc(); }));
-    H('OSCILADORES (JD-Xi)');
+    H('OSCILADORES EXTRAS');
     advRows.push(mkChips(b,'ANEL OSC1 × OSC2',['DESLIGADO','LIGADO'],()=>P.rg,i=>{ P.rg=i; pc(); }));
     advRows.push(mkChips(b,'UNÍSSONO (OSC 1)',['DESLIGADO','+1','+2','+3'],()=>P.un,i=>{ P.un=i; pc(); }));
     advRows.push(mkSlider(b,'ABERTURA UNÍSSONO',()=>P.ud,p=>'±'+Math.round(p*40)+' cent',p=>{ P.ud=+p.toFixed(3); pc(); }));
@@ -2193,6 +2194,86 @@
   }
 
   drawSelectors(); renderOled();
+})();
+</script>
+<script>
+/* AURA SYNTH BASS — licenciamento (somente no app desktop). © 2026 Thiago R. Galvão. Todos os direitos reservados. ID: AURA-SB-TRG-2026
+   Fluxo: teste grátis de 15 dias -> chave de ativação (limite de aparelhos no servidor) -> revalidação periódica com tolerância offline. */
+(function(){
+  const D=window.auraDesktop; if(!D) return;           // app web: sem licenciamento
+  const CFG=Object.assign({ api:'https://api.lemonsqueezy.com/v1/licenses', trialDays:15, graceDays:30, buyUrl:'https://fervor.website/aura' }, D.config||{});
+  const DAY=86400000, $=id=>document.getElementById(id);
+  let st={ t0:0, seen:0, key:'', inst:'', val:0, name:'' }, status='trial', info='';
+  const css=document.createElement('style'); css.textContent=`
+  #licOv{position:fixed;inset:0;z-index:100000;background:rgba(6,6,7,.92);display:none;align-items:center;justify-content:center;font-family:"Avenir Next",Futura,"Helvetica Neue",Arial,sans-serif;color:#e2e5ea}
+  #licOv.on{display:flex}
+  #licOv .lb{width:min(520px,92vw);background:linear-gradient(180deg,#26282c,#17191c);border:1px solid #3a3d42;border-top:6px solid #7a4c2a;border-radius:14px;padding:26px 28px;box-shadow:0 24px 60px #000}
+  #licOv h2{margin:0 0 4px;font-size:15px;letter-spacing:.3em;color:#fff} #licOv .sb{font-size:11px;letter-spacing:.35em;color:#E8890C;margin-bottom:16px}
+  #licOv p{font-size:13px;line-height:1.5;color:#b5bac2;margin:0 0 12px} #licOv b{color:#fff}
+  #licOv input{width:100%;padding:12px 14px;background:#0e0f11;border:1px solid #454a52;border-radius:8px;color:#fff;font:15px "SF Mono",Menlo,Consolas,monospace;letter-spacing:.06em;margin:4px 0 12px}
+  #licOv .bt{display:flex;gap:10px;flex-wrap:wrap} #licOv button{flex:1;min-width:130px;padding:12px;border-radius:8px;border:1px solid #555;background:#2a2d31;color:#fff;font-weight:700;letter-spacing:.12em;font-size:12px;cursor:pointer}
+  #licOv button.pr{background:linear-gradient(#ffab2e,#E8890C);color:#1a0d00;border-color:#ffcf8a} #licOv .er{color:#ff6a3d;font-size:12px;min-height:16px;margin-bottom:6px}
+  #licOv .fn{font-size:10.5px;color:#7d838c;margin-top:12px;line-height:1.4}
+  #licChip{position:fixed;right:12px;bottom:10px;z-index:9000;font:700 10px/1 "Avenir Next",Arial,sans-serif;letter-spacing:.18em;color:#ffcf8a;background:rgba(20,12,4,.85);border:1px solid #7a4c2a;border-radius:20px;padding:6px 12px;cursor:pointer}`;
+  document.head.appendChild(css);
+  const ov=document.createElement('div'); ov.id='licOv'; ov.innerHTML=`<div class="lb"><h2>AURA</h2><div class="sb">SYNTH BASS</div><div id="licMsg"></div>
+   <input id="licKey" placeholder="CHAVE DE ATIVAÇÃO" autocomplete="off" spellcheck="false"><div class="er" id="licErr"></div>
+   <div class="bt"><button class="pr" id="licGo">ATIVAR</button><button id="licBuy">COMPRAR</button><button id="licTry" hidden>CONTINUAR TESTE</button></div>
+   <div class="fn" id="licFn"></div></div>`; document.body.appendChild(ov);
+  const chip=document.createElement('div'); chip.id='licChip'; chip.hidden=true; document.body.appendChild(chip);
+
+  async function load(){ try{ const s=await D.store.get('lic'); if(s) st=Object.assign(st,JSON.parse(s)); }catch(e){}
+    try{ const b=JSON.parse(localStorage.getItem('aura_lic_b')||'null'); if(b&&b.t0&&(!st.t0||b.t0<st.t0)) st.t0=b.t0; if(b&&b.seen>st.seen) st.seen=b.seen; }catch(e){} }
+  async function save(){ const j=JSON.stringify(st); try{ await D.store.set('lic',j); }catch(e){} try{ localStorage.setItem('aura_lic_b',JSON.stringify({t0:st.t0,seen:st.seen})); }catch(e){} }
+  async function call(path,body){ if(D.http) return D.http(CFG.api+path,body); const r=await fetch(CFG.api+path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(body)}); let j={}; try{ j=await r.json(); }catch(e){} j._http=r.status; return j; }
+  const devName=()=> (D.deviceName||'Aparelho')+' · '+(D.deviceId||'').slice(0,8);
+
+  function evalStatus(){
+    const now=Date.now();
+    if(st.seen && now < st.seen - DAY){ status='clock'; return; }       // relógio atrasado: trata como expirado
+    if(st.key && st.inst){ status = (now-st.val) <= CFG.graceDays*DAY ? 'licensed' : 'recheck'; return; }
+    const left=CFG.trialDays - Math.floor((now-st.t0)/DAY);
+    status = left>0 ? 'trial' : 'expired'; info=left;
+  }
+  function paint(){
+    chip.hidden = status!=='trial' && status!=='licensed'; 
+    if(status==='trial'){ chip.textContent='TESTE GRÁTIS · '+info+(info===1?' DIA':' DIAS'); chip.onclick=()=>show(true); }
+    else if(status==='licensed'){ chip.textContent='LICENCIADO'; chip.onclick=()=>show(true); }
+    ok._s=status;
+  }
+  function ok(){ return status==='trial'||status==='licensed'; }
+  function show(optional){
+    const m=$('licMsg'), tryB=$('licTry'); $('licErr').textContent='';
+    tryB.hidden = !(optional && status==='trial');
+    let h='';
+    if(status==='licensed'){ h='<p><b>Licença ativa</b> neste aparelho ('+(st.name||devName())+').</p><p>Chave: <b>'+st.key.slice(0,8)+'••••••••</b></p>'; $('licKey').hidden=true; $('licGo').textContent='DESATIVAR ESTE APARELHO'; }
+    else{ $('licKey').hidden=false; $('licGo').textContent='ATIVAR';
+      h = status==='trial' ? '<p><b>Teste grátis:</b> restam '+info+' dia(s) com todos os recursos.</p><p>Já comprou? Cole a chave abaixo.</p>'
+        : status==='clock' ? '<p><b>O relógio do sistema parece ter sido alterado.</b> Corrija a data e hora, ou ative uma chave.</p>'
+        : status==='recheck' ? '<p><b>Precisamos revalidar sua licença.</b> Conecte-se à internet e toque em ATIVAR.</p>'
+        : '<p><b>Seu teste de '+CFG.trialDays+' dias terminou.</b> Para continuar usando o AURA, insira sua chave de ativação.</p>'; }
+    m.innerHTML=h; $('licFn').textContent='Cada chave vale para até 3 aparelhos seus. Aparelho: '+devName()+' · v'+(D.version||'');
+    ov.classList.add('on'); }
+  function hide(){ ov.classList.remove('on'); }
+  $('licTry').onclick=hide; ov.addEventListener('keydown',e=>{ if(e.key==='Enter') $('licGo').click(); if(e.key==='Escape'&&ok()) hide(); });
+  $('licBuy').onclick=()=>D.openExternal?D.openExternal(CFG.buyUrl):window.open(CFG.buyUrl);
+  $('licGo').onclick=async()=>{ const er=$('licErr'), b=$('licGo'); er.textContent=''; b.disabled=true;
+    try{
+      if(status==='licensed'){ const j=await call('/deactivate',{license_key:st.key,instance_id:st.inst}); if(j.deactivated||j._http===404){ st.key=st.inst=''; st.val=0; await save(); evalStatus(); paint(); show(); } else er.textContent=j.error||'Não foi possível desativar agora.'; return; }
+      const key=($('licKey').value||'').trim(); if(!key){ er.textContent='Cole a chave de ativação.'; return; }
+      const j=await call('/activate',{license_key:key,instance_name:devName()});
+      if(j.activated){ st.key=key; st.inst=j.instance&&j.instance.id; st.name=devName(); st.val=Date.now(); await save(); evalStatus(); paint(); hide(); try{ window.dispatchEvent(new Event('aura-licensed')); }catch(e){} }
+      else if(/limit/i.test(j.error||'')) er.textContent='Esta chave já está ativa em 3 aparelhos. Desative um deles (no AURA do outro aparelho: Ativação → Desativar) ou fale com o suporte.';
+      else er.textContent=(j.error||'Chave inválida.')+(j._http===0?'':''); }
+    catch(e){ er.textContent='Sem conexão com o servidor de licenças. Verifique a internet e tente de novo.'; }
+    finally{ b.disabled=false; } };
+  async function revalidate(){ if(!(st.key&&st.inst)) return; try{ const j=await call('/validate',{license_key:st.key,instance_id:st.inst});
+      if(j.valid){ st.val=Date.now(); await save(); } else if(j._http && j._http<500 && j.valid===false){ st.key=st.inst=''; st.val=0; await save(); } }catch(e){} evalStatus(); paint(); if(!ok()) show(); }
+
+  const api={ ok, show:()=>show(false), status:()=>status, _st:()=>st, _reload:async()=>{ await load(); evalStatus(); paint(); } };
+  window.AuraLic=api;
+  (async()=>{ await load(); const now=Date.now(); if(!st.t0) st.t0=now; if(now>st.seen) st.seen=now; await save(); evalStatus(); paint(); if(!ok()) show(); else await revalidate(); window.__licReady=true; })();
+  setInterval(()=>{ const now=Date.now(); if(now>st.seen){ st.seen=now; save(); } evalStatus(); paint(); if(!ok()){ show(); try{ if(window.panicAll) window.panicAll(); }catch(e){} } },60000);
 })();
 </script>
 <script>document.querySelectorAll(".seg.lever").forEach(function(g){if(g.querySelectorAll("button").length===2)g.classList.add("rk")});</script>

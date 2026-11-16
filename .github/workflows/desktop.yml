@@ -1,0 +1,105 @@
+name: Instaladores (Windows e macOS)
+on:
+  push:
+    branches: [comercial]
+    paths: ['desktop/**', 'index.html', 'vst/**', '.github/workflows/desktop.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+env:
+  VERSAO: "1.0.0"
+jobs:
+  plugin-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar plugin VST3
+        shell: bash
+        run: |
+          cmake -S vst -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release -j 4
+          mkdir -p plugin-out && cp -R build/AuraSynthBass_artefacts/Release/VST3/*.vst3 plugin-out/
+      - uses: actions/upload-artifact@v4
+        with: { name: plugin-win, path: plugin-out }
+  plugin-mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compilar plugin VST3 e AU
+        run: |
+          cmake -S vst -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release -j 4
+          mkdir -p plugin-out
+          cp -R build/AuraSynthBass_artefacts/Release/VST3/*.vst3 plugin-out/
+          cp -R build/AuraSynthBass_artefacts/Release/AU/*.component plugin-out/
+          codesign --force --deep -s - plugin-out/*.vst3 || true
+          codesign --force --deep -s - plugin-out/*.component || true
+      - uses: actions/upload-artifact@v4
+        with: { name: plugin-mac, path: plugin-out }
+  instalador-win:
+    needs: plugin-win
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/download-artifact@v4
+        with: { name: plugin-win, path: desktop/plugins/win }
+      - name: Gerar instalador .exe
+        shell: bash
+        working-directory: desktop
+        run: |
+          ls -R plugins/win | head -20
+          npm install --no-audit --no-fund
+          npm run dist:win
+          ls dist
+      - uses: actions/upload-artifact@v4
+        with: { name: AURA-Synth-Bass-Windows-Setup, path: "desktop/dist/*.exe" }
+  instalador-mac:
+    needs: plugin-mac
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - uses: actions/download-artifact@v4
+        with: { name: plugin-mac, path: desktop/plugins/mac }
+      - name: Gerar o app (universal)
+        working-directory: desktop
+        run: |
+          npm install --no-audit --no-fund
+          npm run dist:mac
+          ls dist
+      - name: Montar o instalador .pkg (app + VST3 + AU)
+        run: |
+          set -e
+          APP=$(ls -d desktop/dist/mac-universal/*.app | head -1)
+          mkdir -p pkgroot/app/Applications pkgroot/vst3 pkgroot/au pkgs
+          cp -R "$APP" pkgroot/app/Applications/
+          mkdir -p pkgroot/vst3/Library/Audio/Plug-Ins/VST3 pkgroot/au/Library/Audio/Plug-Ins/Components
+          cp -R "desktop/plugins/mac/AURA Synth Bass.vst3" pkgroot/vst3/Library/Audio/Plug-Ins/VST3/
+          cp -R "desktop/plugins/mac/AURA Synth Bass.component" pkgroot/au/Library/Audio/Plug-Ins/Components/
+          pkgbuild --root pkgroot/app  --identifier website.fervor.aurasynthbass.app  --version $VERSAO pkgs/app.pkg
+          pkgbuild --root pkgroot/vst3 --identifier website.fervor.aurasynthbass.vst3 --version $VERSAO pkgs/vst3.pkg
+          pkgbuild --root pkgroot/au   --identifier website.fervor.aurasynthbass.au   --version $VERSAO pkgs/au.pkg
+          cp desktop/build/EULA.txt pkgs/license.txt
+          cat > pkgs/dist.xml <<'X'
+          <?xml version="1.0" encoding="utf-8"?>
+          <installer-gui-script minSpecVersion="1">
+            <title>AURA Synth Bass</title>
+            <license file="license.txt"/>
+            <options customize="allow" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+            <choices-outline><line choice="app"/><line choice="vst3"/><line choice="au"/></choices-outline>
+            <choice id="app"  title="Aplicativo AURA Synth Bass" description="Instala o programa na pasta Aplicativos."><pkg-ref id="website.fervor.aurasynthbass.app"/></choice>
+            <choice id="vst3" title="Plugin VST3" description="Para Reaper e outras DAWs."><pkg-ref id="website.fervor.aurasynthbass.vst3"/></choice>
+            <choice id="au"   title="Plugin Audio Unit (AU)" description="Para Logic, GarageBand e outras DAWs AU."><pkg-ref id="website.fervor.aurasynthbass.au"/></choice>
+            <pkg-ref id="website.fervor.aurasynthbass.app">app.pkg</pkg-ref>
+            <pkg-ref id="website.fervor.aurasynthbass.vst3">vst3.pkg</pkg-ref>
+            <pkg-ref id="website.fervor.aurasynthbass.au">au.pkg</pkg-ref>
+          </installer-gui-script>
+          X
+          sed -i '' 's/^          //' pkgs/dist.xml
+          productbuild --distribution pkgs/dist.xml --package-path pkgs --resources pkgs "AURA-Synth-Bass-macOS-Setup-$VERSAO.pkg"
+          ls -la *.pkg
+      - uses: actions/upload-artifact@v4
+        with: { name: AURA-Synth-Bass-macOS-Setup, path: "*.pkg" }

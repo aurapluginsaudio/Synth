@@ -36,8 +36,8 @@ AuraEditor::AuraEditor(AuraProcessor& p) : AudioProcessorEditor(&p), proc(p) {
     addSection("EFEITO 1", { "fxd", "fxdr", "fxdp", "fxcr", "fxcb", "fxdl" });
     addSection("EFEITO 2", { "fxm", "fxmr", "fxmd", "fxmf", "fxmn", "fxmb", "fxrf" });
     addSection("REVERB", { "fxrv", "fxrt", "fxrm", "fxrh", "fxrl" });
-    addSection("OSC (JD-Xi)", { "rg", "un", "ud" });
-    addSection("FILTRO (BASS STATION)", { "fk", "fm", "of" });
+    addSection("OSC EXTRAS", { "rg", "un", "ud" });
+    addSection("FILTRO AVANÇADO", { "fk", "fm", "of" });
     addSection("LFO 2", { "l2w", "l2r", "l2d", "l2k", "l2f", "l2p", "l2m" });
     addSection("MOD. EXTRA", { "pwe", "pe" });
     addSection("ARPEJADOR", { "arpon", "arppat", "arpdiv", "arpoct", "arpgate", "arpsw", "arpbpm", "arpsync", "arplatch" });
