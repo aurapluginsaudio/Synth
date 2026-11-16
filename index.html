@@ -349,6 +349,42 @@
     box-shadow:inset 0 2px 2px rgba(255,220,170,.35),inset 0 -3px 4px rgba(0,0,0,.6)}
   :root{--cheek:clamp(16px,2.4vw,34px)}
   html:not(.light) .cheek{background-blend-mode:normal;filter:brightness(.62) saturate(.9)}
+
+  /* ===== aparência de instrumento: serigrafia, lâmpadas, knobs serrilhados e teclado com relevo (tema escuro) ===== */
+  .leds{display:flex;gap:clamp(8px,1.1vw,16px);align-items:flex-start;margin:0 auto 0 4px}
+  .lamp{display:flex;flex-direction:column;align-items:center;gap:4px}
+  .lamp i{display:block;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#4a4d53,#17181b 70%);box-shadow:0 0 0 2px #2c2e33,0 0 0 3px #000,0 1px 3px rgba(0,0,0,.8)}
+  .lamp b{font-size:7.5px;letter-spacing:1.2px;font-weight:800;color:#bdb7a5}
+  .lamp.g.on i{background:radial-gradient(circle at 38% 32%,#d7ffe5,#3ddc84 55%,#14803f);box-shadow:0 0 0 2px #2c2e33,0 0 0 3px #000,0 0 10px 2px rgba(61,220,132,.75)}
+  .lamp.a.on i{background:radial-gradient(circle at 38% 32%,#fff1d0,#ffab2e 55%,#a85d00);box-shadow:0 0 0 2px #2c2e33,0 0 0 3px #000,0 0 10px 2px rgba(255,171,46,.75)}
+  .lamp.r.on i{background:radial-gradient(circle at 38% 32%,#ffe0d6,#ff4a22 55%,#9a1a00);box-shadow:0 0 0 2px #2c2e33,0 0 0 3px #000,0 0 12px 3px rgba(255,74,34,.85)}
+  html:not(.light) .leds{gap:clamp(6px,.7vw,12px);margin:0 auto 0 0} html:not(.light) .lamp b{font-size:7px;letter-spacing:.8px}
+  html.light .leds{display:none}
+  @media (max-width:1359px),(max-height:560px){ .leds{display:none} }
+
+  html:not(.light) .panel{background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,rgba(0,0,0,.02) 1px 3px),
+      linear-gradient(100deg,rgba(255,255,255,0) 20%,rgba(255,255,255,.05) 36%,rgba(255,255,255,0) 52%,rgba(255,255,255,.025) 90%),
+      linear-gradient(180deg,#1d1f23 0,#14161a 55%,#0e0f12 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09),inset 0 -3px 0 rgba(0,0,0,.7),inset 0 0 0 1px #000}
+  html:not(.light) .sec h2{display:flex;align-items:center;gap:7px;color:#e9e4d4;border-bottom:0;box-shadow:none;padding:0 0 3px}
+  html:not(.light) .sec h2::before,html:not(.light) .sec h2::after{content:"";flex:1 1 0;height:2px;background:#d9d3c0;opacity:.85;border-radius:1px}
+  html:not(.light) .sec h2::before{flex:0 0 12px}
+  html:not(.light) .kn label,html:not(.light) .sel .cap2{color:#e9e4d4}
+  html:not(.light) .lamp b{color:#cfc9b6}
+  html:not(.light) .brand b{color:#e9e4d4}
+  /* escala impressa 0–10 em volta dos knobs */
+  html:not(.light) .kn::before,html:not(.light) .kn::after{position:absolute;top:calc(var(--ks)*.80);font:800 7.5px/1 "SF Mono",Menlo,Consolas,monospace;color:#bdb7a5;pointer-events:none}
+  html:not(.light) .kn::before{content:"0";left:calc(var(--ks)*.02)} html:not(.light) .kn::after{content:"10";right:-1px}
+  html:not(.light) .kn.sm::before,html:not(.light) .kn.sm::after{display:none}
+  /* knob com borda serrilhada (knurling) e topo liso */
+  html:not(.light) .cap{background:repeating-conic-gradient(from 0deg,#0a0b0c 0 3.2deg,#34363b 3.2deg 6.4deg);box-shadow:0 6px 9px rgba(0,0,0,.75),0 1px 2px #000,inset 0 0 0 1.5px #000}
+  html:not(.light) .cap::before{inset:15%;background:radial-gradient(circle at 50% 30%,#4a4c52,#1b1c20 60%,#101113);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.18),inset 0 -2px 3px rgba(0,0,0,.6),0 0 0 1.5px rgba(0,0,0,.85)}
+  html:not(.light) .cap::after,html:not(.light) .kn.big .cap::after{width:7%;margin-left:-3.5%;top:4%;height:42%;border-radius:1.5px;box-shadow:0 0 3px rgba(255,255,255,.35)}
+  /* teclado: borda frontal sombreada e pretas com brilho */
+  html:not(.light) .k.w{box-shadow:inset 0 -9px 8px -4px rgba(0,0,0,.28),inset 1px 0 0 rgba(255,255,255,.5),inset -1px 0 1px rgba(0,0,0,.25),0 2px 3px rgba(0,0,0,.6)}
+  html:not(.light) .k.b{box-shadow:inset 0 -6px 6px rgba(255,255,255,.07),inset 2px 0 1px rgba(255,255,255,.1),0 4px 5px rgba(0,0,0,.8)}
+  html:not(.light) .felt{background:linear-gradient(180deg,#4a0b0e,#7a1519 55%,#2c0709)}
   [hidden]{display:none !important}
 </style>
 </head>
@@ -360,6 +396,9 @@
       <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
       <div class="top">
         <div class="brand"><svg class="wordmark" viewBox="0 0 540 160" role="img" aria-label="AURA"><g fill="none" stroke="#1b1d20" stroke-width="22"><polyline points="20,148 70,16 120,148"/><path d="M160 16 V96 a40 40 0 0 0 80 0 V16"/><path d="M290 148 V27 H337 a32 32 0 0 1 0 64 H290 M334 91 L378 148"/><polyline points="420,148 470,16 520,148"/></g><g fill="none" stroke="#E8890C" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path d="M40 104 C 52 84, 58 84, 70 104 S 88 124, 100 104"/><path d="M440 108 H456 V92 H484 V108 H500"/></g></svg><span>SYNTH BASS</span></div>
+        <div class="leds" aria-hidden="true">
+          <div class="lamp g" id="lPwr"><i></i><b>POWER</b></div><div class="lamp a" id="lMidi"><i></i><b>MIDI</b></div><div class="lamp g" id="lGate"><i></i><b>GATE</b></div><div class="lamp a" id="lArp"><i></i><b>ARP</b></div><div class="lamp r" id="lOvl"><i></i><b>OVERLOAD</b></div>
+        </div>
         <div class="pnav">
           <button id="pPrev" class="btn" aria-label="Preset anterior">◀</button>
           <div class="oled" id="oled" role="button" tabindex="0" aria-label="Abrir lista de presets">
@@ -1731,7 +1770,7 @@
   // ====================== Osciloscópio e medidor ======================
   const cv=$('scope'), g=cv.getContext('2d'); let buf=null, fbuf=null, clipUntil=0;
   const mLeds=[...$('meter').children], TH=[-30,-20,-12,-6,0,3];
-  let idleFrames=0, frameNo=0;
+  let idleFrames=0, frameNo=0, midiUntil=0, ovlUntil=0; const LED={}; const ledSet=(id,on)=>{ const e=LED[id]||(LED[id]=$(id)); if(e&&e._on!==on){ e._on=on; e.classList.toggle('on',on); } };
   function draw(){
     requestAnimationFrame(draw);
     if(document.hidden) return;
@@ -1753,6 +1792,7 @@
     const db = peak>0 ? 20*Math.log10(peak) : -100, now=performance.now();
     if(db>=TH[5]) clipUntil=now+700;
     idleFrames = (peak<0.0015 && now>clipUntil) ? idleFrames+1 : 0;
+    ledSet('lPwr',!!ctx&&ctx.state==='running'); ledSet('lMidi',now<midiUntil); ledSet('lGate',gate); ledSet('lArp',arp.on); if(db>=-1) ovlUntil=now+450; ledSet('lOvl',now<ovlUntil);
     for(let i=0;i<6;i++){ const on = i<5 ? db>=TH[i] : now<clipUntil; if(mLeds[i]._on!==on){ mLeds[i]._on=on; mLeds[i].classList.toggle('on',on); } }
   }
   draw();
@@ -1793,6 +1833,7 @@
 
   // ====================== MIDI ======================
   function onMsg(ev){
+    midiUntil=performance.now()+120;
     const d=ev.data, cmd=d[0]&0xF0; let d1=d[1]; const d2=d[2];
     if(cmd>=0x80 && cmd<0xF0){ if(G.ch>0 && (d[0]&0x0F)+1!==G.ch) return; if(G.xp && cmd<=0xA0) d1=Math.max(0,Math.min(127,d1+G.xp)); }
     if(cmd===0x90 && d2>0){
