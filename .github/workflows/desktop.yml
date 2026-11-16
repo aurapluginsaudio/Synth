@@ -67,9 +67,17 @@ jobs:
       - name: Gerar o app (universal)
         working-directory: desktop
         run: |
-          npm install --no-audit --no-fund
-          npm run dist:mac
+          set -o pipefail
+          npm install --no-audit --no-fund 2>&1 | tail -5
+          npm run dist:mac 2>&1 | tee ../mac.log
           ls dist
+      - name: Enviar log do app (diagnóstico)
+        if: failure()
+        run: |
+          git config user.name ci; git config user.email ci@example.com
+          cp mac.log /tmp/l.log 2>/dev/null || echo "sem log" > /tmp/l.log
+          git checkout --orphan buildlogdesk && git rm -rf . -q || true
+          cp /tmp/l.log mac.log && git add mac.log && git commit -m "log desktop mac" -q && git push -f origin buildlogdesk
       - name: Montar o instalador .pkg (app + VST3 + AU)
         run: |
           set -e
