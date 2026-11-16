@@ -349,6 +349,7 @@
     box-shadow:inset 0 2px 2px rgba(255,220,170,.35),inset 0 -3px 4px rgba(0,0,0,.6)}
   :root{--cheek:clamp(16px,2.4vw,34px)}
   html:not(.light) .cheek{background-blend-mode:normal;filter:brightness(.62) saturate(.9)}
+  [hidden]{display:none !important}
 </style>
 </head>
 <body>
@@ -453,7 +454,8 @@
 <div class="dlg" id="dlgList" role="dialog" aria-modal="true" aria-label="Presets"><div class="box wide">
   <button class="x" data-close aria-label="Fechar">×</button>
   <h3 id="pTitle">PRESETS</h3>
-  <div class="lrow"><input id="pSearch" type="search" placeholder="BUSCAR" autocomplete="off"><button id="favOnly" class="btn">★ Só favoritos</button></div>
+  <div class="lrow"><input id="pSearch" type="search" placeholder="BUSCAR" autocomplete="off"><button id="favOnly" class="btn">★ Só favoritos</button><button id="manage" class="btn" aria-pressed="false">🗑 Apagar</button></div>
+  <button id="delAll" class="btn danger" hidden></button>
   <div id="pCats" class="cats" role="group" aria-label="Categorias"></div>
   <div id="pList"></div>
   <button class="btn" data-close>Fechar</button>
@@ -878,6 +880,25 @@
     CATS.forEach(n=>{ const b=document.createElement('button'); b.className='btn chip'+(n===catSel?' cur':''); b.textContent=n; b.setAttribute('aria-pressed',n===catSel?'true':'false');
       b.addEventListener('click',()=>{ catSel=n; drawList(); }); box.appendChild(b); });
   }
+  let manageOn=false, delArm=null, delT=0;
+  const canDel = p => !FACTORY.includes(p);          // os 5 de fábrica ficam; os seus e os da nuvem podem ser apagados
+  async function deletePresets(list){
+    const names=new Set(list.map(p=>p.name)), cur=PRESETS[curPreset]?PRESETS[curPreset].name:null;
+    const erGone=list.filter(p=>p.factory).map(p=>p.name);
+    let note='Apagado'+(list.length>1?'s '+list.length:'');
+    if(erGone.length){
+      ER=ER.filter(p=>!names.has(p.name)); LS.set(ERKEY,ER);
+      if(cloud){ try{ for(let i=0;i<erGone.length;i+=20){ const ch=erGone.slice(i,i+20).map(n=>'"'+n.replace(/"/g,'\\"')+'"').join(','); await sb('/rest/v1/aura_presets?name=in.('+encodeURIComponent(ch)+')',{method:'DELETE'}); } erGone.forEach(n=>{ cloudNames.delete(n); delete cloudHash[n]; }); LS.set(CNKEY,[...cloudNames]); }
+        catch(e){ note='Apagado aqui, mas a nuvem falhou: '+(e&&e.message||e); } }
+      else note='Apagado só neste aparelho (sem login, volta ao sincronizar)';
+    }
+    favs.forEach(n=>{ if(names.has(n)) favs.delete(n); }); LS.set(FKEY,[...favs]);
+    PRESETS=FACTORY.concat(ER,PRESETS.filter(p=>!p.factory&&!names.has(p.name)));
+    persistUser();
+    const i=PRESETS.findIndex(p=>p.name===cur);
+    if(i>=0){ curPreset=i; LS.set(LKEY,curPreset); renderOled(); } else loadPreset(Math.min(curPreset,PRESETS.length-1));
+    drawList(); say(note);
+  }
   function drawList(){
     const box=$('pList'), q=($('pSearch').value||'').trim().toUpperCase(); box.innerHTML='';
     drawCats();
@@ -888,8 +909,16 @@
       if(catSel!=='TODOS' && !catsOf(p).includes(catSel)) return;
       if(favOnly && !q && !favs.has(p.name)) return;
       const row=document.createElement('div'); row.className='prow';
-      const s=document.createElement('button'); s.className='btn star'+(favs.has(p.name)?' cur':''); s.textContent='★'; s.setAttribute('aria-label','Favorito');
+      let s;
+      if(manageOn){
+        s=document.createElement('button'); s.setAttribute('aria-label','Apagar '+p.name);
+        if(canDel(p)){ const armed=delArm===p.name; s.className='btn star'+(armed?' armed':''); s.textContent=armed?'?':'✕'; s.style.color=armed?'':'#ff7a5c';
+          s.addEventListener('click',()=>{ if(delArm===p.name){ delArm=null; clearTimeout(delT); deletePresets([p]); } else { delArm=p.name; clearTimeout(delT); delT=setTimeout(()=>{ delArm=null; drawList(); },3500); drawList(); } }); }
+        else { s.className='btn star'; s.textContent='🔒'; s.disabled=true; s.style.opacity='.35'; }
+      } else {
+      s=document.createElement('button'); s.className='btn star'+(favs.has(p.name)?' cur':''); s.textContent='★'; s.setAttribute('aria-label','Favorito');
       s.addEventListener('click',()=>{ if(favs.has(p.name)) favs.delete(p.name); else favs.add(p.name); LS.set(FKEY,[...favs]); drawList(); renderOled(); });
+      }
       const b=document.createElement('button'); b.className='btn row mono'+(i===curPreset?' cur':'');
       b.textContent=String(i+1).padStart(2,'0')+'  '+p.name;
       if(!p.factory){ const em=document.createElement('em'); em.textContent='MEU'; b.appendChild(em); }
@@ -897,11 +926,16 @@
       b.addEventListener('click',()=>{ loadPreset(i); closeD('dlgList'); });
       row.appendChild(s); row.appendChild(b); box.appendChild(row);
     });
+    const vis=PRESETS.filter(p=>canDel(p)&&(!q||p.name.toUpperCase().includes(q))&&(catSel==='TODOS'||catsOf(p).includes(catSel))&&(!favOnly||q||favs.has(p.name)));
+    const da=$('delAll'); da.hidden=!(manageOn&&vis.length>1); disarm(da); da.textContent='Apagar os '+vis.length+' listados'; da._vis=vis;
+    $('manage').classList.toggle('cur',manageOn); $('manage').setAttribute('aria-pressed',manageOn?'true':'false');
     if(!box.children.length){ const e=document.createElement('p'); e.textContent=favOnly&&!q?'Nenhum favorito marcado ainda.':'Nenhum preset encontrado.'; box.appendChild(e); }
   }
   $('oled').addEventListener('click',()=>{ if(learnMode) return; $('pSearch').value=''; drawList(); openD('dlgList'); const c=$('pCur'); if(c) c.scrollIntoView({block:'center'}); });
   $('oled').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('oled').click(); } });
   $('pSearch').addEventListener('input',drawList);
+  $('manage').addEventListener('click',()=>{ manageOn=!manageOn; delArm=null; drawList(); });
+  confirmTap($('delAll'),()=>{ const v=$('delAll')._vis||[]; if(v.length) deletePresets(v); });
   $('favOnly').addEventListener('click',()=>{ favOnly=!favOnly; LS.set(FOKEY,favOnly); drawList(); });
 
   const pName=$('pName');
