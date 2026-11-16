@@ -6,7 +6,7 @@ using aura::kDefs; using aura::Kind;
 
 namespace {
 // valores padrão (iguais ao DEF da versão web), para presets importados que não trazem todos os campos
-const float kDefault[aura::NP] = {-1,2,0.5f,0.75f,1,0.5f,0,0,0,0,0,0,0,0.5f,0,0,0,0,4,0,0,0.15f,5.5f,0,0,0,0,0.002f,0.3f,0,0.2f,0.004f,0.3f,1,0.1f,1,1.3f,0,1,0,0,1,0,0,0,0,0.3f,0.35f,0, 0,0,1,0.5f,1,1,1,1,1,0};
+const float kDefault[aura::NP] = {-1,2,0.5f,0.75f,1,0.5f,0,0,0,0,0,0,0,0.5f,0,0,0,0,4,0,0,0.15f,5.5f,0,0,0,0,0.002f,0.3f,0,0.2f,0.004f,0.3f,1,0.1f,1,1.3f,0,1,0,0,1,0,0,0,0,0.3f,0.35f,0, 0,0,1,0.5f,1,1,1,1,1,0, 0,0,0.4f};
 int waveFromVar(const var& v, int d) {
     if (v.isString()) { auto s = v.toString(); if (s == "triangle") return 0; if (s == "sawtooth") return 1; if (s == "square") return 2; if (s == "rsaw") return 3; if (s == "tsaw") return 4; }
     return v.isVoid() ? d : (int)v;
@@ -40,6 +40,15 @@ AudioProcessorValueTreeState::ParameterLayout AuraProcessor::makeLayout() {
     L.add(std::make_unique<AudioParameterFloat>(ParameterID("arpgate", 1), "Arp Duracao", NormalisableRange<float>(0.1f, 0.95f), 0.6f));
     L.add(std::make_unique<AudioParameterBool>(ParameterID("arplatch", 1), "Arp Trava", false));
     L.add(std::make_unique<AudioParameterBool>(ParameterID("arpsync", 1), "Arp Tempo do host", true));
+    // efeitos (inspirados no JD-Xi)
+    L.add(std::make_unique<AudioParameterChoice>(ParameterID("fxd", 1), "EFX1 Tipo", StringArray{ "Desligado", "Distorcao", "Fuzz", "Bitcrusher" }, 0));
+    L.add(std::make_unique<AudioParameterChoice>(ParameterID("fxm", 1), "EFX2 Tipo", StringArray{ "Desligado", "Chorus", "Flanger", "Phaser", "Anel" }, 0));
+    L.add(std::make_unique<AudioParameterBool>(ParameterID("fxrv", 1), "Reverb", false));
+    L.add(std::make_unique<AudioParameterChoice>(ParameterID("fxrt", 1), "Reverb Tipo", StringArray{ "Sala 1", "Sala 2", "Palco 1", "Palco 2", "Catedral 1", "Catedral 2" }, 1));
+    { static const struct { const char* id; const char* nm; float def; } F[] = { {"fxdr","Drive",0.4f},{"fxdp","Presenca",0.6f},{"fxdl","EFX1 Nivel",0.7f},{"fxcr","Taxa",0.4f},{"fxcb","Bits",0.5f},
+        {"fxmr","Velocidade",0.3f},{"fxmd","Profundidade",0.5f},{"fxmf","Feedback/Res.",0.2f},{"fxmn","Manual",0.5f},{"fxmb","Balanco",0.5f},{"fxrf","Freq. Anel",0.35f},
+        {"fxrm","Reverb Tempo",0.5f},{"fxrh","Reverb Agudos",0.7f},{"fxrl","Reverb Nivel",0.3f} };
+      for (auto& f : F) L.add(std::make_unique<AudioParameterFloat>(ParameterID(f.id, 1), f.nm, NormalisableRange<float>(0, 1), f.def)); }
     L.add(std::make_unique<AudioParameterFloat>(ParameterID("tun", 1), "Tune (cent)", NormalisableRange<float>(-100, 100, 1), 0));
     L.add(std::make_unique<AudioParameterBool>(ParameterID("kte", 1), "Erro de tecla", false));
     L.add(std::make_unique<AudioParameterChoice>(ParameterID("tt", 1), "Escala", StringArray{ "Igual", "Pitagorica", "Carlos", "Partch 43" }, 0));
@@ -64,13 +73,14 @@ AuraProcessor::AuraProcessor()
     auto g = [this](const char* id) { return apvts.getRawParameterValue(id); };
     pVelSens = g("velsens"); pVelDest = g("veldest"); pPrio = g("prio"); pAtDest = g("atdest"); pHold = g("hold");
     pArpOn = g("arpon"); pArpPat = g("arppat"); pArpDiv = g("arpdiv"); pArpOct = g("arpoct"); pArpGate = g("arpgate"); pArpLatch = g("arplatch"); pArpSync = g("arpsync"); pArpBpm = g("arpbpm");
+    { static const char* ids[kFxN] = { "fxd","fxm","fxrv","fxrt","fxdr","fxdp","fxdl","fxcr","fxcb","fxmr","fxmd","fxmf","fxmn","fxmb","fxrf","fxrm","fxrh","fxrl" }; for (int i = 0; i < kFxN; i++) pFx[i] = g(ids[i]); }
     pTun = g("tun"); pKte = g("kte"); pTt = g("tt"); pBu = g("bu"); pBd = g("bd"); pVcv = g("vcv"); pXp = g("xp"); pCh = g("ch"); pA440 = g("a440"); pXon = g("xon"); pXlvl = g("xlvl"); pXmode = g("xmode"); pXthr = g("xthr");
-    engine.prepare(44100);
+    engine.prepare(44100); fx.prepare(44100);
 }
 
 void AuraProcessor::prepareToPlay(double sr, int) {
     for (int i = 0; i < aura::NP; i++) engine.p[i] = raw[i]->load();
-    engine.prepare(sr); arp.clear();
+    engine.prepare(sr); fx.prepare(sr); arp.clear();
 }
 
 const String AuraProcessor::getProgramName(int i) {
@@ -202,6 +212,20 @@ void AuraProcessor::processBlock(AudioBuffer<float>& buf, MidiBuffer& midi) {
     }
     render(n);
     if (tone) { for (int i = 0; i < n; i++) { out[i] += 0.25f * (float)std::sin(tonePh); tonePh += 6.283185307179586 * 440.0 / engine.sr; if (tonePh > 6.283185307179586) tonePh -= 6.283185307179586; } }
+    {   // efeitos: mono -> estéreo
+        aura::FxParams q; q.d = (int)pFx[0]->load(); q.m = (int)pFx[1]->load(); q.rv = pFx[2]->load() > 0.5f ? 1 : 0; q.rt = (int)pFx[3]->load();
+        q.dr = pFx[4]->load(); q.dp = pFx[5]->load(); q.dl = pFx[6]->load(); q.cr = pFx[7]->load(); q.cb = pFx[8]->load(); q.mr = pFx[9]->load(); q.md = pFx[10]->load(); q.mf = pFx[11]->load();
+        q.mn = pFx[12]->load(); q.mb = pFx[13]->load(); q.rf = pFx[14]->load(); q.rm = pFx[15]->load(); q.rh = pFx[16]->load(); q.rl = pFx[17]->load();
+        if (q.d || q.m || q.rv) {
+            fxTmp.assign(out, out + n); fxR.assign((size_t)n, 0.f);
+            fx.process(q, fxTmp.data(), out, fxR.data(), n);
+            auto sc = [](float x) { const float a = std::fabs(x); return a < 0.9f ? x : std::copysign(0.9f + 0.1f * std::tanh((a - 0.9f) / 0.1f), x); };
+            for (int i = 0; i < n; i++) { out[i] = sc(out[i]); fxR[(size_t)i] = sc(fxR[(size_t)i]); }
+            if (nch >= 2) buf.copyFrom(1, 0, fxR.data(), n);
+            for (int c = 2; c < nch; c++) buf.copyFrom(c, 0, buf, 0, 0, n);
+            return;
+        }
+    }
     for (int c = 1; c < nch; c++) buf.copyFrom(c, 0, buf, 0, 0, n);
 }
 

@@ -6,6 +6,7 @@ const Colour kBg(0xff14181d), kPanel(0xff1f252c), kAmber(0xffe8890c), kText(0xff
 struct Meta { const char* id; const char* label; };
 const Meta kExtra[] = { {"velsens","TOQUE"},{"veldest","TOQUE AGE EM"},{"prio","PRIORIDADE"},{"atdest","PRESSAO"},{"hold","HOLD"},
   {"tun","TUNE"},{"tt","ESCALA"},{"kte","ERRO TECLA"},{"a440","A-440"},{"bu","PITCH +"},{"bd","PITCH -"},{"vcv","CURVA"},{"xp","TRANSP."},{"ch","CANAL"},{"xon","LIGAR"},{"xlvl","NIVEL"},{"xmode","DISPARO"},{"xthr","LIMIAR"},{"mm","MOD MIX"},{"ma","A=ENV FILTRO"},{"mb","B=LFO"},{"mx","A <-> B"},{"mo","MOD OSC"},{"mf","MOD FILTRO"},{"e1","OSC 1"},{"e2","OSC 2"},{"e3","OSC 3"},{"kts","PASSOS"},
+  {"fxd","EFX1"},{"fxdr","DRIVE"},{"fxdp","PRESENCA"},{"fxdl","NIVEL"},{"fxcr","TAXA"},{"fxcb","BITS"},{"fxm","EFX2"},{"fxmr","VELOC."},{"fxmd","PROFUND."},{"fxmf","FEEDBACK"},{"fxmn","MANUAL"},{"fxmb","BALANCO"},{"fxrf","FREQ. ANEL"},{"fxrv","REVERB"},{"fxrt","TIPO"},{"fxrm","TEMPO"},{"fxrh","AGUDOS"},{"fxrl","NIVEL REV."},{"rg","ANEL OSC"},{"un","UNISSONO"},{"ud","ABERTURA"},
   {"arpon","ARP"},{"arppat","PADRAO"},{"arpdiv","DIVISAO"},{"arpoct","OITAVAS"},{"arpgate","DURACAO"},{"arplatch","TRAVA"},{"arpsync","TEMPO HOST"},{"arpbpm","BPM"} };
 String shortLabel(const String& id, const String& full) {
     for (auto& m : kExtra) if (id == m.id) return m.label;
@@ -31,6 +32,10 @@ AuraEditor::AuraEditor(AuraProcessor& p) : AudioProcessorEditor(&p), proc(p) {
     addSection("AFINACAO", { "tun", "tt", "kte", "a440" });
     addSection("CONTROLES", { "bu", "bd", "vcv", "xp", "ch" });
     addSection("ENTRADA EXTERNA", { "xon", "xlvl", "xmode", "xthr" });
+    addSection("EFEITO 1", { "fxd", "fxdr", "fxdp", "fxcr", "fxcb", "fxdl" });
+    addSection("EFEITO 2", { "fxm", "fxmr", "fxmd", "fxmf", "fxmn", "fxmb", "fxrf" });
+    addSection("REVERB", { "fxrv", "fxrt", "fxrm", "fxrh", "fxrl" });
+    addSection("OSC (JD-Xi)", { "rg", "un", "ud" });
     addSection("ARPEJADOR", { "arpon", "arppat", "arpdiv", "arpoct", "arpgate", "arpbpm", "arpsync", "arplatch" });
 
     for (auto* b : { &bSave, &bImp, &bExp, &bPrev, &bNext }) addAndMakeVisible(*b);

@@ -19,6 +19,7 @@ static const Def kDefs[aura::NP] = {
  {"k3","Osc 3 Segue Teclado",0,1,1,B},{"nc","Ruido Rosa",0,1,1,B},{"ovl","Overload",0,1,1,F},{"lsr","LFO Fonte (0 LFO, 1 Osc3, 2 Rand)",0,2,1,I},
  {"ec","Envelopes Lineares",0,1,1,B},{"dt","Delay Tempo (s)",0.02f,1,1,F},{"df","Delay Repeticoes",0,0.9f,1,F},{"dm","Delay Mix",0,1,1,F},
  {"mm","Mod Mix Ligado",0,1,1,B},{"ma","Mod A = Env Filtro",0,1,1,B},{"mb","Mod B = LFO",0,1,1,B},{"mx","Mod Mix A-B",0,1,1,F},{"mo","Mod Osciladores",0,1,1,B},{"mf","Mod Filtro",0,1,1,B},
- {"e1","Osc 1 Ligado",0,1,1,B},{"e2","Osc 2 Ligado",0,1,1,B},{"e3","Osc 3 Ligado",0,1,1,B},{"kts","Teclado em passos",0,1,1,B}};
+ {"e1","Osc 1 Ligado",0,1,1,B},{"e2","Osc 2 Ligado",0,1,1,B},{"e3","Osc 3 Ligado",0,1,1,B},{"kts","Teclado em passos",0,1,1,B},
+ {"rg","Anel OSC1 x OSC2",0,1,1,B},{"un","Unissono",0,3,1,I},{"ud","Unissono abertura",0,1,1,F}};
 
 }

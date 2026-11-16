@@ -2,6 +2,7 @@
 #pragma once
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "AuraEngine.h"
+#include "Fx.h"
 #include "Arp.h"
 #include "Presets.h"
 #include "ParamDefs.h"
@@ -45,6 +46,7 @@ private:
     aura::Engine engine; aura::Arp arp;
     std::atomic<float>* raw[aura::NP] = {};
     std::atomic<float> *pTun, *pKte, *pTt, *pBu, *pBd, *pVcv, *pXp, *pCh, *pA440, *pXon, *pXlvl, *pXmode, *pXthr;
+    static constexpr int kFxN = 18; std::atomic<float>* pFx[kFxN] = {}; aura::Fx fx; std::vector<float> fxTmp, fxR;
     std::vector<float> extIn; double tonePh = 0;
     std::atomic<float> *pVelSens, *pVelDest, *pPrio, *pAtDest, *pHold, *pArpOn, *pArpPat, *pArpDiv, *pArpOct, *pArpGate, *pArpLatch, *pArpSync, *pArpBpm;
     std::vector<UserPreset> user;

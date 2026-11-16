@@ -10,7 +10,7 @@ namespace aura {
 
 enum P { oct, wave, pw1, lvl, w2, pw2, l2, d2, o2, sync, sub, sw, nz, cut, res, fenv, kt, drv, pol, glide, pa, pd, lr, lwv, lp, lf, lw,
          fa, fd, fs, fr, a, d, s, r, leg, vol, l3, w3, o3, d3, k3, nc, ovl, lsr, ec, dt, df, dm,
-         mm, ma, mb, mx, mo, mf, e1, e2, e3, kts, NP };
+         mm, ma, mb, mx, mo, mf, e1, e2, e3, kts, rg, un, ud, NP };
 
 static const double TWO_PI = 6.283185307179586;
 
@@ -24,6 +24,7 @@ struct Engine {
     // ajustes globais (iguais aos do app web)
     float tun = 0; int kte = 0, tt = 0; float bu = 2, bd = 12; int vcv = 1;
     float xlvl = 0, xthr = 0.15f; int xmode = 0;   // entrada externa
+    double pu[3] = { 0, 0, 0 };
     double mvm = 0, nn0 = 0, nn1 = 0, nn2 = 0, rdN = 0, fe = 0, feStep = 0, feStep2 = 0, xe = 0; int xtr = 0, xh = 0; int xNote = -1;
     double sr = 44100;
 
@@ -183,6 +184,8 @@ struct Engine {
 
     // ----- processamento (mono). Escreve n amostras em out.
     void process(float* out, int n, const float* in = nullptr) {
+        const bool rgOn = p[rg] > 0.5f; const int unN = std::max(0, std::min(3, (int)std::lround(p[un]))); const double ug = 1.0 / std::sqrt(1.0 + unN); double ur[3] = { 1, 1, 1 };
+        for (int k2 = 0; k2 < unN; k2++) { double off = (k2 % 2 ? 1 : -1) * (double)(k2 / 2 + 1) / std::ceil((unN + 1) / 2.0) * p[ud] * 40.0; ur[k2] = std::pow(2.0, off / 1200.0); }
         const bool mmOn = p[mm] > 0.5f;
         const int lsr_ = mmOn ? 0 : (int)std::lround(p[lsr]);
         const bool ext = lsr_ > 0 || mmOn;
@@ -274,8 +277,14 @@ struct Engine {
             if (ml3 > 1e-4 || lsr_ == 1 || (mmOn && !maEG)) { double f3 = k3on ? f * ratio3 : fx3, d3_ = std::min(f3 / sr, 0.45); p3 += d3_; if (p3 >= 1) p3 -= 1; s3 = osc(w3_, p3, d3_, 0.5); }
             if (lsr_ == 1) mv = s3; else if (lsr_ == 2) { shT -= p[lr] / sr; if (shT <= 0) { shT += 1; shV = rnd() * 2 - 1; } mv = shV; }
             double sg = 0;
-            if (ml1 > 1e-4) sg += ml1 * osc(w1, p1, dt1, std::min(0.95, std::max(0.05, p[pw1] + pm)));
-            if (ml2 > 1e-4) sg += ml2 * osc(w2_, p2, dt2, std::min(0.95, std::max(0.05, p[pw2] + pm)));
+            {   const double pw1v = std::min(0.95, std::max(0.05, p[pw1] + pm)), pw2v = std::min(0.95, std::max(0.05, p[pw2] + pm));
+                if (rgOn) { if (ml1 > 1e-4 || ml2 > 1e-4) sg += std::max(ml1, ml2) * osc(w1, p1, dt1, pw1v) * osc(w2_, p2, dt2, pw2v); }
+                else {
+                    if (ml1 > 1e-4) { double o1 = osc(w1, p1, dt1, pw1v);
+                        if (unN > 0) { for (int k2 = 0; k2 < unN; k2++) { const double dk = std::min(dt1 * ur[k2], 0.45); pu[k2] += dk; if (pu[k2] >= 1) pu[k2] -= 1; o1 += osc(w1, pu[k2], dk, pw1v); } o1 *= ug; }
+                        sg += ml1 * o1; }
+                    if (ml2 > 1e-4) sg += ml2 * osc(w2_, p2, dt2, pw2v);
+                } }
             if (mls > 1e-4) {
                 if (sm) { ps += dt1 * 0.5; if (ps >= 1) ps -= 1; sg += mls * 0.75 * ((ps < 0.5 ? 1 : -1) + blep(ps, dt1 * 0.5) - blep(ps < 0.5 ? ps + 0.5 : ps - 0.5, dt1 * 0.5)); }
                 else { ps += dt1; if (ps >= 1) ps -= 1; sg += mls * std::sin(TWO_PI * ps); }

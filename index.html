@@ -1379,7 +1379,7 @@
     fx.cg=ctx.createGain(); fx.cg.gain.value=0; fx.i1.connect(fx.crush); fx.crush.connect(fx.cg); fx.cg.connect(fx.o1); fxApply();
   }
   function fxCurve(type,k){ const N=2048, a=new Float32Array(N);
-    for(let i=0;i<N;i++){ const x=i/(N-1)*2-1; a[i]= type===1 ? Math.tanh(k*x)/Math.tanh(k) : (Math.tanh(k*(x*1.2+0.35))-Math.tanh(k*0.35))/ (Math.tanh(k*1.55)-Math.tanh(k*0.35)); }
+    for(let i=0;i<N;i++){ const x=i/(N-1)*2-1; a[i]= type===1 ? Math.tanh(k*x)/Math.tanh(k) : (Math.tanh(k*x+0.6)-Math.tanh(0.6))*0.6; }
     return a; }
   function genIR(){
     if(!ctx) return; const sr=ctx.sampleRate, T=[[0.5,0.003],[0.9,0.007],[1.4,0.010],[2.0,0.014],[3.0,0.022],[4.2,0.034]][FX.rt|0];
