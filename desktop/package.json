@@ -21,15 +21,65 @@
     "appId": "website.fervor.aurasynthbass",
     "productName": "AURA Synth Bass",
     "copyright": "© 2026 Thiago R. Galvão. Todos os direitos reservados.",
-    "directories": { "output": "dist", "buildResources": "build" },
-    "files": ["src/**", "app/**", "package.json"],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**",
+      "app/**",
+      "package.json"
+    ],
     "asar": true,
     "artifactName": "AURA-Synth-Bass-Setup-${version}.${ext}",
-    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "icon": "build/icon.ico", "publisherName": "Thiago R. Galvão", "legalTrademarks": "AURA Synth Bass" },
-    "nsis": { "oneClick": false, "perMachine": true, "allowToChangeInstallationDirectory": true, "installerIcon": "build/icon.ico", "uninstallerIcon": "build/icon.ico",
-              "license": "build/EULA.txt", "include": "build/installer.nsh", "shortcutName": "AURA Synth Bass", "language": "1046" },
-    "mac": { "identity": null, "category": "public.app-category.music", "icon": "build/icon.icns", "target": [{ "target": "dir", "arch": ["universal"] }],
-             "extendInfo": { "NSHumanReadableCopyright": "© 2026 Thiago R. Galvão. Todos os direitos reservados." } },
-    "extraResources": [{ "from": "plugins/${os}", "to": "plugins", "filter": ["**/*"] }]
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "publisherName": "Thiago R. Galvão",
+      "legalTrademarks": "AURA Synth Bass",
+      "extraResources": [
+        {
+          "from": "plugins/win",
+          "to": "plugins",
+          "filter": [
+            "**/*"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "license": "build/EULA.txt",
+      "include": "build/installer.nsh",
+      "shortcutName": "AURA Synth Bass",
+      "language": "1046"
+    },
+    "mac": {
+      "identity": null,
+      "category": "public.app-category.music",
+      "icon": "build/icon.icns",
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "extendInfo": {
+        "NSHumanReadableCopyright": "© 2026 Thiago R. Galvão. Todos os direitos reservados."
+      }
+    }
   }
 }
