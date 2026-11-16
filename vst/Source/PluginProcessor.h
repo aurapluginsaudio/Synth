@@ -14,7 +14,7 @@ public:
     ~AuraProcessor() override = default;
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
-    bool isBusesLayoutSupported(const BusesLayout& l) const override { return l.getMainOutputChannelSet() == juce::AudioChannelSet::stereo() || l.getMainOutputChannelSet() == juce::AudioChannelSet::mono(); }
+    bool isBusesLayoutSupported(const BusesLayout& l) const override { auto o = l.getMainOutputChannelSet(); auto i = l.getMainInputChannelSet(); return (o == juce::AudioChannelSet::stereo() || o == juce::AudioChannelSet::mono()) && (i.isDisabled() || i == juce::AudioChannelSet::stereo() || i == juce::AudioChannelSet::mono()); }
     void processBlock(juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
@@ -44,6 +44,8 @@ private:
     void applyValues(const float* v);
     aura::Engine engine; aura::Arp arp;
     std::atomic<float>* raw[aura::NP] = {};
+    std::atomic<float> *pTun, *pKte, *pTt, *pBu, *pBd, *pVcv, *pXp, *pCh, *pA440, *pXon, *pXlvl, *pXmode, *pXthr;
+    std::vector<float> extIn; double tonePh = 0;
     std::atomic<float> *pVelSens, *pVelDest, *pPrio, *pAtDest, *pHold, *pArpOn, *pArpPat, *pArpDiv, *pArpOct, *pArpGate, *pArpLatch, *pArpSync, *pArpBpm;
     std::vector<UserPreset> user;
     int program = 0; bool pedal = false, lastArpOn = false;

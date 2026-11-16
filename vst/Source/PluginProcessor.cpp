@@ -6,9 +6,9 @@ using aura::kDefs; using aura::Kind;
 
 namespace {
 // valores padrão (iguais ao DEF da versão web), para presets importados que não trazem todos os campos
-const float kDefault[aura::NP] = {-1,2,0.5f,0.75f,1,0.5f,0,0,0,0,0,0,0,0.5f,0,0,0,0,4,0,0,0.15f,5.5f,0,0,0,0,0.002f,0.3f,0,0.2f,0.004f,0.3f,1,0.1f,1,1.3f,0,1,0,0,1,0,0,0,0,0.3f,0.35f,0};
+const float kDefault[aura::NP] = {-1,2,0.5f,0.75f,1,0.5f,0,0,0,0,0,0,0,0.5f,0,0,0,0,4,0,0,0.15f,5.5f,0,0,0,0,0.002f,0.3f,0,0.2f,0.004f,0.3f,1,0.1f,1,1.3f,0,1,0,0,1,0,0,0,0,0.3f,0.35f,0, 0,0,1,0.5f,1,1,1,1,1,0};
 int waveFromVar(const var& v, int d) {
-    if (v.isString()) { auto s = v.toString(); if (s == "triangle") return 0; if (s == "sawtooth") return 1; if (s == "square") return 2; }
+    if (v.isString()) { auto s = v.toString(); if (s == "triangle") return 0; if (s == "sawtooth") return 1; if (s == "square") return 2; if (s == "rsaw") return 3; if (s == "tsaw") return 4; }
     return v.isVoid() ? d : (int)v;
 }
 }
@@ -24,7 +24,7 @@ AudioProcessorValueTreeState::ParameterLayout AuraProcessor::makeLayout() {
                   L.add(std::make_unique<AudioParameterFloat>(pid, d.name, r, aura::kFactory[0].v[i], at)); break; }
         case aura::I: L.add(std::make_unique<AudioParameterInt>(pid, d.name, (int)d.mn, (int)d.mx, (int)aura::kFactory[0].v[i])); break;
         case aura::B: L.add(std::make_unique<AudioParameterBool>(pid, d.name, aura::kFactory[0].v[i] > 0.5f)); break;
-        case aura::W: L.add(std::make_unique<AudioParameterChoice>(pid, d.name, StringArray{ "Triangular", "Serra", "Quadrada" }, (int)aura::kFactory[0].v[i])); break;
+        case aura::W: L.add(std::make_unique<AudioParameterChoice>(pid, d.name, StringArray{ "Triangular", "Serra", "Quadrada", "Serra reversa", "Tri/Serra" }, (int)aura::kFactory[0].v[i])); break;
         case aura::LW: L.add(std::make_unique<AudioParameterChoice>(pid, d.name, StringArray{ "Triangular", "Quadrada" }, (int)aura::kFactory[0].v[i])); break;
         }
     }
@@ -40,17 +40,31 @@ AudioProcessorValueTreeState::ParameterLayout AuraProcessor::makeLayout() {
     L.add(std::make_unique<AudioParameterFloat>(ParameterID("arpgate", 1), "Arp Duracao", NormalisableRange<float>(0.1f, 0.95f), 0.6f));
     L.add(std::make_unique<AudioParameterBool>(ParameterID("arplatch", 1), "Arp Trava", false));
     L.add(std::make_unique<AudioParameterBool>(ParameterID("arpsync", 1), "Arp Tempo do host", true));
+    L.add(std::make_unique<AudioParameterFloat>(ParameterID("tun", 1), "Tune (cent)", NormalisableRange<float>(-100, 100, 1), 0));
+    L.add(std::make_unique<AudioParameterBool>(ParameterID("kte", 1), "Erro de tecla", false));
+    L.add(std::make_unique<AudioParameterChoice>(ParameterID("tt", 1), "Escala", StringArray{ "Igual", "Pitagorica", "Carlos", "Partch 43" }, 0));
+    L.add(std::make_unique<AudioParameterInt>(ParameterID("bu", 1), "Pitch para cima (st)", 0, 12, 2));
+    L.add(std::make_unique<AudioParameterInt>(ParameterID("bd", 1), "Pitch para baixo (st)", 0, 12, 12));
+    L.add(std::make_unique<AudioParameterChoice>(ParameterID("vcv", 1), "Curva de toque", StringArray{ "Suave", "Media", "Dura" }, 1));
+    L.add(std::make_unique<AudioParameterChoice>(ParameterID("xp", 1), "Transposicao MIDI", StringArray{ "-12", "0", "+12" }, 1));
+    L.add(std::make_unique<AudioParameterInt>(ParameterID("ch", 1), "Canal MIDI (0 = todos)", 0, 16, 0));
+    L.add(std::make_unique<AudioParameterBool>(ParameterID("a440", 1), "Tom A-440", false));
+    L.add(std::make_unique<AudioParameterBool>(ParameterID("xon", 1), "Entrada externa", false));
+    L.add(std::make_unique<AudioParameterFloat>(ParameterID("xlvl", 1), "Entrada nivel", NormalisableRange<float>(0, 1), 0.5f));
+    L.add(std::make_unique<AudioParameterChoice>(ParameterID("xmode", 1), "Entrada disparo", StringArray{ "Pelas teclas", "Pelo sinal" }, 0));
+    L.add(std::make_unique<AudioParameterFloat>(ParameterID("xthr", 1), "Entrada limiar", NormalisableRange<float>(0.01f, 0.6f), 0.15f));
     L.add(std::make_unique<AudioParameterFloat>(ParameterID("arpbpm", 1), "Arp Andamento", NormalisableRange<float>(40, 240, 1), 100));
     return L;
 }
 
 AuraProcessor::AuraProcessor()
-    : AudioProcessor(BusesProperties().withOutput("Output", AudioChannelSet::stereo(), true)),
+    : AudioProcessor(BusesProperties().withInput("Entrada", AudioChannelSet::stereo(), true).withOutput("Output", AudioChannelSet::stereo(), true)),
       apvts(*this, nullptr, "AURA", makeLayout()) {
     for (int i = 0; i < aura::NP; i++) raw[i] = apvts.getRawParameterValue(kDefs[i].id);
     auto g = [this](const char* id) { return apvts.getRawParameterValue(id); };
     pVelSens = g("velsens"); pVelDest = g("veldest"); pPrio = g("prio"); pAtDest = g("atdest"); pHold = g("hold");
     pArpOn = g("arpon"); pArpPat = g("arppat"); pArpDiv = g("arpdiv"); pArpOct = g("arpoct"); pArpGate = g("arpgate"); pArpLatch = g("arplatch"); pArpSync = g("arpsync"); pArpBpm = g("arpbpm");
+    pTun = g("tun"); pKte = g("kte"); pTt = g("tt"); pBu = g("bu"); pBd = g("bd"); pVcv = g("vcv"); pXp = g("xp"); pCh = g("ch"); pA440 = g("a440"); pXon = g("xon"); pXlvl = g("xlvl"); pXmode = g("xmode"); pXthr = g("xthr");
     engine.prepare(44100);
 }
 
@@ -112,12 +126,12 @@ int AuraProcessor::importJson(const File& f) {
 
 bool AuraProcessor::exportJson(const File& f) const {
     Array<var> list;
-    static const char* wn[3] = { "triangle", "sawtooth", "square" };
+    static const char* wn[5] = { "triangle", "sawtooth", "square", "rsaw", "tsaw" };
     for (auto& u : user) {
         auto* o = new DynamicObject(); o->setProperty("name", u.name);
         for (int i = 0; i < aura::NP; i++) {
             const auto id = kDefs[i].id;
-            if (kDefs[i].k == aura::W) o->setProperty(id, String(wn[jlimit(0, 2, (int)u.v[i])]));
+            if (kDefs[i].k == aura::W) o->setProperty(id, String(wn[jlimit(0, 4, (int)u.v[i])]));
             else if (kDefs[i].k == aura::LW) o->setProperty(id, String(u.v[i] > 0.5f ? "square" : "triangle"));
             else o->setProperty(id, (double)u.v[i]);
         }
@@ -133,6 +147,19 @@ void AuraProcessor::processBlock(AudioBuffer<float>& buf, MidiBuffer& midi) {
     for (int i = 0; i < aura::NP; i++) engine.p[i] = raw[i]->load();
     engine.velSens = pVelSens->load(); engine.velDest = (int)pVelDest->load(); engine.prio = (int)pPrio->load(); engine.atDest = (int)pAtDest->load();
     if (nch < 1) return;
+    engine.tun = pTun->load(); engine.kte = (int)pKte->load(); engine.tt = (int)pTt->load(); engine.bu = pBu->load(); engine.bd = pBd->load(); engine.vcv = (int)pVcv->load();
+    engine.xlvl = pXon->load() > 0.5f ? pXlvl->load() : 0.0f; engine.xmode = (int)pXmode->load(); engine.xthr = pXthr->load();
+    const int xpose = ((int)pXp->load() - 1) * 12, chan = (int)pCh->load();
+    const bool tone = pA440->load() > 0.5f;
+    // entrada externa em mono (soma dos canais de entrada)
+    const float* inPtr = nullptr;
+    if (getTotalNumInputChannels() > 0 && engine.xlvl > 0) {
+        extIn.assign((size_t)n, 0.0f);
+        for (int c = 0; c < getTotalNumInputChannels() && c < nch; c++) { auto* r = buf.getReadPointer(c); for (int i = 0; i < n; i++) extIn[(size_t)i] += r[i]; }
+        const float g = 1.0f / (float)std::max(1, std::min(getTotalNumInputChannels(), nch));
+        for (auto& v : extIn) v *= g;
+        inPtr = extIn.data();
+    }
     // arpejador
     const bool arpOn = pArpOn->load() > 0.5f;
     arp.pat = (int)pArpPat->load(); arp.div = (int)pArpDiv->load(); arp.oct = (int)pArpOct->load(); arp.gate = pArpGate->load(); arp.latch = pArpLatch->load() > 0.5f;
@@ -153,15 +180,17 @@ void AuraProcessor::processBlock(AudioBuffer<float>& buf, MidiBuffer& midi) {
         while (pos < upto) {
             int len = upto - pos;
             if (arpOn) { double e = arp.samplesToEvent(); if (e < len) len = std::max(1, (int)std::ceil(e)); }
-            engine.process(out + pos, len); pos += len;
+            engine.process(out + pos, len, inPtr ? inPtr + pos : nullptr); pos += len;
             if (arpOn) arp.advance(len, sr, onF, offF);
         }
     };
     for (const auto meta : midi) {
         const auto m = meta.getMessage();
+        if (chan > 0 && m.getChannel() != 0 && m.getChannel() != chan) continue;
         render(meta.samplePosition);
-        if (m.isNoteOn()) { if (arpOn) arp.press(m.getNoteNumber(), m.getVelocity() ? m.getVelocity() : 100); else engine.noteOn(m.getNoteNumber(), m.getVelocity()); }
-        else if (m.isNoteOff()) { if (arpOn) arp.release(m.getNoteNumber(), offF); else engine.noteOff(m.getNoteNumber()); }
+        const int nt = m.isNoteOnOrOff() ? jlimit(0, 127, m.getNoteNumber() + xpose) : 0;
+        if (m.isNoteOn()) { if (arpOn) arp.press(nt, m.getVelocity() ? m.getVelocity() : 100); else engine.noteOn(nt, m.getVelocity()); }
+        else if (m.isNoteOff()) { if (arpOn) arp.release(nt, offF); else engine.noteOff(nt); }
         else if (m.isPitchWheel()) engine.bend = jlimit(-1.0f, 1.0f, (m.getPitchWheelValue() - 8192) / 8192.0f);
         else if (m.isChannelPressure()) engine.atVal = m.getChannelPressureValue() / 127.0f;
         else if (m.isController()) {
@@ -172,6 +201,7 @@ void AuraProcessor::processBlock(AudioBuffer<float>& buf, MidiBuffer& midi) {
         } else if (m.isAllNotesOff() || m.isAllSoundOff()) { arp.silence(offF); arp.clear(); engine.allOff(); }
     }
     render(n);
+    if (tone) { for (int i = 0; i < n; i++) { out[i] += 0.25f * (float)std::sin(tonePh); tonePh += 6.283185307179586 * 440.0 / engine.sr; if (tonePh > 6.283185307179586) tonePh -= 6.283185307179586; } }
     for (int c = 1; c < nch; c++) buf.copyFrom(c, 0, buf, 0, 0, n);
 }
 

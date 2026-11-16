@@ -5,6 +5,7 @@ namespace {
 const Colour kBg(0xff14181d), kPanel(0xff1f252c), kAmber(0xffe8890c), kText(0xffd9dde2);
 struct Meta { const char* id; const char* label; };
 const Meta kExtra[] = { {"velsens","TOQUE"},{"veldest","TOQUE AGE EM"},{"prio","PRIORIDADE"},{"atdest","PRESSAO"},{"hold","HOLD"},
+  {"tun","TUNE"},{"tt","ESCALA"},{"kte","ERRO TECLA"},{"a440","A-440"},{"bu","PITCH +"},{"bd","PITCH -"},{"vcv","CURVA"},{"xp","TRANSP."},{"ch","CANAL"},{"xon","LIGAR"},{"xlvl","NIVEL"},{"xmode","DISPARO"},{"xthr","LIMIAR"},{"mm","MOD MIX"},{"ma","A=ENV FILTRO"},{"mb","B=LFO"},{"mx","A <-> B"},{"mo","MOD OSC"},{"mf","MOD FILTRO"},{"e1","OSC 1"},{"e2","OSC 2"},{"e3","OSC 3"},{"kts","PASSOS"},
   {"arpon","ARP"},{"arppat","PADRAO"},{"arpdiv","DIVISAO"},{"arpoct","OITAVAS"},{"arpgate","DURACAO"},{"arplatch","TRAVA"},{"arpsync","TEMPO HOST"},{"arpbpm","BPM"} };
 String shortLabel(const String& id, const String& full) {
     for (auto& m : kExtra) if (id == m.id) return m.label;
@@ -25,6 +26,11 @@ AuraEditor::AuraEditor(AuraProcessor& p) : AudioProcessorEditor(&p), proc(p) {
     addSection("LFO", { "lr", "lwv", "lp", "lf", "lw", "lsr" });
     addSection("DELAY", { "dt", "df", "dm" });
     addSection("SAIDA", { "vol", "velsens", "veldest", "prio", "atdest", "hold" });
+    addSection("MOD MIX", { "mm", "ma", "mb", "mx", "mo", "mf" });
+    addSection("OSC LIGADO / TECLADO", { "e1", "e2", "e3", "kts" });
+    addSection("AFINACAO", { "tun", "tt", "kte", "a440" });
+    addSection("CONTROLES", { "bu", "bd", "vcv", "xp", "ch" });
+    addSection("ENTRADA EXTERNA", { "xon", "xlvl", "xmode", "xthr" });
     addSection("ARPEJADOR", { "arpon", "arppat", "arpdiv", "arpoct", "arpgate", "arpbpm", "arpsync", "arplatch" });
 
     for (auto* b : { &bSave, &bImp, &bExp, &bPrev, &bNext }) addAndMakeVisible(*b);
