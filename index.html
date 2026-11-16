@@ -512,6 +512,7 @@
     <button id="mDly" class="btn row">Delay…<em id="mDlySt">—</em></button>
     <button id="mArp" class="btn row">Arpejador…<em id="mArpSt">—</em></button>
     <button id="mTheme" class="btn row">Tema<em id="mThemeSt">—</em></button>
+    <button id="mFx" class="btn row">Efeitos…<em id="mFxSt">—</em></button>
     <button id="mAdv" class="btn row">Avançado…<em id="mAdvSt">—</em></button>
   </div>
   <h4>TOQUE</h4>
@@ -543,6 +544,14 @@
   <div id="dlyBody"></div>
   <button class="btn" data-close>Fechar</button>
   <p>O delay é gravado junto com o preset. Mix em 0% deixa o delay desligado.</p>
+</div></div>
+
+<div class="dlg" id="dlgFx" role="dialog" aria-modal="true" aria-label="Efeitos"><div class="box wide">
+  <button class="x" data-close aria-label="Fechar">×</button>
+  <h3>EFEITOS</h3>
+  <div id="fxBody"></div>
+  <button class="btn" data-close>Fechar</button>
+  <p>Os efeitos valem para todos os presets e ficam salvos neste aparelho. Cadeia: Efeito 1 → Efeito 2 → Delay → Reverb. Chorus, phaser e reverb deixam o grave seco (abaixo de ~150 Hz) para o baixo não perder definição.</p>
 </div></div>
 
 <div class="dlg" id="dlgAdv" role="dialog" aria-modal="true" aria-label="Avançado"><div class="box wide">
@@ -603,14 +612,14 @@
                lr:5.5, lwv:'triangle', lp:0, lf:0, lw:0,
                fa:0.002, fd:0.3, fs:0, fr:0.2, a:0.004, d:0.3, s:1, r:0.1, leg:1, vol:1.3,
                l3:0, w3:'sawtooth', o3:0, d3:0, k3:1, nc:0, ovl:0, lsr:0, ec:0, dt:0.3, df:0.35, dm:0,
-               mm:0, ma:0, mb:1, mx:0.5, mo:1, mf:1, e1:1, e2:1, e3:1, kts:0};
+               mm:0, ma:0, mb:1, mx:0.5, mo:1, mf:1, e1:1, e2:1, e3:1, kts:0, rg:0, un:0, ud:0.4};
   const PKEYS = Object.keys(DEF);
   // limites de cada parâmetro: qualquer preset (de fábrica, salvo ou importado) passa por aqui antes de chegar ao motor de som
-  const LIM = {pw1:[0.05,0.5], pw2:[0.05,0.5], lvl:[0,1], l2:[0,1], sub:[0,1], nz:[0,1], cut:[0,1], res:[0,1], kt:[0,1], drv:[0,1], fs:[0,1], s:[0,1], lw:[0,1],
+  const LIM = {pw1:[0.05,0.5], pw2:[0.05,0.5], lvl:[0,1], l2:[0,1], sub:[0,1], nz:[0,1], cut:[0,1], res:[0,1], kt:[0,1], drv:[0,1], fs:[0,1], s:[0,1], lw:[0,1], ud:[0,1],
                d2:[-7,7], fenv:[0,4], glide:[0,0.4], pa:[0,48], pd:[0.01,1.5], lr:[0.1,30], lp:[0,12], lf:[0,3],
                fa:[0.002,1], a:[0.002,1], fd:[0.02,2], d:[0.02,2], fr:[0.02,2], r:[0.02,2], vol:[0,3],
                l3:[0,1], d3:[-7,7], ovl:[0,1], dt:[0.02,1], df:[0,0.9], dm:[0,1], mx:[0,1]};
-  const LIMI = {oct:[-3,1], o2:[-2,3], sync:[0,1], sw:[0,1], leg:[0,1], pol:[1,4], o3:[-3,3], k3:[0,1], nc:[0,1], lsr:[0,2], ec:[0,1], mm:[0,1], ma:[0,1], mb:[0,1], mo:[0,1], mf:[0,1], e1:[0,1], e2:[0,1], e3:[0,1], kts:[0,1]};
+  const LIMI = {oct:[-3,1], o2:[-2,3], sync:[0,1], sw:[0,1], leg:[0,1], pol:[1,4], o3:[-3,3], k3:[0,1], nc:[0,1], lsr:[0,2], ec:[0,1], mm:[0,1], ma:[0,1], mb:[0,1], mo:[0,1], mf:[0,1], e1:[0,1], e2:[0,1], e3:[0,1], kts:[0,1], rg:[0,1], un:[0,3]};
   const WAVES=['square','sawtooth','triangle','rsaw','tsaw'];
   const ENUM = {wave:WAVES, w2:WAVES, w3:WAVES, lwv:['triangle','square']};
   function norm(p){
@@ -1134,7 +1143,8 @@
       {name:'lfoin',defaultValue:0,automationRate:'a-rate'} ]; }
     constructor(){ super(); this.p1=0; this.p2=0; this.ps=0; this.p3=0; this.y1=0; this.y2=0; this.y3=0; this.y4=0;
       this.b0=0; this.b1=0; this.b2=0; this.hx=0; this.hy=0; this.mv=0; this.shT=0; this.shV=0; this.ha=Math.exp(-6.283185307*25/sampleRate);
-      this.c={w1:2,w2:1,pw1:.5,pw2:.5,ratio:1,sync:0,l1:.75,l2:0,ls:0,sm:0,nz:0,res:0,drv:0,pol:4,w3:1,r3:1,fx3:5,k3:1,l3:0,nc:0,ovl:0,lsr:0,lp:0,lf:0,lw:0,lr:5,mm:0,ma:0,mb:1,mx:.5,mo:1,mf:1,md:0,xl:0,xm:0,xthr:.15};
+      this.c={w1:2,w2:1,pw1:.5,pw2:.5,ratio:1,sync:0,l1:.75,l2:0,ls:0,sm:0,nz:0,res:0,drv:0,pol:4,w3:1,r3:1,fx3:5,k3:1,l3:0,nc:0,ovl:0,lsr:0,lp:0,lf:0,lw:0,lr:5,mm:0,ma:0,mb:1,mx:.5,mo:1,mf:1,md:0,xl:0,xm:0,xthr:.15,rg:0,un:0,ud:0};
+      this.pu=[0,0,0]; this.ur=[1,1,1];
       this.mvm=0; this.n0=0; this.n1=0; this.n2=0; this.rd=0; this.xe=0; this.xtr=0; this.xh=0;
       this.m={l1:.75,l2:0,ls:0,nz:0,l3:0,ovl:0,res:0,drv:0,first:true};     // valores suavizados, para não estalar ao girar um knob
       this.port.onmessage=e=>{ Object.assign(this.c,e.data); }; }
@@ -1153,6 +1163,8 @@
       let p1=this.p1,p2=this.p2,ps=this.ps,p3=this.p3,y1=this.y1,y2=this.y2,y3=this.y3,y4=this.y4,b0=this.b0,b1=this.b1,b2=this.b2,hx=this.hx,hy=this.hy,mv=this.mv,shT=this.shT,shV=this.shV;
       const lsr=c.lsr|0, ha=this.ha, mm=c.mm|0, md=c.md, gA=Math.min(1,2*(1-c.mx)), gB=Math.min(1,2*c.mx), mo=c.mo, mf=c.mf;
       let mvm=this.mvm, n0=this.n0, n1=this.n1, n2=this.n2, rd=this.rd, xe=this.xe, xtr=this.xtr, xh=this.xh;
+      const rg=c.rg|0, un=Math.min(3,c.un|0), pu=this.pu, ur=this.ur, ug=1/Math.sqrt(1+un);
+      for(let k=0;k<un;k++){ const off=(k%2?1:-1)*(Math.floor(k/2)+1)/Math.ceil((un+1)/2)*c.ud*40; ur[k]=Math.pow(2,off/1200); }
       const ex=(inputs[0]&&inputs[0][0])||null, xl=c.xl, xrel=Math.exp(-1/(0.06*sr)), xthr=c.xthr;
       const m=this.m; if(m.first){ m.first=false; m.l1=c.l1; m.l2=c.l2; m.ls=c.ls; m.nz=c.nz; m.l3=c.l3; m.ovl=c.ovl; m.res=c.res; m.drv=c.drv; }
       m.res+=0.35*(c.res-m.res); m.drv+=0.35*(c.drv-m.drv); m.ovl+=0.35*(c.ovl-m.ovl);
@@ -1172,8 +1184,15 @@
         if(l3>1e-4 || lsr===1 || (mm&&c.ma===0)){ const f3=c.k3?f*c.r3:c.fx3, d3=Math.min(f3/sr,0.45); p3+=d3; if(p3>=1) p3-=1; s3=this.osc(c.w3,p3,d3,0.5); }
         if(lsr===1) mv=s3; else if(lsr===2){ shT-=c.lr/sr; if(shT<=0){ shT+=1; shV=Math.random()*2-1; } mv=shV; }
         let s=0;
-        if(l1>1e-4) s+=l1*this.osc(c.w1,p1,dt1,Math.min(0.95,Math.max(0.05,c.pw1+pm)));
-        if(l2>1e-4) s+=l2*this.osc(c.w2,p2,dt2,Math.min(0.95,Math.max(0.05,c.pw2+pm)));
+        const pw1v=Math.min(0.95,Math.max(0.05,c.pw1+pm)), pw2v=Math.min(0.95,Math.max(0.05,c.pw2+pm));
+        if(rg){      // anel (ring): OSC 1 x OSC 2, no nível do maior dos dois
+          if(l1>1e-4||l2>1e-4) s+=(l1>l2?l1:l2)*this.osc(c.w1,p1,dt1,pw1v)*this.osc(c.w2,p2,dt2,pw2v);
+        } else {
+          if(l1>1e-4){ let o1=this.osc(c.w1,p1,dt1,pw1v);
+            if(un>0){ for(let k=0;k<un;k++){ const dk=Math.min(dt1*ur[k],0.45); pu[k]+=dk; if(pu[k]>=1) pu[k]-=1; o1+=this.osc(c.w1,pu[k],dk,pw1v); } o1*=ug; }
+            s+=l1*o1; }
+          if(l2>1e-4) s+=l2*this.osc(c.w2,p2,dt2,pw2v);
+        }
         if(ls>1e-4){
           if(c.sm){ ps+=dt1*0.5; if(ps>=1) ps-=1; s+=ls*0.75*((ps<0.5?1:-1)+this.blep(ps,dt1*0.5)-this.blep(ps<0.5?ps+0.5:ps-0.5,dt1*0.5)); }
           else { ps+=dt1; if(ps>=1) ps-=1; s+=ls*Math.sin(6.283185307*ps); }
@@ -1234,6 +1253,12 @@
     }
   }
   registerProcessor('aura-comp',AuraComp);
+  class AuraCrush extends AudioWorkletProcessor{
+    constructor(){ super(); this.c={bits:16,rate:1}; this.ph=0; this.hold=0; this.port.onmessage=e=>{ Object.assign(this.c,e.data); }; }
+    process(inp,out){ const x=inp[0]&&inp[0][0], o=out[0][0]; if(!x){ o.fill(0); return true; } const q=Math.pow(2,this.c.bits-1), r=this.c.rate; let ph=this.ph, h=this.hold;
+      for(let i=0;i<o.length;i++){ ph+=r; if(ph>=1){ ph-=1; h=Math.round(x[i]*q)/q; } o[i]=h; } this.ph=ph; this.hold=h; return true; }
+  }
+  registerProcessor('aura-crush',AuraCrush);
 `;
 
   let tone=null, toneG=null, ctx=null, amp=null, velG=null, master=null, comp=null, an=null, lfo=null, lfoP=null, lfoC=null, lfoW=null, V=null, atG=null, dly=null, dlyFb=null, dlyW=null;
@@ -1275,7 +1300,7 @@
       detune(c){ q('detune').value=c; },
       freq(fr,tc,now){ const t=ctx.currentTime, p=q('freq'); p.cancelScheduledValues(t); if(now) p.setValueAtTime(fr,t); else p.setTargetAtTime(fr,t,tc); },
       apply(){ node.port.postMessage({w1:WI[P.wave],w2:WI[P.w2],pw1:P.pw1,pw2:P.pw2,ratio:ratio2(),sync:P.sync?1:0,l1:P.lvl*P.e1,l2:P.l2*P.e2,ls:P.sub,sm:P.sw?1:0,nz:P.nz,res:P.res,drv:P.drv,pol:P.pol,
-        w3:WI[P.w3],r3:ratio3(),fx3:P.lr*Math.pow(2,P.d3/12),k3:P.k3,l3:P.l3*P.e3,nc:P.nc,ovl:P.ovl,lsr:P.mm?0:P.lsr,lp:P.lp,lf:P.lf,lw:P.lw,lr:P.lr,mm:P.mm,ma:P.ma,mb:P.mb,mx:P.mx,mo:P.mo,mf:P.mf,md:modDepth(),xl:G.xon?G.xlvl:0,xm:G.xmode,xthr:G.xthr}); },
+        w3:WI[P.w3],r3:ratio3(),fx3:P.lr*Math.pow(2,P.d3/12),k3:P.k3,l3:P.l3*P.e3,nc:P.nc,ovl:P.ovl,lsr:P.mm?0:P.lsr,lp:P.lp,lf:P.lf,lw:P.lw,lr:P.lr,mm:P.mm,ma:P.ma,mb:P.mb,mx:P.mx,mo:P.mo,mf:P.mf,md:modDepth(),xl:G.xon?G.xlvl:0,xm:G.xmode,xthr:G.xthr,rg:P.rg,un:P.un,ud:P.ud}); },
       pitchEnv(t){ const p=q('pitch'); p.cancelScheduledValues(t); if(P.pa>0.05){ p.setValueAtTime(P.pa*100,t); p.setTargetAtTime(0,t,Math.max(P.pd,0.01)/3); } else p.setValueAtTime(0,t); },
       kill(){}
     };
@@ -1294,14 +1319,14 @@
     const sh = ctx.createWaveShaper(), N = 4096, curve = new Float32Array(N);
     for(let i=0;i<N;i++){ const x = (i/(N-1)*2-1)*3, a = Math.abs(x); curve[i] = Math.sign(x) * (a<0.6 ? a : 0.6 + 0.4*Math.tanh((a-0.6)/0.4)); }
     sh.curve = curve; sh.oversample = 'none';
-    velG = ctx.createGain(); amp.connect(comp); comp.connect(velG); velG.connect(master); master.connect(an); master.connect(pre); pre.connect(sh); sh.connect(ctx.destination);
+    velG = ctx.createGain(); amp.connect(comp); comp.connect(velG); velG.connect(master); master.connect(an); pre.connect(sh); sh.connect(ctx.destination);
     lfo = ctx.createOscillator(); lfoP = ctx.createGain(); lfoC = ctx.createGain(); lfoW = ctx.createGain();
     lfoP.gain.value = lfoC.gain.value = lfoW.gain.value = 0; lfo.connect(lfoP); lfo.connect(lfoC); lfo.connect(lfoW); lfo.start();
     atG = ctx.createGain(); atG.gain.value = 0; try{ const cs=ctx.createConstantSource(); cs.connect(atG); cs.start(); }catch(e){}
     // delay em paralelo: o som direto não passa por ele, então não soma atraso
     dly=ctx.createDelay(1.5); dlyW=ctx.createGain(); dlyW.gain.value=0; dlyFb=ctx.createGain(); dlyFb.gain.value=0;
     const dlp=ctx.createBiquadFilter(); dlp.type='lowpass'; dlp.frequency.value=4200;
-    master.connect(dly); dly.connect(dlp); dlp.connect(dlyFb); dlyFb.connect(dly); dlp.connect(dlyW); dlyW.connect(pre);
+    const fxOut=buildFx(); fxOut.connect(pre); fxOut.connect(dly); dly.connect(dlp); dlp.connect(dlyFb); dlyFb.connect(dly); dlp.connect(dlyW); dlyW.connect(pre);
     tone=ctx.createOscillator(); toneG=ctx.createGain(); tone.frequency.value=440; toneG.gain.value=0; tone.connect(toneG); toneG.connect(pre); tone.start();
     V = nativeVoice(); applyAll(); V.cut.forEach(p=>{ p.value=baseCut(); }); renderOled();
     if(ctx.audioWorklet && window.AudioWorkletNode){
@@ -1311,11 +1336,104 @@
         const old=V, nv=workletVoice(); old.kill(); V=nv; window.__auraEngine='worklet';
         try{ const cw=new AudioWorkletNode(ctx,'aura-comp',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1],channelCount:1,channelCountMode:'explicit'});
           amp.disconnect(comp); comp.disconnect(); amp.connect(cw); cw.connect(velG); comp=cw; window.__auraComp='worklet'; }catch(e){ window.__auraComp='native'; }
+        try{ fxCrush(); }catch(e){}
         applyAll(); V.freq(noteFreq(lastNote),0,true);
         const t=ctx.currentTime; V.cut.forEach(p=>{ p.setValueAtTime(gate ? Math.min(baseCut()*Math.pow(2,P.fenv*P.fs),20000) : baseCut(), t); });
       }).catch(()=>{ window.__auraEngine='native'; });
     } else window.__auraEngine='native';
   }
+
+  // ====================== Efeitos (inspirados no JD-Xi): EFX1 → EFX2 → delay → reverb ======================
+  const FXK='aura_fx_v1';
+  const FXD={d:0, dr:0.4, dp:0.6, dl:0.7, cr:0.4, cb:0.5,                     // EFX1: 0 off, 1 distorção, 2 fuzz, 3 bitcrusher
+             m:0, mr:0.3, md:0.5, mf:0.2, mn:0.5, mb:0.5, rf:0.35,            // EFX2: 0 off, 1 chorus, 2 flanger, 3 phaser, 4 anel
+             rv:0, rt:1, rm:0.5, rh:0.7, rl:0.3};                              // reverb
+  const RVN=['SALA 1','SALA 2','PALCO 1','PALCO 2','CATEDRAL 1','CATEDRAL 2'];
+  let FX=Object.assign({},FXD); { const o=LS.get(FXK,null); if(o&&typeof o==='object') Object.keys(FXD).forEach(k=>{ if(typeof o[k]==='number'&&isFinite(o[k])) FX[k]=o[k]; }); }
+  const fxSave=()=>LS.set(FXK,FX);
+  const fx={}; let rvTimer=0;
+  const expMap=(p,a,b)=>a*Math.pow(b/a,p);
+  function buildFx(){
+    const c=ctx, G0=()=>c.createGain();
+    // EFX1
+    fx.i1=G0(); fx.o1=G0(); fx.dry1=G0(); fx.i1.connect(fx.dry1); fx.dry1.connect(fx.o1);
+    fx.pre=G0(); fx.sh=c.createWaveShaper(); fx.sh.oversample='2x'; fx.pl=c.createBiquadFilter(); fx.pl.type='lowpass'; fx.lv=G0();
+    fx.i1.connect(fx.pre); fx.pre.connect(fx.sh); fx.sh.connect(fx.pl); fx.pl.connect(fx.lv); fx.lv.connect(fx.o1); fx.lv.gain.value=0;
+    // EFX2
+    fx.i2=G0(); fx.o2=G0(); fx.dry2=G0(); fx.o1.connect(fx.i2); fx.i2.connect(fx.dry2); fx.dry2.connect(fx.o2);
+    fx.lfo=c.createOscillator(); fx.lfo.type='sine'; fx.lfo.frequency.value=0.5; fx.lfo.start();
+    fx.hp=c.createBiquadFilter(); fx.hp.type='highpass'; fx.hp.frequency.value=140; fx.dl=c.createDelay(0.05); fx.fbk=G0(); fx.wCF=G0(); fx.lfD=G0(); fx.dl.delayTime.value=0.01;
+    fx.i2.connect(fx.hp); fx.hp.connect(fx.dl); fx.dl.connect(fx.fbk); fx.fbk.connect(fx.dl); fx.dl.connect(fx.wCF); fx.wCF.connect(fx.o2); fx.lfo.connect(fx.lfD); fx.lfD.connect(fx.dl.delayTime); fx.wCF.gain.value=0; fx.fbk.gain.value=0;
+    fx.ap=[0,1,2,3].map(()=>{ const f=c.createBiquadFilter(); f.type='allpass'; f.frequency.value=600; return f; }); fx.wPh=G0(); fx.lfP=G0();
+    fx.i2.connect(fx.ap[0]); fx.ap.forEach((f,i)=>{ if(i) fx.ap[i-1].connect(f); fx.lfP.connect(f.detune); }); fx.ap[3].connect(fx.wPh); fx.wPh.connect(fx.o2); fx.lfo.connect(fx.lfP); fx.wPh.gain.value=0;
+    fx.rg=G0(); fx.rg.gain.value=0; fx.car=c.createOscillator(); fx.car.type='sine'; fx.car.frequency.value=300; fx.car.connect(fx.rg.gain); fx.car.start(); fx.wR=G0(); fx.wR.gain.value=0;
+    fx.i2.connect(fx.rg); fx.rg.connect(fx.wR); fx.wR.connect(fx.o2);
+    // reverb em paralelo
+    fx.rvIn=G0(); fx.rvHp=c.createBiquadFilter(); fx.rvHp.type='highpass'; fx.rvHp.frequency.value=150; fx.conv=c.createConvolver(); fx.conv.normalize=false; fx.rvOut=G0(); fx.rvOut.gain.value=0;
+    fx.o2.connect(fx.rvIn); fx.rvIn.connect(fx.rvHp); fx.rvHp.connect(fx.conv); fx.conv.connect(fx.rvOut);
+    const out=G0(); fx.o2.connect(out); fx.rvOut.connect(out); fx.i1.gain.value=1; master.connect(fx.i1);
+    fxApply(true); return out;
+  }
+  function fxCrush(){      // bitcrusher: precisa do AudioWorklet
+    if(!ctx||fx.crush||!fx.i1) return; fx.crush=new AudioWorkletNode(ctx,'aura-crush',{numberOfInputs:1,numberOfOutputs:1,outputChannelCount:[1],channelCount:1,channelCountMode:'explicit'});
+    fx.cg=ctx.createGain(); fx.cg.gain.value=0; fx.i1.connect(fx.crush); fx.crush.connect(fx.cg); fx.cg.connect(fx.o1); fxApply();
+  }
+  function fxCurve(type,k){ const N=2048, a=new Float32Array(N);
+    for(let i=0;i<N;i++){ const x=i/(N-1)*2-1; a[i]= type===1 ? Math.tanh(k*x)/Math.tanh(k) : (Math.tanh(k*(x*1.2+0.35))-Math.tanh(k*0.35))/ (Math.tanh(k*1.55)-Math.tanh(k*0.35)); }
+    return a; }
+  function genIR(){
+    if(!ctx) return; const sr=ctx.sampleRate, T=[[0.5,0.003],[0.9,0.007],[1.4,0.010],[2.0,0.014],[3.0,0.022],[4.2,0.034]][FX.rt|0];
+    const rt=T[0]*(0.5+FX.rm*1.1), len=Math.max(2048,Math.floor(Math.min(4,rt*1.15)*sr)), pre=Math.floor(T[1]*sr);
+    const fc=FX.rh>=0.99?20000:expMap(FX.rh,200,8000), a=Math.exp(-6.283185307*fc/sr), buf=ctx.createBuffer(2,len,sr);
+    for(let ch=0;ch<2;ch++){ const d=buf.getChannelData(ch); let y=0, e=0;
+      for(let i=0;i<len;i++){ const t=i/sr; let env=Math.pow(10,-3*t/rt); if(i<pre) env=0; else if(i-pre<0.025*sr) env*=(i-pre)/(0.025*sr);
+        y=a*y+(1-a)*(Math.random()*2-1); d[i]=y*env; e+=d[i]*d[i]; }
+      const k=1/Math.sqrt(e||1)*1.6; for(let i=0;i<len;i++) d[i]*=k; }
+    fx.conv.buffer=buf; }
+  function fxApply(init){
+    if(!ctx||!fx.i1) return; const t=ctx.currentTime, S=(p,v,tc)=>p.setTargetAtTime(v,t,tc||0.02);
+    // EFX1
+    const d=FX.d|0; S(fx.dry1.gain,d===0||(d===3&&!fx.crush)?1:0);
+    if(d===1||d===2){ const k=1+FX.dr*(d===1?18:40); fx.sh.curve=fxCurve(d,k); S(fx.pre.gain,1+FX.dr*3); S(fx.pl.frequency,expMap(FX.dp,1500,14000)); }
+    S(fx.lv.gain,(d===1||d===2)?FX.dl*(d===2?0.7:0.9):0);
+    if(fx.crush){ S(fx.cg.gain,d===3?FX.dl:0); fx.crush.port.postMessage({bits:Math.max(2,Math.round(16-FX.cb*13)),rate:Math.pow(0.03,FX.cr)}); }
+    // EFX2
+    const m=FX.m|0, bal=FX.mb, wet=m===3?bal*0.7:(m===4?bal:bal*0.8); S(fx.dry2.gain,m===0?1:(m===4?1-bal:(m===3?1-bal*0.35:1))); S(fx.hp.frequency,m===1?140:80);
+    fx.lfo.frequency.setTargetAtTime(expMap(FX.mr,0.05,8),t,0.05);
+    const ch=m===1, fl=m===2;
+    S(fx.wCF.gain,(ch||fl)?wet:0); S(fx.fbk.gain,fl?Math.min(0.88,FX.mf*0.9):0);
+    const base=ch?0.014:expMap(FX.mn,0.0005,0.009); S(fx.dl.delayTime,base,0.03); S(fx.lfD.gain,ch?FX.md*0.006:FX.md*base*0.8);
+    S(fx.wPh.gain,m===3?wet:0); const pf=expMap(FX.mn,150,1800); fx.ap.forEach(f=>{ S(f.frequency,pf); S(f.Q,0.5+FX.mf*7); }); S(fx.lfP.gain,FX.md*2400);
+    S(fx.wR.gain,m===4?wet:0); S(fx.car.frequency,expMap(FX.rf,20,2000),0.03);
+    // reverb
+    S(fx.rvOut.gain,FX.rv?FX.rl*1.6:0,0.05);
+    if(init||fx.rvKey!==(FX.rt|0)+'|'+FX.rm.toFixed(2)+'|'+FX.rh.toFixed(2)){ fx.rvKey=(FX.rt|0)+'|'+FX.rm.toFixed(2)+'|'+FX.rh.toFixed(2); clearTimeout(rvTimer); rvTimer=setTimeout(genIR,init?0:200); }
+  }
+  const fxRows=[];
+  { const b=$('fxBody'), H=t=>{ const h=document.createElement('h4'); h.textContent=t; b.appendChild(h); };
+    const up=()=>{ fxSave(); fxApply(); drawMenuSt(); fxRows.forEach(r=>r.vis&&r.vis()); };
+    const pct=p=>Math.round(p*100)+'%', S=(k,lab,f)=>{ const r=mkSlider(b,lab,()=>FX[k],f||pct,p=>{ FX[k]=+p.toFixed(3); up(); }); fxRows.push(r); return r; };
+    const show=(r,fn)=>{ r.vis=()=>{ r.hidden=!fn(); }; };
+    H('EFEITO 1');
+    fxRows.push(mkChips(b,'TIPO',['DESLIGADO','DISTORÇÃO','FUZZ','BITCRUSHER'],()=>FX.d,i=>{ FX.d=i; up(); }));
+    show(S('dr','DRIVE'),()=>FX.d===1||FX.d===2); show(S('dp','PRESENÇA'),()=>FX.d===1||FX.d===2);
+    show(S('cr','TAXA (AMOSTRAGEM)'),()=>FX.d===3); show(S('cb','PROFUNDIDADE (BITS)',p=>Math.max(2,Math.round(16-p*13))+' bits'),()=>FX.d===3);
+    show(S('dl','NÍVEL'),()=>FX.d>0);
+    H('EFEITO 2');
+    fxRows.push(mkChips(b,'TIPO',['DESLIGADO','CHORUS','FLANGER','PHASER','ANEL (RING)'],()=>FX.m,i=>{ FX.m=i; up(); }));
+    show(S('mr','VELOCIDADE',p=>expMap(p,0.05,8).toFixed(2)+' Hz'),()=>FX.m>=1&&FX.m<=3);
+    show(S('md','PROFUNDIDADE'),()=>FX.m>=1&&FX.m<=3); show(S('mf','FEEDBACK / RESSONÂNCIA'),()=>FX.m===2||FX.m===3);
+    show(S('mn','MANUAL (FREQUÊNCIA BASE)'),()=>FX.m===2||FX.m===3); show(S('rf','FREQUÊNCIA DO ANEL',p=>Math.round(expMap(p,20,2000))+' Hz'),()=>FX.m===4);
+    show(S('mb','BALANÇO DIRETO ↔ EFEITO'),()=>FX.m>0);
+    H('REVERB');
+    fxRows.push(mkChips(b,'REVERB',['DESLIGADO','LIGADO'],()=>FX.rv,i=>{ FX.rv=i; up(); }));
+    fxRows.push(mkChips(b,'TIPO',RVN,()=>FX.rt,i=>{ FX.rt=i; up(); }));
+    show(S('rm','TEMPO'),()=>FX.rv===1); show(S('rh','CORTE DE AGUDOS',p=>p>=0.99?'LIVRE':Math.round(expMap(p,200,8000))+' Hz'),()=>FX.rv===1); show(S('rl','NÍVEL'),()=>FX.rv===1);
+    fxRows.forEach(r=>r.vis&&r.vis());
+  }
+  const fxSt=()=>{ const a=[]; if(FX.d) a.push(['','DIST','FUZZ','CRUSH'][FX.d]); if(FX.m) a.push(['','CHORUS','FLANGER','PHASER','ANEL'][FX.m]); if(FX.rv) a.push('REVERB'); return a.length?a.join(' · '):'DESLIGADOS'; };
+  window.__fx={FX,fxApply:()=>fxApply(),fx,P,applyAll:()=>applyAll()};
+  $('mFx').addEventListener('click',()=>{ closeD('dlgMenu'); fxRows.forEach(r=>{ r.draw&&r.draw(); r.vis&&r.vis(); }); openD('dlgFx'); });
   function applyAll(){
     if(!ctx) return;
     master.gain.setTargetAtTime(P.vol*(1+(atDest===3?atVal*0.6:0)), ctx.currentTime, 0.012);      // sem degraus ao girar o volume
@@ -1452,7 +1570,7 @@
   const PRIOS=['ÚLTIMA NOTA','MAIS GRAVE','MAIS AGUDA'], VDS=['VOLUME E BRILHO','SÓ VOLUME','SÓ BRILHO'], ATS=['DESLIGADO','VIBRATO','FILTRO','VOLUME'];
   function drawMenuSt(){
     $('mPrioSt').textContent=PRIOS[prio]; $('mVelDSt').textContent=VDS[velDest]; $('mAtSt').textContent=ATS[atDest]; $('mHoldSt').textContent=holdOn?'LIGADO':'DESLIGADO'; $('mAdvSt').textContent=(P.mm?'MOD MIX · ':'')+(G.tt?['','PITAGÓRICA','CARLOS','PARTCH'][G.tt]:'AFINAÇÃO / MIDI'); $('mSetSt').textContent=setlist.length?(setOn?'LIGADA · ':'')+setlist.length+' ITENS':'VAZIA'; $('mMapSt').textContent=(Object.keys(ccMap).length+Object.keys(actMap).length)+' MAPEADOS';
-    $('mArpSt').textContent=arp.on?'LIGADO · '+APAT[arp.pat]:'DESLIGADO'; $('mDlySt').textContent=P.dm>0.005?Math.round(P.dt*1000)+' ms · '+Math.round(P.dm*100)+'%':'DESLIGADO';
+    $('mArpSt').textContent=arp.on?'LIGADO · '+APAT[arp.pat]:'DESLIGADO'; $('mFxSt').textContent=fxSt(); $('mDlySt').textContent=P.dm>0.005?Math.round(P.dt*1000)+' ms · '+Math.round(P.dm*100)+'%':'DESLIGADO';
   }
   $('mPrio').addEventListener('click',()=>{ prio=(prio+1)%3; LS.set(PRIOK,prio); drawMenuSt(); });
   $('mVelD').addEventListener('click',()=>{ velDest=(velDest+1)%3; LS.set(VDK,velDest); drawMenuSt(); });
@@ -1516,6 +1634,10 @@
     H('OSCILADORES E TECLADO');
     [['OSC 1','e1'],['OSC 2','e2'],['OSC 3','e3']].forEach(([n,k])=>advRows.push(mkChips(b,n,['MUDO','LIGADO'],()=>P[k],i=>{ P[k]=i; drawMutes(); pc(); })));
     advRows.push(mkChips(b,'TECLADO NO FILTRO',['CONTÍNUO','1/3 · 2/3 · TOTAL'],()=>P.kts,i=>{ P.kts=i; pc(); if(ctx&&gate) trackFilter(); }));
+    H('OSCILADORES (JD-Xi)');
+    advRows.push(mkChips(b,'ANEL OSC1 × OSC2',['DESLIGADO','LIGADO'],()=>P.rg,i=>{ P.rg=i; pc(); }));
+    advRows.push(mkChips(b,'UNÍSSONO (OSC 1)',['DESLIGADO','+1','+2','+3'],()=>P.un,i=>{ P.un=i; pc(); }));
+    advRows.push(mkSlider(b,'ABERTURA UNÍSSONO',()=>P.ud,p=>'±'+Math.round(p*40)+' cent',p=>{ P.ud=+p.toFixed(3); pc(); }));
     H('AFINAÇÃO');
     advRows.push(mkSlider(b,'TUNE',()=>(G.tun+100)/200,p=>{ const c=Math.round(p*200-100); return (c>0?'+':'')+c+' cent'; },p=>{ G.tun=Math.round(p*200-100); gc(); }));
     advRows.push(mkChips(b,'TOM A-440',['DESLIGADO','LIGADO'],()=>a440?1:0,i=>setA440(i===1)));
