@@ -2,6 +2,7 @@ name: Instaladores (Windows e macOS)
 on:
   push:
     branches: [comercial]
+    tags: ['v*']
     paths: ['desktop/**', 'index.html', 'vst/**', '.github/workflows/desktop.yml']
   workflow_dispatch:
 permissions:
@@ -53,8 +54,9 @@ jobs:
           npm install --no-audit --no-fund
           npm run dist:win
           ls dist
+          cp dist/*.exe ../AURA-Synth-Bass-Windows.exe
       - uses: actions/upload-artifact@v4
-        with: { name: AURA-Synth-Bass-Windows-Setup, path: "desktop/dist/*.exe" }
+        with: { name: AURA-Synth-Bass-Windows-Setup, path: "AURA-Synth-Bass-Windows.exe" }
   instalador-mac:
     needs: plugin-mac
     runs-on: macos-latest
@@ -107,7 +109,21 @@ jobs:
           </installer-gui-script>
           X
           sed -i '' 's/^          //' pkgs/dist.xml
-          productbuild --distribution pkgs/dist.xml --package-path pkgs --resources pkgs "AURA-Synth-Bass-macOS-Setup-$VERSAO.pkg"
+          productbuild --distribution pkgs/dist.xml --package-path pkgs --resources pkgs "AURA-Synth-Bass-macOS.pkg"
           ls -la *.pkg
       - uses: actions/upload-artifact@v4
         with: { name: AURA-Synth-Bass-macOS-Setup, path: "*.pkg" }
+  publicar:
+    # só quando você cria uma tag de versão (ex.: v1.0.0): publica os instaladores como Release para a página de download
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [instalador-win, instalador-mac]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: AURA-Synth-Bass-Windows-Setup, path: rel }
+      - uses: actions/download-artifact@v4
+        with: { name: AURA-Synth-Bass-macOS-Setup, path: rel }
+      - name: Criar release
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release create "${{ github.ref_name }}" rel/* --repo "${{ github.repository }}" --title "AURA Synth Bass ${{ github.ref_name }}" --notes "Instaladores do AURA Synth Bass para Windows e macOS. © 2026 Thiago R. Galvão."
