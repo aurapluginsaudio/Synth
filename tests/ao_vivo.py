@@ -2,7 +2,7 @@ import sys,numpy as np
 exec(open('/home/claude/synthbass/tests/_fxhead.py').read())
 with sync_playwright() as p:
     b=p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
-    pg=b.new_page(viewport={'width':1440,'height':900}); errs=[]
+    pg=b.new_page(viewport={'width':1440,'height':1200}); errs=[]
     pg.on('pageerror',lambda e:errs.append(str(e)))
     pg.add_init_script(INIT); pg.goto('http://localhost:8765/index.html'); pg.wait_for_timeout(700)
     pg.mouse.click(300,600); pg.wait_for_timeout(500)
