@@ -114,8 +114,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with: { name: AURA-Synth-Bass-macOS-Setup, path: "*.pkg" }
   publicar:
-    # só quando você cria uma tag de versão (ex.: v1.0.0): publica os instaladores como Release para a página de download
-    if: startsWith(github.ref, 'refs/tags/v')
+    # publica os instaladores como Release (a página de download aponta para /releases/latest)
+    if: github.ref == 'refs/heads/comercial' || startsWith(github.ref, 'refs/tags/v')
     needs: [instalador-win, instalador-mac]
     runs-on: ubuntu-latest
     steps:
@@ -123,7 +123,10 @@ jobs:
         with: { name: AURA-Synth-Bass-Windows-Setup, path: rel }
       - uses: actions/download-artifact@v4
         with: { name: AURA-Synth-Bass-macOS-Setup, path: rel }
-      - name: Criar release
+      - name: Criar ou atualizar release
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
-          gh release create "${{ github.ref_name }}" rel/* --repo "${{ github.repository }}" --title "AURA Synth Bass ${{ github.ref_name }}" --notes "Instaladores do AURA Synth Bass para Windows e macOS. © 2026 Thiago R. Galvão."
+          TAG="v${VERSAO}"
+          gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1 \
+            && gh release upload "$TAG" rel/* --clobber --repo "${{ github.repository }}" \
+            || gh release create "$TAG" rel/* --repo "${{ github.repository }}" --target "${{ github.sha }}" --title "AURA Synth Bass $TAG" --notes "Instaladores do AURA Synth Bass para Windows e macOS. © 2026 Thiago R. Galvão."
