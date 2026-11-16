@@ -10,7 +10,8 @@ namespace aura {
 
 enum P { oct, wave, pw1, lvl, w2, pw2, l2, d2, o2, sync, sub, sw, nz, cut, res, fenv, kt, drv, pol, glide, pa, pd, lr, lwv, lp, lf, lw,
          fa, fd, fs, fr, a, d, s, r, leg, vol, l3, w3, o3, d3, k3, nc, ovl, lsr, ec, dt, df, dm,
-         mm, ma, mb, mx, mo, mf, e1, e2, e3, kts, rg, un, ud, NP };
+         mm, ma, mb, mx, mo, mf, e1, e2, e3, kts, rg, un, ud,
+         fm, fk, l2r, l2w, l2d, l2k, l2f, l2p, l2m, of, pwe, pe, NP };
 
 static const double TWO_PI = 6.283185307179586;
 
@@ -24,7 +25,8 @@ struct Engine {
     // ajustes globais (iguais aos do app web)
     float tun = 0; int kte = 0, tt = 0; float bu = 2, bd = 12; int vcv = 1;
     float xlvl = 0, xthr = 0.15f; int xmode = 0;   // entrada externa
-    double pu[3] = { 0, 0, 0 };
+    double o2sv = 0, pu[3] = { 0, 0, 0 }, q2p = 0, q2s = 0, q2t = 1e9, prC = 0;
+    void newNote() { q2t = 0; if (p[l2k] > 0.5f) q2p = 0; prC = p[pe] > 0 ? (rnd() * 2 - 1) * p[pe] * 100.0 : 0.0; }
     double mvm = 0, nn0 = 0, nn1 = 0, nn2 = 0, rdN = 0, fe = 0, feStep = 0, feStep2 = 0, xe = 0; int xtr = 0, xh = 0; int xNote = -1;
     double sr = 44100;
 
@@ -150,8 +152,8 @@ struct Engine {
         stack.erase(std::remove(stack.begin(), stack.end(), n), stack.end()); stack.push_back(n);
         if (gate && pickNote() != n) return;
         lastNote = n;
-        if (!gate) { setPitch(n, true); triggerEnv(vel); }
-        else if (p[leg] < 0.5f) { setPitch(n, false); triggerEnv(vel); }
+        if (!gate) { setPitch(n, true); newNote(); triggerEnv(vel); }
+        else if (p[leg] < 0.5f) { setPitch(n, false); newNote(); triggerEnv(vel); }
         else { setPitch(n, false); velApply(vel); trackFilter(); }
     }
     void realOff(int n) {
@@ -265,11 +267,14 @@ struct Engine {
             // --- voz
             ml1 += lsm2 * (lvl1 - ml1); ml2 += lsm2 * (lvl2 - ml2); mls += lsm2 * (lvlS - mls); mnz += lsm2 * (lvlN - mnz); ml3 += lsm2 * (lvl3 - ml3);
             if ((i & 127) == 0) { mres += bs * 0 + 0.35 * (p[res] - mres); mdrv += 0.35 * (p[drv] - mdrv); movl += 0.35 * (p[ovl] - movl); }
-            const double ovg = movl * 0.6, k = mres * 4.25, dg = 1 + mdrv * 7, comp = 1 + k * 0.55, og = 1 / (1 + 1.5 * mdrv);
-            double cents = bendC + lv * lfoGp + pc; if (lsr_ > 0) cents += mv * p[lp] * 100; else if (mmOn && mo_) cents += mvm * md * (100 + p[lp] * 100);
+            const double ovg = movl * 0.6, k = mres * 4.25, dg = 1 + mdrv * 7, comp = (p[fk] > 0.5f ? 1 + k * 0.2 : 1 + k * 0.55), og = 1 / (1 + 1.5 * mdrv);
+            q2p += p[l2r] / sr; if (q2p >= 1) { q2p -= 1; q2s = rnd() * 2 - 1; } q2t += 1.0 / sr;
+            const int lw2 = (int)std::lround(p[l2w]);
+            const double L2 = (lw2 == 0 ? 1 - 4 * std::fabs(q2p - 0.5) : (lw2 == 1 ? 2 * q2p - 1 : (lw2 == 2 ? (q2p < 0.5 ? 1.0 : -1.0) : q2s))) * (p[l2d] > 0 ? std::min(1.0, q2t / p[l2d]) : 1.0);
+            double cents = bendC + lv * lfoGp + pc + prC + L2 * p[l2p] * 200.0; if (lsr_ > 0) cents += mv * p[lp] * 100; else if (mmOn && mo_) cents += mvm * md * (100 + p[lp] * 100);
             double f = freq; if (cents != 0) f *= std::pow(2, cents / 1200);
             const double dt1 = std::min(f / sr, 0.45), dt2 = std::min(f * ratio / sr, 0.45);
-            const double pm = lv * lfoGw + (lsr_ > 0 ? mv * p[lw] * 0.4 : 0) + ((mmOn && mo_) ? mvm * md * p[lw] * 0.4 : 0);
+            const double pm = fe * p[pwe] * 0.4 + L2 * p[l2m] * 0.4 + lv * lfoGw + (lsr_ > 0 ? mv * p[lw] * 0.4 : 0) + ((mmOn && mo_) ? mvm * md * p[lw] * 0.4 : 0);
             p1 += dt1; bool wrap = false; if (p1 >= 1) { p1 -= 1; wrap = true; }
             p2 += dt2; if (p2 >= 1) p2 -= 1;
             if (wrap && sync_) { p2 = p1 * dt2 / dt1; if (p2 >= 1) p2 -= std::floor(p2); }
@@ -278,12 +283,13 @@ struct Engine {
             if (lsr_ == 1) mv = s3; else if (lsr_ == 2) { shT -= p[lr] / sr; if (shT <= 0) { shT += 1; shV = rnd() * 2 - 1; } mv = shV; }
             double sg = 0;
             {   const double pw1v = std::min(0.95, std::max(0.05, p[pw1] + pm)), pw2v = std::min(0.95, std::max(0.05, p[pw2] + pm));
-                if (rgOn) { if (ml1 > 1e-4 || ml2 > 1e-4) sg += std::max(ml1, ml2) * osc(w1, p1, dt1, pw1v) * osc(w2_, p2, dt2, pw2v); }
+                const double o2s = (ml2 > 1e-4 || rgOn || p[of] > 0.001f) ? osc(w2_, p2, dt2, pw2v) : 0.0; o2sv = o2s;
+                if (rgOn) { if (ml1 > 1e-4 || ml2 > 1e-4) sg += std::max(ml1, ml2) * osc(w1, p1, dt1, pw1v) * o2s; }
                 else {
                     if (ml1 > 1e-4) { double o1 = osc(w1, p1, dt1, pw1v);
                         if (unN > 0) { for (int k2 = 0; k2 < unN; k2++) { const double dk = std::min(dt1 * ur[k2], 0.45); pu[k2] += dk; if (pu[k2] >= 1) pu[k2] -= 1; o1 += osc(w1, pu[k2], dk, pw1v); } o1 *= ug; }
                         sg += ml1 * o1; }
-                    if (ml2 > 1e-4) sg += ml2 * osc(w2_, p2, dt2, pw2v);
+                    if (ml2 > 1e-4) sg += ml2 * o2s;
                 } }
             if (mls > 1e-4) {
                 if (sm) { ps += dt1 * 0.5; if (ps >= 1) ps -= 1; sg += mls * 0.75 * ((ps < 0.5 ? 1 : -1) + blep(ps, dt1 * 0.5) - blep(ps < 0.5 ? ps + 0.5 : ps - 0.5, dt1 * 0.5)); }
@@ -304,13 +310,20 @@ struct Engine {
             }
             sg *= 0.6;
             if (ovg > 1e-4) sg += ovg * hy;
-            double cm = lv * lfoGc + atCut + (lsr_ > 0 ? mv * p[lf] : 0.0) + ((mmOn && mf_) ? mvm * md * (1 + p[lf]) : 0.0);
+            double cm = L2 * p[l2f] * 2.0 + o2sv * p[of] * 2.0 + lv * lfoGc + atCut + (lsr_ > 0 ? mv * p[lf] : 0.0) + ((mmOn && mf_) ? mvm * md * (1 + p[lf]) : 0.0);
             double fc = cutNow; if (cm != 0) fc *= std::pow(2, cm);
             if (fc > sr * 0.3) fc = sr * 0.3; else if (fc < 5) fc = 5;
             const double g = 1 - std::exp(-TWO_PI * fc / sr);
-            const double x = 1.4286 * std::tanh(0.7 * sg * dg) * comp - k * std::tanh(y4) + 1e-9 * (rnd() - 0.5);
-            y1 += g * (x - y1); y2 += g * (y1 - y2); y3 += g * (y2 - y3); y4 += g * (y3 - y4);
-            double ov = (pol_ == 1 ? y1 : (pol_ == 2 ? y2 : (pol_ == 3 ? y3 : y4))) * og;
+            const bool acid = p[fk] > 0.5f; const int fmo = (int)std::lround(p[fm]);
+            const double x = 1.4286 * std::tanh(0.7 * sg * dg) * comp - k * (acid ? 0.85 : 1.0) * std::tanh(y4) + 1e-9 * (rnd() - 0.5);
+            if (acid) { y1 += g * (std::tanh(0.9 * x) - std::tanh(0.9 * y1)) * 1.111; y2 += g * (std::tanh(0.9 * y1) - std::tanh(0.9 * y2)) * 1.111; y3 += g * (std::tanh(0.9 * y2) - std::tanh(0.9 * y3)) * 1.111; y4 += g * (std::tanh(0.9 * y3) - std::tanh(0.9 * y4)) * 1.111; }
+            else { y1 += g * (x - y1); y2 += g * (y1 - y2); y3 += g * (y2 - y3); y4 += g * (y3 - y4); }
+            double fo; const bool p12 = pol_ <= 2;
+            if (acid) fo = y4;
+            else if (fmo == 1) fo = p12 ? (y1 - y2) * 4 : (y2 - 2 * y3 + y4) * 16;
+            else if (fmo == 2) fo = p12 ? (x - 2 * y1 + y2) : (x - 4 * y1 + 6 * y2 - 4 * y3 + y4);
+            else fo = (pol_ == 1 ? y1 : (pol_ == 2 ? y2 : (pol_ == 3 ? y3 : y4)));
+            double ov = fo * og;
             hy = ha * (hy + ov - hx); hx = ov;
             if (std::fabs(y4) < 1e-18) y1 = y2 = y3 = y4 = 0;
             if (std::fabs(hy) < 1e-18) hy = 0;

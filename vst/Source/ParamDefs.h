@@ -20,6 +20,8 @@ static const Def kDefs[aura::NP] = {
  {"ec","Envelopes Lineares",0,1,1,B},{"dt","Delay Tempo (s)",0.02f,1,1,F},{"df","Delay Repeticoes",0,0.9f,1,F},{"dm","Delay Mix",0,1,1,F},
  {"mm","Mod Mix Ligado",0,1,1,B},{"ma","Mod A = Env Filtro",0,1,1,B},{"mb","Mod B = LFO",0,1,1,B},{"mx","Mod Mix A-B",0,1,1,F},{"mo","Mod Osciladores",0,1,1,B},{"mf","Mod Filtro",0,1,1,B},
  {"e1","Osc 1 Ligado",0,1,1,B},{"e2","Osc 2 Ligado",0,1,1,B},{"e3","Osc 3 Ligado",0,1,1,B},{"kts","Teclado em passos",0,1,1,B},
- {"rg","Anel OSC1 x OSC2",0,1,1,B},{"un","Unissono",0,3,1,I},{"ud","Unissono abertura",0,1,1,F}};
+ {"rg","Anel OSC1 x OSC2",0,1,1,B},{"un","Unissono",0,3,1,I},{"ud","Unissono abertura",0,1,1,F},
+ {"fm","Filtro forma",0,2,1,I},{"fk","Filtro acido",0,1,1,B},{"l2r","LFO2 velocidade",0.05f,30,0.35f,F},{"l2w","LFO2 onda",0,3,1,I},{"l2d","LFO2 atraso",0,3,1,F},{"l2k","LFO2 reinicia",0,1,1,B},
+ {"l2f","LFO2 filtro",0,1,1,F},{"l2p","LFO2 pitch",0,1,1,F},{"l2m","LFO2 PWM",0,1,1,F},{"of","Osc2 FM filtro",0,1,1,F},{"pwe","Env PWM",0,1,1,F},{"pe","Erro aleatorio",0,1,1,F}};
 
 }

@@ -6,7 +6,7 @@ using aura::kDefs; using aura::Kind;
 
 namespace {
 // valores padrão (iguais ao DEF da versão web), para presets importados que não trazem todos os campos
-const float kDefault[aura::NP] = {-1,2,0.5f,0.75f,1,0.5f,0,0,0,0,0,0,0,0.5f,0,0,0,0,4,0,0,0.15f,5.5f,0,0,0,0,0.002f,0.3f,0,0.2f,0.004f,0.3f,1,0.1f,1,1.3f,0,1,0,0,1,0,0,0,0,0.3f,0.35f,0, 0,0,1,0.5f,1,1,1,1,1,0, 0,0,0.4f};
+const float kDefault[aura::NP] = {-1,2,0.5f,0.75f,1,0.5f,0,0,0,0,0,0,0,0.5f,0,0,0,0,4,0,0,0.15f,5.5f,0,0,0,0,0.002f,0.3f,0,0.2f,0.004f,0.3f,1,0.1f,1,1.3f,0,1,0,0,1,0,0,0,0,0.3f,0.35f,0, 0,0,1,0.5f,1,1,1,1,1,0, 0,0,0.4f, 0,0,4,0,0,0,0,0,0,0,0,0};
 int waveFromVar(const var& v, int d) {
     if (v.isString()) { auto s = v.toString(); if (s == "triangle") return 0; if (s == "sawtooth") return 1; if (s == "square") return 2; if (s == "rsaw") return 3; if (s == "tsaw") return 4; }
     return v.isVoid() ? d : (int)v;
@@ -62,6 +62,7 @@ AudioProcessorValueTreeState::ParameterLayout AuraProcessor::makeLayout() {
     L.add(std::make_unique<AudioParameterFloat>(ParameterID("xlvl", 1), "Entrada nivel", NormalisableRange<float>(0, 1), 0.5f));
     L.add(std::make_unique<AudioParameterChoice>(ParameterID("xmode", 1), "Entrada disparo", StringArray{ "Pelas teclas", "Pelo sinal" }, 0));
     L.add(std::make_unique<AudioParameterFloat>(ParameterID("xthr", 1), "Entrada limiar", NormalisableRange<float>(0.01f, 0.6f), 0.15f));
+    L.add(std::make_unique<AudioParameterFloat>(ParameterID("arpsw", 1), "Arp Swing", NormalisableRange<float>(0, 1), 0));
     L.add(std::make_unique<AudioParameterFloat>(ParameterID("arpbpm", 1), "Arp Andamento", NormalisableRange<float>(40, 240, 1), 100));
     return L;
 }
@@ -72,7 +73,7 @@ AuraProcessor::AuraProcessor()
     for (int i = 0; i < aura::NP; i++) raw[i] = apvts.getRawParameterValue(kDefs[i].id);
     auto g = [this](const char* id) { return apvts.getRawParameterValue(id); };
     pVelSens = g("velsens"); pVelDest = g("veldest"); pPrio = g("prio"); pAtDest = g("atdest"); pHold = g("hold");
-    pArpOn = g("arpon"); pArpPat = g("arppat"); pArpDiv = g("arpdiv"); pArpOct = g("arpoct"); pArpGate = g("arpgate"); pArpLatch = g("arplatch"); pArpSync = g("arpsync"); pArpBpm = g("arpbpm");
+    pArpOn = g("arpon"); pArpPat = g("arppat"); pArpDiv = g("arpdiv"); pArpOct = g("arpoct"); pArpGate = g("arpgate"); pArpLatch = g("arplatch"); pArpSync = g("arpsync"); pArpBpm = g("arpbpm"); pArpSw = g("arpsw");
     { static const char* ids[kFxN] = { "fxd","fxm","fxrv","fxrt","fxdr","fxdp","fxdl","fxcr","fxcb","fxmr","fxmd","fxmf","fxmn","fxmb","fxrf","fxrm","fxrh","fxrl" }; for (int i = 0; i < kFxN; i++) pFx[i] = g(ids[i]); }
     pTun = g("tun"); pKte = g("kte"); pTt = g("tt"); pBu = g("bu"); pBd = g("bd"); pVcv = g("vcv"); pXp = g("xp"); pCh = g("ch"); pA440 = g("a440"); pXon = g("xon"); pXlvl = g("xlvl"); pXmode = g("xmode"); pXthr = g("xthr");
     engine.prepare(44100); fx.prepare(44100);
@@ -175,7 +176,7 @@ void AuraProcessor::processBlock(AudioBuffer<float>& buf, MidiBuffer& midi) {
     arp.pat = (int)pArpPat->load(); arp.div = (int)pArpDiv->load(); arp.oct = (int)pArpOct->load(); arp.gate = pArpGate->load(); arp.latch = pArpLatch->load() > 0.5f;
     double bpm = pArpBpm->load();
     if (pArpSync->load() > 0.5f) if (auto* ph = getPlayHead()) if (auto pos = ph->getPosition()) if (auto b = pos->getBpm()) bpm = *b;
-    arp.bpm = bpm;
+    arp.bpm = bpm; arp.swing = pArpSw->load();
     auto offF = [this](int note) { engine.realOff(note); };
     auto onF = [this](int note, int vel) { engine.coreOn(note, vel); };
     if (arpOn != lastArpOn) {

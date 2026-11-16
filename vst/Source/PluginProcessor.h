@@ -45,6 +45,7 @@ private:
     void applyValues(const float* v);
     aura::Engine engine; aura::Arp arp;
     std::atomic<float>* raw[aura::NP] = {};
+    std::atomic<float>* pArpSw = nullptr;
     std::atomic<float> *pTun, *pKte, *pTt, *pBu, *pBd, *pVcv, *pXp, *pCh, *pA440, *pXon, *pXlvl, *pXmode, *pXthr;
     static constexpr int kFxN = 18; std::atomic<float>* pFx[kFxN] = {}; aura::Fx fx; std::vector<float> fxTmp, fxR;
     std::vector<float> extIn; double tonePh = 0;

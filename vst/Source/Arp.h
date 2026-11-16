@@ -9,7 +9,7 @@ namespace aura {
 struct Arp {
     bool on = false, latch = false;
     int pat = 0, div = 1, oct = 1;      // pat: 0 sobe, 1 desce, 2 sobe e desce, 3 aleatório, 4 ordem
-    double gate = 0.6, bpm = 100;
+    double gate = 0.6, bpm = 100, swing = 0; int sc = 0;
     std::vector<int> notes, down;
     int k = 0, cur = -1, vel = 100;
     double toNext = 0, toOff = 0; bool running = false, offArmed = false;
@@ -32,7 +32,7 @@ struct Arp {
         if (latch && down.empty()) notes.clear();
         if (std::find(down.begin(), down.end(), n) == down.end()) down.push_back(n);
         if (std::find(notes.begin(), notes.end(), n) == notes.end()) notes.push_back(n);
-        vel = v; if (!running) { running = true; k = 0; toNext = 0; }
+        vel = v; if (!running) { running = true; k = 0; sc = 0; toNext = 0; }
     }
     template <class Off> void release(int n, Off&& off) {
         down.erase(std::remove(down.begin(), down.end(), n), down.end());
@@ -54,7 +54,7 @@ struct Arp {
         if (cur >= 0 && offArmed && toOff <= 1e-9) { int c = cur; cur = -1; offArmed = false; offF(c); }
         if (toNext <= 1e-9) {
             if (notes.empty()) { silence(offF); return; }
-            auto sq = seq(); int nn = sq[idx((int)sq.size())]; double step = 60.0 / std::max(bpm, 1.0) * DIV[div] * sr;
+            auto sq = seq(); int nn = sq[idx((int)sq.size())]; double step = 60.0 / std::max(bpm, 1.0) * DIV[div] * sr * (1.0 + ((sc++ % 2 == 0) ? 1 : -1) * swing * 0.33);
             if (cur >= 0) { int c = cur; cur = -1; offF(c); }
             onF(nn, vel); cur = nn; offArmed = true; toOff = std::max(1.0, step * gate); toNext += step;
         }
