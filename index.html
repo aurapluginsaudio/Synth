@@ -385,6 +385,97 @@
   html:not(.light) .k.w{box-shadow:inset 0 -9px 8px -4px rgba(0,0,0,.28),inset 1px 0 0 rgba(255,255,255,.5),inset -1px 0 1px rgba(0,0,0,.25),0 2px 3px rgba(0,0,0,.6)}
   html:not(.light) .k.b{box-shadow:inset 0 -6px 6px rgba(255,255,255,.07),inset 2px 0 1px rgba(255,255,255,.1),0 4px 5px rgba(0,0,0,.8)}
   html:not(.light) .felt{background:linear-gradient(180deg,#4a0b0e,#7a1519 55%,#2c0709)}
+
+  /* ===== v8: instrumento de verdade — moldura de madeira, painel fosco, knobs de alumínio, chaves de balancim ===== */
+  :root{--k:clamp(36px,min(calc(5.2vw - 8px),calc((100vh - 470px)/6.6)),64px)}
+  @media (max-height:560px){ :root{--k:clamp(30px,5.4vh,42px)} }
+  .woodtop,.arm{display:none}
+  html:not(.light) .woodtop,html:not(.light) .arm{display:block;position:relative;flex:0 0 auto;
+    background:
+      linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.34)),
+      linear-gradient(180deg,rgba(255,230,190,.20),rgba(0,0,0,0) 45%,rgba(0,0,0,.38)),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='80' preserveAspectRatio='none'><filter id='w' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.32' numOctaves='5' seed='11'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.07  0 0 0 0 0.02  2.6 0 0 0 -0.75'/></filter><filter id='p' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.10  0 0 0 0 0.04  0 0 0 0 0.01  0.9 0 0 0 -0.38'/></filter><rect width='100%' height='100%' fill='%238b5427'/><rect width='100%' height='100%' filter='url(%23w)'/><rect width='100%' height='100%' filter='url(%23p)'/></svg>") center/100% 100%,
+      #6b3f1f}
+  html:not(.light) .woodtop{height:clamp(12px,1.9vh,18px);box-shadow:inset 0 1px 1px rgba(255,220,170,.4),0 3px 5px rgba(0,0,0,.8);z-index:2;
+    background-image:
+      radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),
+      radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),radial-gradient(circle,#0c0c0d 0 1.8px,#5a5c61 2.4px 4px,transparent 4.6px),
+      linear-gradient(rgba(0,0,0,.34),rgba(0,0,0,.34)),linear-gradient(180deg,rgba(255,230,190,.20),rgba(0,0,0,0) 45%,rgba(0,0,0,.38)),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='80' preserveAspectRatio='none'><filter id='w' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.32' numOctaves='5' seed='11'/><feColorMatrix values='0 0 0 0 0.16  0 0 0 0 0.07  0 0 0 0 0.02  2.6 0 0 0 -0.75'/></filter><rect width='100%' height='100%' fill='%238b5427'/><rect width='100%' height='100%' filter='url(%23w)'/></svg>");
+    background-repeat:no-repeat;background-size:10px 10px,10px 10px,10px 10px,10px 10px,100% 100%,100% 100%,100% 100%;
+    background-position:7% 50%,36% 50%,64% 50%,93% 50%,0 0,0 0,0 0}
+  html:not(.light) .arm{height:clamp(24px,3.6vh,36px);margin-top:-1px;box-shadow:inset 0 1px 0 rgba(0,0,0,.7),inset 0 2px 2px rgba(255,220,170,.25),0 4px 8px rgba(0,0,0,.85);z-index:2}
+  html:not(.light) .arm::after{content:"";position:absolute;left:3%;right:22%;bottom:22%;height:2px;background:rgba(20,8,0,.7);box-shadow:0 1px 0 rgba(255,220,170,.22)}
+  html:not(.light) .arm .plate{position:absolute;right:3%;top:50%;transform:translateY(-50%);height:82%;min-height:20px;padding:0 14px;display:flex;align-items:baseline;gap:8px;
+    background:linear-gradient(180deg,#26282c,#0b0c0d);border-radius:4px;box-shadow:0 0 0 1px #000,inset 0 1px 0 rgba(255,255,255,.14),0 2px 5px rgba(0,0,0,.8);align-items:center}
+  .arm .plate b{font-size:clamp(11px,1.5vh,15px);letter-spacing:.42em;font-weight:800;color:#ece7d6}
+  .arm .plate small{font-size:clamp(6.5px,.9vh,8.5px);letter-spacing:.3em;font-weight:700;color:#9b9686}
+
+  /* painel preto fosco com moldura de metal */
+  html:not(.light) .panel{padding:14px calc(var(--pad) + 14px) 10px;
+    background:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+      linear-gradient(180deg,#1b1d21 0,#131518 60%,#0e1013 100%);
+    box-shadow:inset 0 0 0 1px #000,inset 0 0 0 3px #858a92,inset 0 0 0 4px #000,inset 0 8px 16px rgba(0,0,0,.55),0 0 0 1px #000}
+  html:not(.light) .screw{width:11px;height:11px}
+  html:not(.light) .screw.tl{top:9px;left:9px} html:not(.light) .screw.tr{top:9px;right:9px} html:not(.light) .screw.bl{bottom:9px;left:9px} html:not(.light) .screw.br{bottom:9px;right:9px}
+  /* serigrafia: título grande embaixo, divisórias verticais finas */
+  html:not(.light) .sec{padding:4px 7px 25px;border-left:1.5px solid rgba(233,228,212,.42)}
+  html:not(.light) .sections > .sec:first-child{border-left:0}
+  html:not(.light) .sections + .sections{border-top:1.5px solid rgba(233,228,212,.32);padding-top:7px;margin-top:5px}
+  html:not(.light) .sec h2{top:auto;bottom:3px;left:0;right:0;justify-content:center;text-align:center;padding:0;font-size:clamp(9.5px,.95vw,13px);letter-spacing:.3em;font-weight:700;color:#ece7d6}
+  html:not(.light) .sec h2::before,html:not(.light) .sec h2::after{display:none}
+  /* knobs: saia serrilhada preta + tampa de alumínio escovado + escala de 270° */
+  html:not(.light) .dial{background:
+      conic-gradient(from 137deg,#14161a 0 86deg,transparent 86deg),
+      repeating-conic-gradient(from -135deg,#ece7d6 0 2deg,transparent 2deg 27deg)}
+  html:not(.light) .dial::before{inset:11%;background:#0b0c0d;box-shadow:none}
+  html:not(.light) .dial::after{content:"";position:absolute;inset:24%;border-radius:50%;pointer-events:none;z-index:3;
+    background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.65),rgba(255,255,255,0) 52%),radial-gradient(circle at 70% 85%,rgba(0,0,0,.28),rgba(0,0,0,0) 55%)}
+  html:not(.light) .cap{inset:15%;background:repeating-conic-gradient(from 0deg,#050506 0 3deg,#3a3c41 3deg 6deg);box-shadow:3px 6px 8px rgba(0,0,0,.85),0 1px 2px #000,inset 0 0 0 1.5px #000}
+  html:not(.light) .cap::before{inset:11%;background:
+      repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,.10) 0 .6px,rgba(0,0,0,.06) .6px 1.3px),
+      conic-gradient(from 20deg,#f1f2f4,#a9adb4 12%,#e6e8eb 25%,#9a9ea6 38%,#f3f4f6 50%,#a2a6ad 63%,#e4e6e9 75%,#979ba3 88%,#f1f2f4);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),inset 0 -2px 3px rgba(0,0,0,.35),0 0 0 1.5px #000}
+  html:not(.light) .cap::after,html:not(.light) .kn.big .cap::after{top:6%;width:7%;margin-left:-3.5%;height:40%;border-radius:2px;background:#0b0c0d;box-shadow:none;z-index:2}
+  html:not(.light) .kn.big .cap::after{background:var(--red)}
+  html:not(.light) .mk::after{top:-3px;width:6px;height:6px;margin-left:-3px;box-shadow:0 0 0 1px #000,0 0 5px rgba(255,106,61,.8)}
+  html:not(.light) .kn::before,html:not(.light) .kn::after{top:calc(var(--ks)*.86);color:#cfc9b6;font-size:8px}
+  html:not(.light) .kn label{font-size:9px;letter-spacing:.14em;font-weight:700}
+  /* botões planos com contorno, como o teclado de comandos de um instrumento */
+  html:not(.light) .btn{background:linear-gradient(180deg,#17191c,#0d0e10);border:1px solid rgba(233,228,212,.55);border-radius:2px;color:#ece7d6;letter-spacing:.14em;
+    box-shadow:inset 0 0 0 1px #000,0 1px 0 rgba(0,0,0,.9)}
+  html:not(.light) .btn:active{background:#2a2c30;box-shadow:inset 0 1px 4px #000}
+  html:not(.light) .btn.icon.on{color:var(--amber);border-color:var(--amber);box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(255,171,46,.35)}
+  html:not(.light) .oled{border-radius:3px;box-shadow:0 0 0 2px #000,0 0 0 3px #858a92,0 0 0 5px #000,inset 0 0 14px #000}
+  html:not(.light) .seg{border-radius:2px;border-color:rgba(233,228,212,.55)}
+  /* chaves de balancim (2 posições) */
+  html:not(.light) .seg.lever.rk{--r1:#ffa062;--r2:#e2621f;--r3:#7a3109;--r4:#a8480f;align-items:stretch;width:40px;padding:2px;border-radius:5px;background:#050506;box-shadow:0 0 0 1px #000,0 3px 4px rgba(0,0,0,.85),inset 0 0 0 1px #2a2c30}
+  html:not(.light) .seg.lever.rk[data-key=sw],html:not(.light) .seg.lever.rk[data-key=nc]{--r1:#9bd6f5;--r2:#4b9ecf;--r3:#235f82;--r4:#3787b4}
+  html:not(.light) .seg.lever.rk button,html:not(.light) .seg.lever.rk button.txt{justify-content:center;gap:0;width:100%;height:17px;padding:0;font-size:7.5px;letter-spacing:.3px;font-weight:800;color:rgba(255,255,255,.8);
+    background:linear-gradient(180deg,var(--r1),var(--r2));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.25);text-shadow:0 1px 0 rgba(0,0,0,.35)}
+  html:not(.light) .seg.lever.rk button::after{display:none}
+  html:not(.light) .seg.lever.rk button:first-child{border-radius:3px 3px 0 0} html:not(.light) .seg.lever.rk button:last-child{border-radius:0 0 3px 3px}
+  html:not(.light) .seg.lever.rk button.on,html:not(.light) .seg.lever.rk button.txt.on{color:#fff;background:linear-gradient(180deg,var(--r3),var(--r4));box-shadow:inset 0 3px 5px rgba(0,0,0,.6);text-shadow:0 0 6px rgba(255,255,255,.5)}
+  /* seletores de 3 ou mais posições: cursor de metal numa canaleta */
+  html:not(.light) .seg.lever:not(.rk){padding:2px 0}
+  html:not(.light) .seg.lever:not(.rk) button.on{color:#fff}
+  /* rodas num módulo parafusado, com o apoio de madeira acima */
+  html:not(.light) .wheels{position:relative;gap:12px;padding:12px 16px 10px;margin-left:calc(-1*clamp(6px,1vw,14px));border-right:1px solid #000;
+    background:
+      radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) 5px 5px/10px 10px no-repeat,
+      radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) right 5px top 5px/10px 10px no-repeat,
+      radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) 5px bottom 5px/10px 10px no-repeat,
+      radial-gradient(circle,#7e8289 0 1.6px,#16171a 2.2px 3.8px,transparent 4.4px) right 5px bottom 5px/10px 10px no-repeat,
+      linear-gradient(180deg,#1b1d21,#0e1013);box-shadow:inset 0 0 0 1px #000,inset 0 0 0 2px #3a3d43,4px 0 8px rgba(0,0,0,.6)}
+  html:not(.light) .whc small{color:#ece7d6;letter-spacing:.2em;font-weight:700}
+  html:not(.light) .felt{display:none}
+  html:not(.light) .keysWrap{padding-top:0}
+  /* teclas com chanfro frontal */
+  html:not(.light) .k.w::after{content:"";position:absolute;left:0;right:0;bottom:0;height:13px;border-radius:0 0 5px 5px;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.20) 55%,rgba(255,255,255,.42) 57%,rgba(0,0,0,.12))}
+  html:not(.light) .k.b::after{content:"";position:absolute;left:9%;right:9%;bottom:0;height:17%;border-radius:0 0 4px 4px;pointer-events:none;background:linear-gradient(180deg,#53555b,#1f2023)}
+  @media (max-width:959px){ html:not(.light) .sec{border-left:0;border-bottom:1px solid rgba(233,228,212,.18)} }
   [hidden]{display:none !important}
 </style>
 </head>
@@ -392,6 +483,7 @@
 <div class="synth">
   <div class="cheek"></div>
   <div class="body">
+    <div class="woodtop" aria-hidden="true"></div>
     <div class="panel">
       <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
       <div class="top">
@@ -474,6 +566,7 @@
         </div></div>
       </div>
     </div>
+    <div class="arm" aria-hidden="true"><div class="plate"><b>AURA</b><small>SYNTH BASS</small></div></div>
     <div class="keysWrap">
       <div class="felt"></div>
       <div class="play">
@@ -1934,5 +2027,6 @@
   drawSelectors(); renderOled();
 })();
 </script>
+<script>document.querySelectorAll(".seg.lever").forEach(function(g){if(g.querySelectorAll("button").length===2)g.classList.add("rk")});</script>
 </body>
 </html>
