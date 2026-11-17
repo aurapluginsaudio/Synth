@@ -98,7 +98,17 @@ void AuraProcessor::applyValues(const float* v) {
 void AuraProcessor::setCurrentProgram(int idx) {
     if (idx < 0 || idx >= getNumPrograms()) return;
     program = idx;
-    if (idx < aura::kNumFactory) applyValues(aura::kFactory[idx].v); else applyValues(user[(size_t)(idx - aura::kNumFactory)].v);
+    if (idx < aura::kNumFactory) {
+        applyValues(aura::kFactory[idx].v);
+        if (aura::kFactory[idx].temFx) applyFx(aura::kFactory[idx].fx);
+    } else {
+        applyValues(user[(size_t)(idx - aura::kNumFactory)].v);
+    }
+}
+
+void AuraProcessor::applyFx(const float* f) {
+    for (int i = 0; i < aura::kNumFx; i++)
+        if (auto* p = apvts.getParameter(aura::kFxIds[i])) { p->beginChangeGesture(); p->setValueNotifyingHost(p->convertTo0to1(f[i])); p->endChangeGesture(); }
 }
 
 void AuraProcessor::saveUserPreset(const String& nameIn) {

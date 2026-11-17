@@ -864,6 +864,11 @@
   const LIMI = {oct:[-3,1], o2:[-2,3], sync:[0,1], sw:[0,1], leg:[0,1], pol:[1,4], o3:[-3,3], k3:[0,1], nc:[0,1], lsr:[0,2], ec:[0,1], mm:[0,1], ma:[0,1], mb:[0,1], mo:[0,1], mf:[0,1], e1:[0,1], e2:[0,1], e3:[0,1], kts:[0,1], rg:[0,1], un:[0,3], fm:[0,2], fk:[0,1], l2w:[0,3], l2k:[0,1]};
   const WAVES=['square','sawtooth','triangle','rsaw','tsaw'];
   const ENUM = {wave:WAVES, w2:WAVES, w3:WAVES, lwv:['triangle','square']};
+  const FXK='aura_fx_v1';
+  const FXD={d:0, dr:0.4, dp:0.6, dl:0.7, cr:0.4, cb:0.5,                     // EFX1: 0 off, 1 distorção, 2 fuzz, 3 bitcrusher
+             m:0, mr:0.3, md:0.5, mf:0.2, mn:0.5, mb:0.5, rf:0.35,            // EFX2: 0 off, 1 chorus, 2 flanger, 3 phaser, 4 anel
+             rv:0, rt:1, rm:0.5, rh:0.7, rl:0.3};                              // reverb
+
   function norm(p){
     const o = Object.assign({}, DEF, p);
     if(p.fa===undefined && p.fx===undefined){ o.fa=o.a; o.fd=o.d; o.fs=o.s; o.fr=o.r; }   // presets de um envelope só
@@ -876,12 +881,41 @@
     for(const k in ENUM){ if(!ENUM[k].includes(o[k])) o[k]=DEF[k]; }
     o.name = String(o.name==null?'':o.name).trim().toUpperCase().slice(0,18) || 'SEM NOME';
     const out={name:o.name}; PKEYS.forEach(k=>out[k]=o[k]); if(p.factory) out.factory=true;       // só as chaves conhecidas seguem adiante
+    if(p.efx && typeof p.efx==='object'){                                                        // efeitos que viajam junto com o preset
+      const e={}; for(const k in p.efx){ const v=+p.efx[k]; if(k in FXD && Number.isFinite(v)) e[k]=v; }
+      if(Object.keys(e).length) out.efx=e;
+    }
     return out;
   }
   const F = p => Object.assign(norm(p), {factory:true});
   const FACTORY = [
     F({name:'CHURCH SYNTH BASS', oct:-2, wave:'square', lvl:1.0, sub:0, cut:0.0560, fenv:1.04, kt:0.667, glide:0, a:0.002, d:0.25, s:0.60, r:0.25, vol:1.69}),
     F({name:'DEEP SUB BASS', oct:-1, wave:'square',   lvl:0.75, sub:0.35, cut:0.41, fenv:0.8, kt:0, glide:0.03,  a:0.008, d:0.295, s:0.59, r:0.19, vol:1.57}),
+
+    // Os seis abaixo são a leitura, no synth, dos seis timbres que medimos no
+    // AURA Bass. Lá eles são ajustes de um pré de baixo; aqui não existe sinal
+    // de instrumento para tratar, então o que foi recriado é o caráter de cada
+    // um e, principalmente, a diferença entre eles: quanto médio e presença
+    // cada timbre tem em relação ao primeiro. Os que precisam de efeito o
+    // trazem no bloco efx e o ligam sozinhos ao serem escolhidos.
+    F({name:'SÓ DRIVE', oct:-1, wave:'square', lvl:0.85, sub:0.18, cut:0.50, res:0.10, fenv:0.45, kt:0.30, drv:0.45, ovl:0.22,
+       fa:0.004, fd:0.30, fs:0.55, fr:0.20, a:0.004, d:0.35, s:0.88, r:0.12, vol:1.35,
+       efx:{d:0, m:0, rv:0}}),
+    F({name:'DRIVE ESTÁGIO 2', oct:-1, wave:'square', lvl:0.90, sub:0.12, cut:0.21, res:0.0, fenv:0.50, kt:0.30, drv:0.96, ovl:0.75,
+       fa:0.003, fd:0.28, fs:0.62, fr:0.20, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.90,
+       efx:{d:1, dr:0.25, dp:0.65, dl:0.78, m:0, rv:0}}),
+    F({name:'OITAVA LIMPA', oct:-1, wave:'square', sw:1, lvl:0.70, sub:0.70, cut:0.52, res:0.06, fenv:0.40, kt:0.30, drv:0.49, ovl:0.39,
+       fa:0.005, fd:0.32, fs:0.55, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.14, vol:1.33,
+       efx:{d:0, m:0, rv:0}}),
+    F({name:'OITAVA SUJA', oct:-1, wave:'square', sw:1, lvl:0.80, sub:0.62, cut:0.20, res:0.01, fenv:0.50, kt:0.30, drv:0.37, ovl:0.66,
+       fa:0.003, fd:0.28, fs:0.62, fr:0.20, a:0.003, d:0.32, s:0.90, r:0.12, vol:2.40,
+       efx:{d:2, dr:0.14, dp:0.55, dl:1.00, m:0, rv:0}}),
+    F({name:'SUB GRAVE', oct:-2, wave:'sawtooth', sw:1, lvl:0.62, sub:0.62, cut:0.35, res:0.40, fenv:0.39, kt:0.20, drv:0.50, ovl:0.40,
+       fa:0.008, fd:0.35, fs:0.60, fr:0.25, a:0.008, d:0.40, s:0.92, r:0.18, vol:1.60,
+       efx:{d:0, m:0, rv:0}}),
+    F({name:'CHORUS', oct:-1, wave:'square', lvl:0.80, sub:0.20, cut:0.55, res:0.10, fenv:0.42, kt:0.30, drv:0.18, ovl:0.40,
+       fa:0.005, fd:0.32, fs:0.58, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.16, vol:0.90,
+       efx:{d:0, m:1, mr:0.30, md:0.47, mb:0.50, rv:0}}),
   ];
   const UKEY='aura_user_presets_v1', LKEY='aura_last_preset_v1', FKEY='aura_favs_v1', FOKEY='aura_fav_only_v1';
   const asList = v => Array.isArray(v) ? v : [];
@@ -1072,6 +1106,7 @@
     curPreset=((i%PRESETS.length)+PRESETS.length)%PRESETS.length;
     PKEYS.forEach(k=>P[k]=PRESETS[curPreset][k]);
     KNOBS.forEach(drawKnob); drawMarks(); drawSelectors(); if(typeof drawMutes==='function') drawMutes(); applyAll(); retune(); if(ctx && gate) trackFilter();
+    aplicarEfxDoPreset(PRESETS[curPreset]);
     dirty=false; flash=null; renderOled(); LS.set(LKEY,curPreset);
   }
   function stepPreset(dir){
@@ -1601,13 +1636,16 @@
   }
 
   // ====================== Efeitos (inspirados no JD-Xi): EFX1 → EFX2 → delay → reverb ======================
-  const FXK='aura_fx_v1';
-  const FXD={d:0, dr:0.4, dp:0.6, dl:0.7, cr:0.4, cb:0.5,                     // EFX1: 0 off, 1 distorção, 2 fuzz, 3 bitcrusher
-             m:0, mr:0.3, md:0.5, mf:0.2, mn:0.5, mb:0.5, rf:0.35,            // EFX2: 0 off, 1 chorus, 2 flanger, 3 phaser, 4 anel
-             rv:0, rt:1, rm:0.5, rh:0.7, rl:0.3};                              // reverb
   const RVN=['SALA 1','SALA 2','PALCO 1','PALCO 2','CATEDRAL 1','CATEDRAL 2'];
   let FX=Object.assign({},FXD); { const o=LS.get(FXK,null); if(o&&typeof o==='object') Object.keys(FXD).forEach(k=>{ if(typeof o[k]==='number'&&isFinite(o[k])) FX[k]=o[k]; }); }
   const fxSave=()=>LS.set(FXK,FX);
+  // Um preset pode trazer os seus próprios efeitos. Quem não traz não mexe nos
+  // que estão ligados, para não mudar o que já era o comportamento de antes.
+  function aplicarEfxDoPreset(pr){
+    if(!pr || !pr.efx || typeof FX==='undefined') return;
+    Object.keys(FXD).forEach(k=>{ FX[k] = (k in pr.efx) ? pr.efx[k] : FXD[k]; });
+    fxSave(); if(ctx) fxApply(); if(typeof drawMenuSt==='function') drawMenuSt();
+  }
   const fx={}; let rvTimer=0;
   const expMap=(p,a,b)=>a*Math.pow(b/a,p);
   function buildFx(){
@@ -2176,7 +2214,7 @@
     KNOBS.forEach(drawKnob); drawSelectors(); applyAll(); retune(); setDirty(true); renderOled(); say('PRESET DE EMERGÊNCIA',2500);
   }
   $('mSafe').addEventListener('click',()=>{ closeD('dlgMenu'); safePreset(); });
-  window.__live={panicAll,safePreset,liteOn:()=>liteOn(),setLite:v=>{ G.lite=v; fxApply(); }};
+  window.__live={panicAll,safePreset,presets:()=>PRESETS,carregar:i=>loadPreset(i),liteOn:()=>liteOn(),setLite:v=>{ G.lite=v; fxApply(); }};
 
   // ====================== Linha de efeitos no painel ======================
   { const TY={1:['OFF','DIST','FUZZ','CRUSH'],2:['OFF','CHORUS','FLANGER','PHASER','ANEL'],3:['OFF','ON']};
