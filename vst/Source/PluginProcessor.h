@@ -43,6 +43,7 @@ public:
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout makeLayout();
     void applyValues(const float* v);
+    void applyFx(const float* f);
     aura::Engine engine; aura::Arp arp;
     std::atomic<float>* raw[aura::NP] = {};
     std::atomic<float>* pArpSw = nullptr;
