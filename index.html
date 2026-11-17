@@ -1630,8 +1630,10 @@
 
   function initAudio(){
     if(ctx) return;
+    if(window.AuraDemo && !window.AuraDemo.allow()) return;
     const AC = window.AudioContext || window.webkitAudioContext;
     ctx = new AC({latencyHint:'interactive'}); ctx.onstatechange=()=>audioState();
+    if(window.AuraDemo) window.AuraDemo.start(ctx);
     amp = ctx.createGain(); amp.gain.value = 0;
     comp = ctx.createDynamicsCompressor();
     comp.threshold.value=-14; comp.knee.value=10; comp.ratio.value=5; comp.attack.value=0.004; comp.release.value=0.15;
@@ -2287,5 +2289,42 @@
 })();
 </script>
 <script>document.querySelectorAll(".seg.lever").forEach(function(g){if(g.querySelectorAll("button").length===2)g.classList.add("rk")});</script>
+<script>
+/* AURA Synth Bass — modo demonstração (só quando a página é aberta com ?demo=1, como no site de vendas).
+   © 2026 Thiago R. Galvão. 5 minutos de áudio por navegador a cada 12 horas; depois, convite para baixar o teste de 15 dias. */
+(function(){
+  if(window.auraDesktop || !/[?&]demo=1(&|$)/.test(location.search)) return;
+  var LIM=300, KEY='aura_demo_v1', JANELA=12*3600*1000, BUY='https://fervor.website/plugins/aurasynthbass/#baixar';
+  function ld(){ try{ var o=JSON.parse(localStorage.getItem(KEY)||'null'); if(o && Date.now()-o.t0<JANELA) return o; }catch(e){} return {t0:Date.now(),used:0}; }
+  function sv(o){ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
+  var st=ld(), ctxD=null, ended=false, chip=null, ov=null;
+  var css=document.createElement('style'); css.textContent=
+   '#demoChip{position:fixed;z-index:9998;left:50%;top:6px;transform:translateX(-50%);display:flex;gap:10px;align-items:center;background:rgba(12,13,15,.92);border:1px solid #ff9f0a;color:#f4efde;border-radius:999px;padding:4px 6px 4px 14px;font:700 12px/1 -apple-system,Helvetica,Arial,sans-serif;letter-spacing:.08em;box-shadow:0 4px 16px rgba(0,0,0,.5)}'+
+   '#demoChip b{color:#ff9f0a;font-variant-numeric:tabular-nums}#demoChip a{background:#ff9f0a;color:#160800;text-decoration:none;border-radius:999px;padding:6px 12px}'+
+   '#demoOv{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);backdrop-filter:blur(6px);padding:20px;font-family:-apple-system,Helvetica,Arial,sans-serif}'+
+   '#demoOv div{max-width:440px;text-align:center;background:#161617;border:1px solid #3a3a3c;border-radius:22px;padding:32px 28px;color:#f5f5f7}'+
+   '#demoOv h2{margin:0 0 10px;font-size:26px;letter-spacing:-.02em}#demoOv p{margin:0 0 22px;color:#a1a1a6;font-size:16px;line-height:1.4}'+
+   '#demoOv a,#demoOv button{display:inline-block;margin:4px;background:#ff9f0a;color:#160800;border:0;border-radius:999px;padding:13px 24px;font:700 16px/1 inherit;text-decoration:none;cursor:pointer}#demoOv button{background:#2c2c2e;color:#f5f5f7}';
+  document.head.appendChild(css);
+  function fmt(n){ n=Math.max(0,n); return Math.floor(n/60)+':'+('0'+(n%60)).slice(-2); }
+  function showChip(){ if(chip||ended) return; chip=document.createElement('div'); chip.id='demoChip';
+    chip.innerHTML='DEMO · <b id="demoT">'+fmt(LIM-st.used)+'</b><a href="'+BUY+'" target="_top">BAIXAR TESTE DE 15 DIAS</a>'; document.body.appendChild(chip); }
+  function showEnd(){ if(ov) return; ended=true; if(chip){ chip.remove(); chip=null; }
+    ov=document.createElement('div'); ov.id='demoOv';
+    ov.innerHTML='<div><h2>Fim da demonstração</h2><p>Foram 5 minutos de teste. Gostou? Baixe o AURA e use por 15 dias com todos os recursos, sem cartão. Para tocar de novo aqui, volte em algumas horas.</p><a href="'+BUY+'" target="_top">Baixar teste grátis</a><button id="demoX" type="button">Fechar</button></div>';
+    document.body.appendChild(ov);
+    document.getElementById('demoX').onclick=function(){ try{ if(parent!==window) parent.postMessage({aura:'close'},'*'); }catch(e){} };
+    if(ctxD && ctxD.state==='running'){ try{ ctxD.suspend(); }catch(e){} } }
+  window.AuraDemo={
+    allow:function(){ if(st.used>=LIM){ showEnd(); return false; } return true; },
+    start:function(c){ ctxD=c; showChip();
+      setInterval(function(){
+        if(ended){ if(ctxD && ctxD.state==='running'){ try{ ctxD.suspend(); }catch(e){} } return; }
+        if(ctxD.state==='running' && !document.hidden){ st.used++; sv(st); var t=document.getElementById('demoT'); if(t) t.textContent=fmt(LIM-st.used); }
+        if(st.used>=LIM) showEnd();
+      },1000); }
+  };
+})();
+</script>
 </body>
 </html>
