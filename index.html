@@ -947,6 +947,46 @@
     F({name:'CHORUS', oct:-1, wave:'square', lvl:0.80, sub:0.20, cut:0.55, res:0.10, fenv:0.42, kt:0.30, drv:0.18, ovl:0.40,
        fa:0.005, fd:0.32, fs:0.58, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.16, vol:0.90,
        efx:{d:0, m:1, mr:0.30, md:0.47, mb:0.50, rv:0}}),
+
+    // Família Sub
+    F({name:'SUB BASS (SOFT)', oct:-2, wave:'triangle', lvl:0.80, sub:0.40, cut:0.30, res:0.0, fenv:0.30, kt:0.20, drv:0.10, ovl:0.10,
+       fa:0.010, fd:0.30, fs:0.50, fr:0.25, a:0.010, d:0.40, s:0.90, r:0.20, vol:1.60, efx:{d:0, m:0, rv:0}}),
+    F({name:'SUB BASS (HARD)', oct:-2, wave:'square', lvl:0.85, sub:0.55, cut:0.32, res:0.15, fenv:0.60, kt:0.20, drv:0.55, ovl:0.30,
+       fa:0.003, fd:0.30, fs:0.55, fr:0.18, a:0.003, d:0.30, s:0.90, r:0.15, vol:1.50, efx:{d:0, m:0, rv:0}}),
+    F({name:'SUB BASS (808)', oct:-2, wave:'triangle', lvl:0.90, sub:0.50, cut:0.28, res:0.0, fenv:0.20, kt:0.0, drv:0.25, ovl:0.15, pa:12, pd:0.08,
+       fa:0.002, fd:0.50, fs:0.20, fr:0.40, a:0.002, d:1.40, s:0.0, r:0.40, vol:1.80, efx:{d:0, m:0, rv:0}}),
+    // Família Drive
+    F({name:'DRIVE (SOFT)', oct:-1, wave:'square', lvl:0.85, sub:0.18, cut:0.48, res:0.08, fenv:0.40, kt:0.30, drv:0.25, ovl:0.10,
+       fa:0.004, fd:0.30, fs:0.55, fr:0.20, a:0.004, d:0.35, s:0.88, r:0.12, vol:1.35, efx:{d:0, m:0, rv:0}}),
+    F({name:'DRIVE (HEAVY)', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.15, cut:0.30, res:0.05, fenv:0.50, kt:0.30, drv:0.85, ovl:0.60,
+       fa:0.003, fd:0.28, fs:0.60, fr:0.18, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.70, efx:{d:1, dr:0.30, dp:0.60, dl:0.75, m:0, rv:0}}),
+    // Família Octave
+    F({name:'OCTAVE (SOFT)', oct:-1, wave:'triangle', sw:1, lvl:0.70, sub:0.50, cut:0.48, res:0.04, fenv:0.30, kt:0.30, drv:0.20, ovl:0.15,
+       fa:0.006, fd:0.35, fs:0.55, fr:0.22, a:0.006, d:0.40, s:0.90, r:0.16, vol:1.40, efx:{d:0, m:0, rv:0}}),
+    F({name:'OCTAVE (HARD)', oct:-1, wave:'square', sw:1, lvl:0.80, sub:0.75, cut:0.40, res:0.08, fenv:0.50, kt:0.30, drv:0.60, ovl:0.50,
+       fa:0.003, fd:0.30, fs:0.60, fr:0.18, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.70, efx:{d:0, m:0, rv:0}}),
+    // Família Funk
+    F({name:'FUNK (PLUCK)', oct:-1, wave:'sawtooth', lvl:0.85, sub:0.15, cut:0.25, res:0.30, fenv:2.20, kt:0.40, drv:0.20, ovl:0.10,
+       fa:0.002, fd:0.18, fs:0.10, fr:0.10, a:0.002, d:0.30, s:0.50, r:0.10, vol:1.45, efx:{d:0, m:0, rv:0}}),
+    F({name:'FUNK (SLAP)', oct:-1, wave:'sawtooth', w2:'square', l2:0.40, d2:0.10, lvl:0.85, sub:0.10, cut:0.35, res:0.25, fenv:2.80, kt:0.40, drv:0.30, ovl:0.15,
+       fa:0.002, fd:0.12, fs:0.15, fr:0.08, a:0.002, d:0.22, s:0.40, r:0.08, vol:1.35, efx:{d:0, m:0, rv:0}}),
+    // Pop e Rock
+    F({name:'POP (ROUND)', oct:-1, wave:'triangle', lvl:0.85, sub:0.30, cut:0.38, res:0.05, fenv:0.80, kt:0.30, drv:0.12, ovl:0.10,
+       fa:0.004, fd:0.25, fs:0.40, fr:0.18, a:0.004, d:0.30, s:0.85, r:0.14, vol:1.55, efx:{d:0, m:0, rv:0}}),
+    F({name:'ROCK (GRIT)', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.20, cut:0.45, res:0.10, fenv:0.60, kt:0.30, drv:0.70, ovl:0.50,
+       fa:0.003, fd:0.30, fs:0.55, fr:0.15, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.45, efx:{d:1, dr:0.20, dp:0.55, dl:0.80, m:0, rv:0}}),
+    // Lead e Pluck
+    F({name:'LEAD (MONO)', oct:0, wave:'sawtooth', w2:'sawtooth', l2:0.60, d2:0.08, lvl:0.80, sub:0.0, cut:0.60, res:0.20, fenv:1.20, kt:0.50, glide:0.06, leg:1,
+       fa:0.006, fd:0.40, fs:0.55, fr:0.25, a:0.006, d:0.40, s:0.85, r:0.20, vol:1.20, efx:{d:0, m:0, rv:0}}),
+    F({name:'LEAD (SOFT)', oct:0, wave:'triangle', w2:'square', l2:0.40, d2:0.06, lvl:0.80, sub:0.0, cut:0.55, res:0.10, fenv:0.70, kt:0.50, glide:0.04, leg:1,
+       fa:0.012, fd:0.45, fs:0.60, fr:0.30, a:0.012, d:0.45, s:0.85, r:0.28, vol:1.25, efx:{d:0, m:0, rv:0}}),
+    F({name:'PLUCK (SHORT)', oct:0, wave:'square', pw1:0.30, lvl:0.80, sub:0.0, cut:0.30, res:0.20, fenv:2.50, kt:0.50, drv:0.10,
+       fa:0.002, fd:0.12, fs:0.0, fr:0.10, a:0.002, d:0.18, s:0.0, r:0.10, vol:1.40, efx:{d:0, m:0, rv:0}}),
+    F({name:'PLUCK (WARM)', oct:0, wave:'triangle', w2:'sawtooth', l2:0.30, d2:0.05, lvl:0.80, sub:0.10, cut:0.35, res:0.10, fenv:1.50, kt:0.50,
+       fa:0.002, fd:0.25, fs:0.0, fr:0.20, a:0.002, d:0.50, s:0.0, r:0.20, vol:1.40, efx:{d:0, m:0, rv:0}}),
+    // Chorus
+    F({name:'CHORUS (WIDE)', oct:-1, wave:'sawtooth', w2:'sawtooth', l2:0.80, d2:0.12, lvl:0.75, sub:0.20, cut:0.50, res:0.08, fenv:0.50, kt:0.30, drv:0.15, ovl:0.20,
+       fa:0.005, fd:0.32, fs:0.58, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.16, vol:1.00, efx:{d:0, m:1, mr:0.25, md:0.60, mb:0.50, rv:0}}),
   ];
   const UKEY='aura_user_presets_v1', LKEY='aura_last_preset_v1', FKEY='aura_favs_v1', FOKEY='aura_fav_only_v1';
   const asList = v => Array.isArray(v) ? v : [];
