@@ -1708,6 +1708,7 @@
           amp.disconnect(comp); comp.disconnect(); amp.connect(cw); cw.connect(velG); comp=cw; window.__auraComp='worklet'; }catch(e){ window.__auraComp='native'; }
         try{ fxCrush(); }catch(e){}
         applyAll(); V.freq(noteFreq(lastNote),0,true);
+        if(gate && stack.length){ try{ setPitch(lastNote,true); noteStart(); triggerEnv(100); }catch(e){} }   // nota já segurada: toca de novo no motor novo
         const t=ctx.currentTime; V.cut.forEach(p=>{ p.setValueAtTime(gate ? Math.min(baseCut()*Math.pow(2,P.fenv*P.fs),20000) : baseCut(), t); });
       }).catch(()=>{ window.__auraEngine='native'; });
     } else window.__auraEngine='native';
@@ -1937,11 +1938,30 @@
 
   // primeiro toque em qualquer lugar liga o áudio e tenta o MIDI
   let triedMidi=false;
+  // iPhone/iPad: o Web Audio é mudo com a chave lateral de silêncio ligada, a menos que a sessão de áudio seja de "reprodução".
+  // iOS 17+ aceita navigator.audioSession; nos anteriores, um <audio> mudo em laço faz o mesmo. Só no iOS (no Android um <audio> abriria notificação de mídia).
+  const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  let silentEl=null;
+  function iosAudioSession(){
+    if(!IOS) return;
+    try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
+    if(!silentEl){
+      try{
+        silentEl=document.createElement('audio'); silentEl.setAttribute('playsinline',''); silentEl.loop=true; silentEl.preload='auto';
+        const N=2205, u=new Uint8Array(44+N), dv=new DataView(u.buffer), W=(o,t)=>{ for(let i=0;i<t.length;i++) u[o+i]=t.charCodeAt(i); };
+        W(0,'RIFF'); dv.setUint32(4,36+N,true); W(8,'WAVE'); W(12,'fmt '); dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+        dv.setUint32(24,22050,true); dv.setUint32(28,22050,true); dv.setUint16(32,1,true); dv.setUint16(34,8,true); W(36,'data'); dv.setUint32(40,N,true); u.fill(128,44);   // 0,1 s de silêncio
+        silentEl.src=URL.createObjectURL(new Blob([u],{type:'audio/wav'}));
+        silentEl.volume=0.01;
+      }catch(e){ silentEl=null; }
+    }
+    if(silentEl){ const pr=silentEl.play(); if(pr&&pr.catch) pr.catch(()=>{}); }
+  }
   function unlock(){
-    initAudio(); if(ctx.state!=='running') ctx.resume(); keepAwake();
+    iosAudioSession(); initAudio(); if(ctx && ctx.state!=='running') ctx.resume().catch(()=>{}); keepAwake();
     if(!triedMidi){ triedMidi=true; connectMidi(true); }
   }
-  ['pointerdown','touchend','click'].forEach(ev=>document.addEventListener(ev,unlock,{passive:true}));
+  ['pointerdown','touchstart','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlock,{passive:true}));
 
 
   // ====================== Menu: toque, delay e arpejador ======================
@@ -2158,7 +2178,11 @@
   function touchVel(n,y){ const r=KEYS[n-kbBase].getBoundingClientRect(); return Math.round(35+92*Math.min(1,Math.max(0,(y-r.top)/r.height))); }
   kb.addEventListener('pointerdown',e=>{ if(!ctx) initAudio(); const n=keyAt(e.clientX,e.clientY); if(n==null)return; kb.setPointerCapture(e.pointerId); active.set(e.pointerId,n); noteOn(n,touchVel(n,e.clientY)); });
   kb.addEventListener('pointermove',e=>{ if(!active.has(e.pointerId))return; const n=keyAt(e.clientX,e.clientY); const cur=active.get(e.pointerId); if(n!=null&&n!==cur){ noteOn(n,touchVel(n,e.clientY)); noteOff(cur); active.set(e.pointerId,n);} });
-  const up=e=>{ if(!active.has(e.pointerId))return; noteOff(active.get(e.pointerId)); active.delete(e.pointerId); };
+  // No primeiro toque o áudio ainda está acordando (suspenso): soltar a tecla nesse instante apagaria a nota antes de ela soar.
+  // Espera o áudio rodar e só então solta, com um pequeno sustain.
+  const up=e=>{ if(!active.has(e.pointerId))return; const n=active.get(e.pointerId); active.delete(e.pointerId);
+    if(ctx && ctx.state!=='running' && ctx.state!=='closed'){ ctx.resume().then(()=>setTimeout(()=>noteOff(n),220)).catch(()=>noteOff(n)); }
+    else noteOff(n); };
   kb.addEventListener('pointerup',up); kb.addEventListener('pointercancel',up);
 
   // ====================== MIDI ======================
@@ -2194,7 +2218,7 @@
     midiShort = names.length ? names[0].toUpperCase() : (midi ? 'SEM DISPOSITIVO' : midiShort); renderOled();
   }
   async function connectMidi(silent){
-    if(!navigator.requestMIDIAccess){ if(!bleName){ midiShort = navigator.bluetooth ? 'ABRA OS AJUSTES PARA CONECTAR' : 'SEM SUPORTE NESTE NAVEGADOR'; renderOled(); } if(silent!==true) say('Este navegador não tem MIDI por cabo'); return; }
+    if(!navigator.requestMIDIAccess){ if(!bleName){ midiShort = navigator.bluetooth ? 'ABRA OS AJUSTES PARA CONECTAR' : (IOS ? 'IPHONE: USE O APP BLUEFY' : 'SEM SUPORTE NESTE NAVEGADOR'); renderOled(); } if(silent!==true) say('Este navegador não tem MIDI por cabo'); return; }
     try{ midi=await navigator.requestMIDIAccess({sysex:false}); midi.onstatechange=refreshInputs; refreshInputs(); if(silent!==true) say('MIDI: '+midiShort); }
     catch(err){ if(!bleName){ midiShort='PERMISSÃO DE MIDI NEGADA'; renderOled(); } }
   }
@@ -2220,7 +2244,7 @@
     bleName=dev.name||'CONTROLADOR'; refreshInputs();
   }
   async function connectBle(){
-    if(!navigator.bluetooth){ say('Este navegador não conecta por Bluetooth',5000); return; }
+    if(!navigator.bluetooth){ say(IOS ? 'No iPhone o Safari não conecta Bluetooth. Abra o AURA no app Bluefy ou use o Chrome no Android' : 'Este navegador não conecta por Bluetooth. Use o Chrome',7000); return; }
     try{
       say('Escolha o SMK-25 na lista',6000);
       // alguns controladores não anunciam o serviço MIDI: na segunda tentativa a lista mostra todos os aparelhos
