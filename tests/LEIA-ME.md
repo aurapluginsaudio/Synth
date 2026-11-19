@@ -12,3 +12,10 @@ O motor existe em dois lugares: `index.html` (AudioWorklet `AuraVoice`/`AuraComp
 
 ## Rodar tudo antes de publicar
 `tests/rodar_tudo.sh` executa os testes do motor (Node e C++) e da interface (Playwright) e mostra um resumo. `tests/ao_vivo.py` cobre o botão de pânico, o preset de emergência, o modo leve e a linha de efeitos do painel.
+
+
+## Novidades (presets, exportação, plugin)
+- `tests/novidades.py`: exportação .syx/.mdp (ida e volta e bloqueio no teste e na demonstração), arpejo ligado pelo preset, aviso de som bloqueado e lista de presets por família com busca.
+- `tests/plugin_presets.js`: Presets.h tem de ser igual ao gerado a partir do index.html, com os mesmos 33 nomes na mesma ordem, e o plugin tem de aplicar e desligar o arpejo do preset.
+- `tests/motor_cpp_presets_arp.cpp`: os 33 presets tocam no motor do plugin (sem mudo, sem NaN) e o arpejador do plugin toca no andamento do Sub Arp e do Sub Agro Arp.
+- `.github/workflows/testes-plugin.yml` roda o Node e o C++ a cada push.

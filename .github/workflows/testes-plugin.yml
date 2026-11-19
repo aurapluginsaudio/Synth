@@ -1,0 +1,27 @@
+name: Testes do plugin (presets e arpejo)
+# Roda a cada push: confere que Presets.h bate com o app e que os 33 presets e o arpejador do plugin funcionam no motor C++.
+on:
+  push:
+    branches: [main, comercial]
+    paths: ['index.html', 'vst/**', 'tests/**', '.github/workflows/testes-plugin.yml']
+  workflow_dispatch:
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Presets.h igual ao app, arpejo e parâmetros no plugin
+        run: node tests/plugin_presets.js
+      - name: Motor C++ (presets de fábrica, arpejador, filtros, efeitos)
+        run: |
+          set -e
+          for f in motor_cpp_presets_arp motor_cpp_efeitos motor_cpp_filtros motor_cpp_modmix motor_cpp_unissono_anel; do
+            g++ -O2 -std=c++17 -Ivst/Source tests/$f.cpp -o /tmp/$f
+            /tmp/$f
+          done
+      - name: Motor (Node)
+        run: |
+          node tests/worklet_unit.js
+          node tests/worklet_filtros_lfo2.js

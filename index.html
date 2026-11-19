@@ -122,6 +122,7 @@
   #advBody{max-height:60vh;overflow:auto;padding-right:4px} #advBody h4{margin:14px 0 4px;font-size:11px;letter-spacing:1.4px;color:var(--amber)}
   .kn.off label{opacity:.35;text-decoration:line-through}
   #pList{max-height:52vh;overflow:auto;margin-top:6px;-webkit-overflow-scrolling:touch}
+  .pgrp{margin:12px 2px 2px;font-size:10.5px;letter-spacing:.16em;font-weight:700;color:var(--amber);opacity:.9} .pgrp:first-child{margin-top:4px}
   .prow{display:flex;gap:6px} .dlg .prow .btn.star{width:48px;flex:0 0 48px;color:#7a7f87;font-size:17px;letter-spacing:0} .dlg .prow .btn.star.cur{color:var(--amber)} .dlg .prow .btn.row{flex:1;min-width:0}
   .sec{flex:1 1 auto;border:1.5px solid rgba(20,22,25,.85);border-radius:9px;padding:15px 8px 5px;position:relative;
     box-shadow:0 1px 0 rgba(255,255,255,.75),inset 0 1px 0 rgba(255,255,255,.35);background:rgba(255,255,255,.07)}
@@ -928,75 +929,17 @@
   }
   const F = p => Object.assign(norm(p), {factory:true});
   const FACTORY = [
-    F({name:'CHURCH SYNTH BASS', oct:-2, wave:'square', lvl:1.0, sub:0, cut:0.0560, fenv:1.04, kt:0.667, glide:0, a:0.002, d:0.25, s:0.60, r:0.25, vol:1.69}),
+    // Sub
     F({name:'DEEP SUB BASS', oct:-1, wave:'square',   lvl:0.75, sub:0.35, cut:0.41, fenv:0.8, kt:0, glide:0.03,  a:0.008, d:0.295, s:0.59, r:0.19, vol:1.57}),
-
-    // Os seis abaixo são a leitura, no synth, dos seis timbres que medimos no
-    // AURA Bass. Lá eles são ajustes de um pré de baixo; aqui não existe sinal
-    // de instrumento para tratar, então o que foi recriado é o caráter de cada
-    // um e, principalmente, a diferença entre eles: quanto médio e presença
-    // cada timbre tem em relação ao primeiro. Os que precisam de efeito o
-    // trazem no bloco efx e o ligam sozinhos ao serem escolhidos.
-    F({name:'DRIVE', oct:-1, wave:'square', lvl:0.85, sub:0.18, cut:0.50, res:0.10, fenv:0.45, kt:0.30, drv:0.45, ovl:0.22,
-       fa:0.004, fd:0.30, fs:0.55, fr:0.20, a:0.004, d:0.35, s:0.88, r:0.12, vol:1.35,
-       efx:{d:0, m:0, rv:0}}),
-    F({name:'DRIVE (STAGE 2)', oct:-1, wave:'square', lvl:0.90, sub:0.12, cut:0.21, res:0.0, fenv:0.50, kt:0.30, drv:0.96, ovl:0.75,
-       fa:0.003, fd:0.28, fs:0.62, fr:0.20, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.90,
-       efx:{d:1, dr:0.25, dp:0.65, dl:0.78, m:0, rv:0}}),
-    F({name:'OCTAVE (CLEAN)', oct:-1, wave:'square', sw:1, lvl:0.70, sub:0.70, cut:0.52, res:0.06, fenv:0.40, kt:0.30, drv:0.49, ovl:0.39,
-       fa:0.005, fd:0.32, fs:0.55, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.14, vol:1.33,
-       efx:{d:0, m:0, rv:0}}),
-    F({name:'OCTAVE (WILD)', oct:-1, wave:'square', sw:1, lvl:0.80, sub:0.62, cut:0.20, res:0.01, fenv:0.50, kt:0.30, drv:0.37, ovl:0.66,
-       fa:0.003, fd:0.28, fs:0.62, fr:0.20, a:0.003, d:0.32, s:0.90, r:0.12, vol:2.40,
-       efx:{d:2, dr:0.14, dp:0.55, dl:1.00, m:0, rv:0}}),
     F({name:'SUB BASS', oct:-2, wave:'sawtooth', sw:1, lvl:0.62, sub:0.62, cut:0.35, res:0.40, fenv:0.39, kt:0.20, drv:0.50, ovl:0.40,
        fa:0.008, fd:0.35, fs:0.60, fr:0.25, a:0.008, d:0.40, s:0.92, r:0.18, vol:1.60,
        efx:{d:0, m:0, rv:0}}),
-    F({name:'CHORUS', oct:-1, wave:'square', lvl:0.80, sub:0.20, cut:0.55, res:0.10, fenv:0.42, kt:0.30, drv:0.18, ovl:0.40,
-       fa:0.005, fd:0.32, fs:0.58, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.16, vol:0.90,
-       efx:{d:0, m:1, mr:0.30, md:0.47, mb:0.50, rv:0}}),
-
-    // Família Sub
     F({name:'SUB BASS (SOFT)', oct:-2, wave:'triangle', lvl:0.80, sub:0.40, cut:0.30, res:0.0, fenv:0.30, kt:0.20, drv:0.10, ovl:0.10,
        fa:0.010, fd:0.30, fs:0.50, fr:0.25, a:0.010, d:0.40, s:0.90, r:0.20, vol:1.60, efx:{d:0, m:0, rv:0}}),
     F({name:'SUB BASS (HARD)', oct:-2, wave:'square', lvl:0.85, sub:0.55, cut:0.32, res:0.15, fenv:0.60, kt:0.20, drv:0.55, ovl:0.30,
        fa:0.003, fd:0.30, fs:0.55, fr:0.18, a:0.003, d:0.30, s:0.90, r:0.15, vol:1.50, efx:{d:0, m:0, rv:0}}),
     F({name:'SUB BASS (808)', oct:-2, wave:'triangle', lvl:0.90, sub:0.50, cut:0.28, res:0.0, fenv:0.20, kt:0.0, drv:0.25, ovl:0.15, pa:12, pd:0.08,
        fa:0.002, fd:0.50, fs:0.20, fr:0.40, a:0.002, d:1.40, s:0.0, r:0.40, vol:1.80, efx:{d:0, m:0, rv:0}}),
-    // Família Drive
-    F({name:'DRIVE (SOFT)', oct:-1, wave:'square', lvl:0.85, sub:0.18, cut:0.48, res:0.08, fenv:0.40, kt:0.30, drv:0.25, ovl:0.10,
-       fa:0.004, fd:0.30, fs:0.55, fr:0.20, a:0.004, d:0.35, s:0.88, r:0.12, vol:1.35, efx:{d:0, m:0, rv:0}}),
-    F({name:'DRIVE (HEAVY)', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.15, cut:0.30, res:0.05, fenv:0.50, kt:0.30, drv:0.85, ovl:0.60,
-       fa:0.003, fd:0.28, fs:0.60, fr:0.18, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.70, efx:{d:1, dr:0.30, dp:0.60, dl:0.75, m:0, rv:0}}),
-    // Família Octave
-    F({name:'OCTAVE (SOFT)', oct:-1, wave:'triangle', sw:1, lvl:0.70, sub:0.50, cut:0.48, res:0.04, fenv:0.30, kt:0.30, drv:0.20, ovl:0.15,
-       fa:0.006, fd:0.35, fs:0.55, fr:0.22, a:0.006, d:0.40, s:0.90, r:0.16, vol:1.40, efx:{d:0, m:0, rv:0}}),
-    F({name:'OCTAVE (HARD)', oct:-1, wave:'square', sw:1, lvl:0.80, sub:0.75, cut:0.40, res:0.08, fenv:0.50, kt:0.30, drv:0.60, ovl:0.50,
-       fa:0.003, fd:0.30, fs:0.60, fr:0.18, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.70, efx:{d:0, m:0, rv:0}}),
-    // Família Funk
-    F({name:'FUNK (PLUCK)', oct:-1, wave:'sawtooth', lvl:0.85, sub:0.15, cut:0.25, res:0.30, fenv:2.20, kt:0.40, drv:0.20, ovl:0.10,
-       fa:0.002, fd:0.18, fs:0.10, fr:0.10, a:0.002, d:0.30, s:0.50, r:0.10, vol:1.45, efx:{d:0, m:0, rv:0}}),
-    F({name:'FUNK (SLAP)', oct:-1, wave:'sawtooth', w2:'square', l2:0.40, d2:0.10, lvl:0.85, sub:0.10, cut:0.35, res:0.25, fenv:2.80, kt:0.40, drv:0.30, ovl:0.15,
-       fa:0.002, fd:0.12, fs:0.15, fr:0.08, a:0.002, d:0.22, s:0.40, r:0.08, vol:1.35, efx:{d:0, m:0, rv:0}}),
-    // Pop e Rock
-    F({name:'POP (ROUND)', oct:-1, wave:'triangle', lvl:0.85, sub:0.30, cut:0.38, res:0.05, fenv:0.80, kt:0.30, drv:0.12, ovl:0.10,
-       fa:0.004, fd:0.25, fs:0.40, fr:0.18, a:0.004, d:0.30, s:0.85, r:0.14, vol:1.55, efx:{d:0, m:0, rv:0}}),
-    F({name:'ROCK (GRIT)', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.20, cut:0.45, res:0.10, fenv:0.60, kt:0.30, drv:0.70, ovl:0.50,
-       fa:0.003, fd:0.30, fs:0.55, fr:0.15, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.45, efx:{d:1, dr:0.20, dp:0.55, dl:0.80, m:0, rv:0}}),
-    // Lead e Pluck
-    F({name:'LEAD (MONO)', oct:0, wave:'sawtooth', w2:'sawtooth', l2:0.60, d2:0.08, lvl:0.80, sub:0.0, cut:0.60, res:0.20, fenv:1.20, kt:0.50, glide:0.06, leg:1,
-       fa:0.006, fd:0.40, fs:0.55, fr:0.25, a:0.006, d:0.40, s:0.85, r:0.20, vol:1.20, efx:{d:0, m:0, rv:0}}),
-    F({name:'LEAD (SOFT)', oct:0, wave:'triangle', w2:'square', l2:0.40, d2:0.06, lvl:0.80, sub:0.0, cut:0.55, res:0.10, fenv:0.70, kt:0.50, glide:0.04, leg:1,
-       fa:0.012, fd:0.45, fs:0.60, fr:0.30, a:0.012, d:0.45, s:0.85, r:0.28, vol:1.25, efx:{d:0, m:0, rv:0}}),
-    F({name:'PLUCK (SHORT)', oct:0, wave:'square', pw1:0.30, lvl:0.80, sub:0.0, cut:0.30, res:0.20, fenv:2.50, kt:0.50, drv:0.10,
-       fa:0.002, fd:0.12, fs:0.0, fr:0.10, a:0.002, d:0.18, s:0.0, r:0.10, vol:1.40, efx:{d:0, m:0, rv:0}}),
-    F({name:'PLUCK (WARM)', oct:0, wave:'triangle', w2:'sawtooth', l2:0.30, d2:0.05, lvl:0.80, sub:0.10, cut:0.35, res:0.10, fenv:1.50, kt:0.50,
-       fa:0.002, fd:0.25, fs:0.0, fr:0.20, a:0.002, d:0.50, s:0.0, r:0.20, vol:1.40, efx:{d:0, m:0, rv:0}}),
-    // Chorus
-    F({name:'CHORUS (WIDE)', oct:-1, wave:'sawtooth', w2:'sawtooth', l2:0.80, d2:0.12, lvl:0.75, sub:0.20, cut:0.50, res:0.08, fenv:0.50, kt:0.30, drv:0.15, ovl:0.20,
-       fa:0.005, fd:0.32, fs:0.58, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.16, vol:1.00, efx:{d:0, m:1, mr:0.25, md:0.60, mb:0.50, rv:0}}),
-
-    // Família Sub (leitura de timbre de baixos de sintetizador analógico): graves limpos, versões "Agro" com mais brilho e distorção, versões "Arp" que ligam o arpejador
     F({name:'SUB', oct:-1, wave:'triangle', lvl:0.80, sub:0.5, cut:0.25, res:0.0, fenv:0.20, kt:0.20, drv:0.08,
        fa:0.006, fd:0.30, fs:0.60, fr:0.20, a:0.006, d:0.35, s:0.95, r:0.15, vol:1.70, efx:{d:0, m:0, rv:0}}),
     F({name:'SUB AGRO', oct:-1, wave:'square', lvl:0.80, sub:0.40, cut:0.62, res:0.18, fenv:0.90, kt:0.30, drv:0.85, ovl:0.45,
@@ -1007,17 +950,67 @@
     F({name:'SUB AGRO ARP', oct:-1, wave:'square', lvl:0.80, sub:0.35, cut:0.48, res:0.20, fenv:1.00, kt:0.30, drv:0.75, ovl:0.45,
        fa:0.002, fd:0.14, fs:0.45, fr:0.08, a:0.002, d:0.18, s:0.85, r:0.06, vol:1.40, efx:{d:0, m:0, rv:0},
        arp:{on:1, pat:0, div:3, oct:2, bpm:125, gate:0.80, sw:0}}),
-    F({name:'HRD PLUCK', oct:-1, wave:'sawtooth', lvl:0.85, sub:0.25, cut:0.20, res:0.25, fenv:2.60, kt:0.35, drv:0.55, ovl:0.30,
-       fa:0.002, fd:0.12, fs:0.0, fr:0.08, a:0.002, d:0.20, s:0.0, r:0.08, vol:1.55, efx:{d:0, m:0, rv:0}}),
-    F({name:'DUO-GLIDE', oct:-2, wave:'sawtooth', w2:'square', l2:0.70, o2:1, d2:0.06, lvl:0.80, sub:0.20, cut:0.4, res:0.08, fenv:0.50, kt:0.20, glide:0.14, leg:1, drv:0.15,
-       fa:0.006, fd:0.40, fs:0.65, fr:0.20, a:0.006, d:0.40, s:0.92, r:0.18, vol:1.55, efx:{d:0, m:0, rv:0}}),
-    F({name:'ANGRY DROP', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.25, cut:0.46, res:0.55, fenv:1.50, kt:0.20, drv:0.65, ovl:0.30, pa:18, pd:0.22,
-       fa:0.002, fd:0.30, fs:0.40, fr:0.15, a:0.002, d:0.35, s:0.88, r:0.14, vol:1.45, efx:{d:0, m:0, rv:0}}),
+    // Drive
+    F({name:'DRIVE', oct:-1, wave:'square', lvl:0.85, sub:0.18, cut:0.50, res:0.10, fenv:0.45, kt:0.30, drv:0.45, ovl:0.22,
+       fa:0.004, fd:0.30, fs:0.55, fr:0.20, a:0.004, d:0.35, s:0.88, r:0.12, vol:1.35,
+       efx:{d:0, m:0, rv:0}}),
+    F({name:'DRIVE (STAGE 2)', oct:-1, wave:'square', lvl:0.90, sub:0.12, cut:0.21, res:0.0, fenv:0.50, kt:0.30, drv:0.96, ovl:0.75,
+       fa:0.003, fd:0.28, fs:0.62, fr:0.20, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.90,
+       efx:{d:1, dr:0.25, dp:0.65, dl:0.78, m:0, rv:0}}),
+    F({name:'DRIVE (SOFT)', oct:-1, wave:'square', lvl:0.85, sub:0.18, cut:0.48, res:0.08, fenv:0.40, kt:0.30, drv:0.25, ovl:0.10,
+       fa:0.004, fd:0.30, fs:0.55, fr:0.20, a:0.004, d:0.35, s:0.88, r:0.12, vol:1.35, efx:{d:0, m:0, rv:0}}),
+    F({name:'DRIVE (HEAVY)', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.15, cut:0.30, res:0.05, fenv:0.50, kt:0.30, drv:0.85, ovl:0.60,
+       fa:0.003, fd:0.28, fs:0.60, fr:0.18, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.70, efx:{d:1, dr:0.30, dp:0.60, dl:0.75, m:0, rv:0}}),
     F({name:'BAD!BASS', oct:-1, wave:'square', lvl:0.85, sub:0.30, cut:0.52, res:0.10, fenv:0.40, kt:0.25, drv:0.4, ovl:0.20,
        fa:0.004, fd:0.30, fs:0.60, fr:0.18, a:0.004, d:0.35, s:0.90, r:0.15, vol:1.55, efx:{d:0, m:0, rv:0}}),
+    // Octave
+    F({name:'OCTAVE (CLEAN)', oct:-1, wave:'square', sw:1, lvl:0.70, sub:0.70, cut:0.52, res:0.06, fenv:0.40, kt:0.30, drv:0.49, ovl:0.39,
+       fa:0.005, fd:0.32, fs:0.55, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.14, vol:1.33,
+       efx:{d:0, m:0, rv:0}}),
+    F({name:'OCTAVE (WILD)', oct:-1, wave:'square', sw:1, lvl:0.80, sub:0.62, cut:0.20, res:0.01, fenv:0.50, kt:0.30, drv:0.37, ovl:0.66,
+       fa:0.003, fd:0.28, fs:0.62, fr:0.20, a:0.003, d:0.32, s:0.90, r:0.12, vol:2.40,
+       efx:{d:2, dr:0.14, dp:0.55, dl:1.00, m:0, rv:0}}),
+    F({name:'OCTAVE (SOFT)', oct:-1, wave:'triangle', sw:1, lvl:0.70, sub:0.50, cut:0.48, res:0.04, fenv:0.30, kt:0.30, drv:0.20, ovl:0.15,
+       fa:0.006, fd:0.35, fs:0.55, fr:0.22, a:0.006, d:0.40, s:0.90, r:0.16, vol:1.40, efx:{d:0, m:0, rv:0}}),
+    F({name:'OCTAVE (HARD)', oct:-1, wave:'square', sw:1, lvl:0.80, sub:0.75, cut:0.40, res:0.08, fenv:0.50, kt:0.30, drv:0.60, ovl:0.50,
+       fa:0.003, fd:0.30, fs:0.60, fr:0.18, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.70, efx:{d:0, m:0, rv:0}}),
+    // Funk, Pop e Rock
+    F({name:'FUNK (PLUCK)', oct:-1, wave:'sawtooth', lvl:0.85, sub:0.15, cut:0.25, res:0.30, fenv:2.20, kt:0.40, drv:0.20, ovl:0.10,
+       fa:0.002, fd:0.18, fs:0.10, fr:0.10, a:0.002, d:0.30, s:0.50, r:0.10, vol:1.45, efx:{d:0, m:0, rv:0}}),
+    F({name:'FUNK (SLAP)', oct:-1, wave:'sawtooth', w2:'square', l2:0.40, d2:0.10, lvl:0.85, sub:0.10, cut:0.35, res:0.25, fenv:2.80, kt:0.40, drv:0.30, ovl:0.15,
+       fa:0.002, fd:0.12, fs:0.15, fr:0.08, a:0.002, d:0.22, s:0.40, r:0.08, vol:1.35, efx:{d:0, m:0, rv:0}}),
+    F({name:'POP (ROUND)', oct:-1, wave:'triangle', lvl:0.85, sub:0.30, cut:0.38, res:0.05, fenv:0.80, kt:0.30, drv:0.12, ovl:0.10,
+       fa:0.004, fd:0.25, fs:0.40, fr:0.18, a:0.004, d:0.30, s:0.85, r:0.14, vol:1.55, efx:{d:0, m:0, rv:0}}),
+    F({name:'ROCK (GRIT)', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.20, cut:0.45, res:0.10, fenv:0.60, kt:0.30, drv:0.70, ovl:0.50,
+       fa:0.003, fd:0.30, fs:0.55, fr:0.15, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.45, efx:{d:1, dr:0.20, dp:0.55, dl:0.80, m:0, rv:0}}),
     F({name:'$24$', oct:-1, wave:'sawtooth', w2:'sawtooth', l2:0.80, o2:1, d2:0.05, lvl:0.75, sub:0.15, cut:0.5, res:0.15, fenv:0.60, kt:0.30, drv:0.20,
        fa:0.003, fd:0.30, fs:0.55, fr:0.15, a:0.003, d:0.32, s:0.90, r:0.12, vol:1.35, efx:{d:0, m:0, rv:0}}),
+    // Lead
+    F({name:'LEAD (MONO)', oct:0, wave:'sawtooth', w2:'sawtooth', l2:0.60, d2:0.08, lvl:0.80, sub:0.0, cut:0.60, res:0.20, fenv:1.20, kt:0.50, glide:0.06, leg:1,
+       fa:0.006, fd:0.40, fs:0.55, fr:0.25, a:0.006, d:0.40, s:0.85, r:0.20, vol:1.20, efx:{d:0, m:0, rv:0}}),
+    F({name:'LEAD (SOFT)', oct:0, wave:'triangle', w2:'square', l2:0.40, d2:0.06, lvl:0.80, sub:0.0, cut:0.55, res:0.10, fenv:0.70, kt:0.50, glide:0.04, leg:1,
+       fa:0.012, fd:0.45, fs:0.60, fr:0.30, a:0.012, d:0.45, s:0.85, r:0.28, vol:1.25, efx:{d:0, m:0, rv:0}}),
+    F({name:'DUO-GLIDE', oct:-2, wave:'sawtooth', w2:'square', l2:0.70, o2:1, d2:0.06, lvl:0.80, sub:0.20, cut:0.4, res:0.08, fenv:0.50, kt:0.20, glide:0.14, leg:1, drv:0.15,
+       fa:0.006, fd:0.40, fs:0.65, fr:0.20, a:0.006, d:0.40, s:0.92, r:0.18, vol:1.55, efx:{d:0, m:0, rv:0}}),
+    // Pluck
+    F({name:'PLUCK (SHORT)', oct:0, wave:'square', pw1:0.30, lvl:0.80, sub:0.0, cut:0.30, res:0.20, fenv:2.50, kt:0.50, drv:0.10,
+       fa:0.002, fd:0.12, fs:0.0, fr:0.10, a:0.002, d:0.18, s:0.0, r:0.10, vol:1.40, efx:{d:0, m:0, rv:0}}),
+    F({name:'PLUCK (WARM)', oct:0, wave:'triangle', w2:'sawtooth', l2:0.30, d2:0.05, lvl:0.80, sub:0.10, cut:0.35, res:0.10, fenv:1.50, kt:0.50,
+       fa:0.002, fd:0.25, fs:0.0, fr:0.20, a:0.002, d:0.50, s:0.0, r:0.20, vol:1.40, efx:{d:0, m:0, rv:0}}),
+    F({name:'HRD PLUCK', oct:-1, wave:'sawtooth', lvl:0.85, sub:0.25, cut:0.20, res:0.25, fenv:2.60, kt:0.35, drv:0.55, ovl:0.30,
+       fa:0.002, fd:0.12, fs:0.0, fr:0.08, a:0.002, d:0.20, s:0.0, r:0.08, vol:1.55, efx:{d:0, m:0, rv:0}}),
+    // Chorus e Especiais
+    F({name:'CHURCH SYNTH BASS', oct:-2, wave:'square', lvl:1.0, sub:0, cut:0.0560, fenv:1.04, kt:0.667, glide:0, a:0.002, d:0.25, s:0.60, r:0.25, vol:1.69}),
+    F({name:'CHORUS', oct:-1, wave:'square', lvl:0.80, sub:0.20, cut:0.55, res:0.10, fenv:0.42, kt:0.30, drv:0.18, ovl:0.40,
+       fa:0.005, fd:0.32, fs:0.58, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.16, vol:0.90,
+       efx:{d:0, m:1, mr:0.30, md:0.47, mb:0.50, rv:0}}),
+    F({name:'CHORUS (WIDE)', oct:-1, wave:'sawtooth', w2:'sawtooth', l2:0.80, d2:0.12, lvl:0.75, sub:0.20, cut:0.50, res:0.08, fenv:0.50, kt:0.30, drv:0.15, ovl:0.20,
+       fa:0.005, fd:0.32, fs:0.58, fr:0.22, a:0.005, d:0.35, s:0.90, r:0.16, vol:1.00, efx:{d:0, m:1, mr:0.25, md:0.60, mb:0.50, rv:0}}),
+    F({name:'ANGRY DROP', oct:-1, wave:'sawtooth', lvl:0.90, sub:0.25, cut:0.46, res:0.55, fenv:1.50, kt:0.20, drv:0.65, ovl:0.30, pa:18, pd:0.22,
+       fa:0.002, fd:0.30, fs:0.40, fr:0.15, a:0.002, d:0.35, s:0.88, r:0.14, vol:1.45, efx:{d:0, m:0, rv:0}}),
   ];
+  const FAMILIAS = [["SUB", ["DEEP SUB BASS", "SUB BASS", "SUB BASS (SOFT)", "SUB BASS (HARD)", "SUB BASS (808)", "SUB", "SUB AGRO", "SUB ARP", "SUB AGRO ARP"]], ["DRIVE", ["DRIVE", "DRIVE (STAGE 2)", "DRIVE (SOFT)", "DRIVE (HEAVY)", "BAD!BASS"]], ["OCTAVE", ["OCTAVE (CLEAN)", "OCTAVE (WILD)", "OCTAVE (SOFT)", "OCTAVE (HARD)"]], ["FUNK, POP E ROCK", ["FUNK (PLUCK)", "FUNK (SLAP)", "POP (ROUND)", "ROCK (GRIT)", "$24$"]], ["LEAD", ["LEAD (MONO)", "LEAD (SOFT)", "DUO-GLIDE"]], ["PLUCK", ["PLUCK (SHORT)", "PLUCK (WARM)", "HRD PLUCK"]], ["CHORUS E ESPECIAIS", ["CHURCH SYNTH BASS", "CHORUS", "CHORUS (WIDE)", "ANGRY DROP"]]];   // título de cada grupo na lista de presets
+  const FAMILIA_DE = {}; FAMILIAS.forEach(([f,l])=>l.forEach(n=>FAMILIA_DE[n]=f));
   const UKEY='aura_user_presets_v1', LKEY='aura_last_preset_v1', FKEY='aura_favs_v1', FOKEY='aura_fav_only_v1';
   const asList = v => Array.isArray(v) ? v : [];
   let USER = asList(LS.get(UKEY,[])).filter(p=>p&&typeof p==='object'&&typeof p.name==='string').map(p=>{ const q=norm(p); delete q.factory; return q; });
@@ -1291,10 +1284,12 @@
     drawCats();
     $('favOnly').classList.toggle('cur',favOnly); $('favOnly').setAttribute('aria-pressed',favOnly?'true':'false');
     $('pTitle').textContent='PRESETS · '+PRESETS.length+(favs.size?' · ★ '+favs.size:'');
+    let famAnt=null; const agrupa=!q && catSel==='TODOS' && !favOnly;
     PRESETS.forEach((p,i)=>{
       if(q && !p.name.toUpperCase().includes(q)) return;
       if(catSel!=='TODOS' && !catsOf(p).includes(catSel)) return;
       if(favOnly && !q && !favs.has(p.name)) return;
+      if(agrupa){ const f=FAMILIA_DE[p.name]||(p.factory?'NUVEM':'MEUS PRESETS'); if(f!==famAnt){ famAnt=f; const h=document.createElement('div'); h.className='pgrp'; h.textContent=f; box.appendChild(h); } }
       const row=document.createElement('div'); row.className='prow';
       let s;
       if(manageOn){
