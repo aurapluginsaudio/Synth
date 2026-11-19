@@ -86,6 +86,8 @@
     box-shadow:0 1px 0 rgba(255,255,255,.8),0 0 0 3px #26282c,inset 0 0 14px #000;
     display:flex;align-items:center;gap:12px;width:clamp(230px,33vw,440px);height:68px;flex:0 0 auto;overflow:hidden}
   .oled canvas{display:block;width:96px;height:48px;flex:0 0 96px}
+  /* janela de computador mais estreita que 480 px: o painel não cabe sem sobrepor rótulos, então rola na horizontal (celular e tablet usam a largura virtual de 1180 px e não entram aqui) */
+  @media (max-width:479px){ html,body{min-width:480px} }
   .oled .txt{flex:1 1 0;min-width:0;color:var(--oled);text-shadow:0 0 7px rgba(127,233,255,.6);white-space:nowrap}
   .oled .txt b,.oled .txt span{display:block;overflow:hidden;text-overflow:ellipsis}
   .oled .txt b{font-size:clamp(15px,1.9vw,22px);height:28px;line-height:28px;letter-spacing:.5px}
@@ -775,6 +777,8 @@
       <button id="mSave" class="btn row">Salvar preset</button>
       <button id="mImport" class="btn row">Importar arquivos<em id="mImpSt">.syx .mdp .json</em></button>
       <button id="mExport" class="btn row">Exportar backup</button>
+      <button id="mExpSyx" class="btn row">Exportar .syx<em>Sub Phatty</em></button>
+      <button id="mExpMdp" class="btn row">Exportar .mdp<em>Minimoog Model D</em></button>
       <button id="mSet" class="btn row">Setlist<em id="mSetSt">—</em></button>
       <button id="mCloud" class="btn row">Nuvem<em id="mCloudSt">—</em></button>
   </div></section>
@@ -1416,6 +1420,79 @@
   if(cloud) setTimeout(cloudSync,2500);
 
   // ====================== Exportar e importar ======================
+
+  // ---- Exportar para outros formatos: .syx (Moog Sub Phatty) e .mdp (Minimoog Model D para iPad), todos num .zip.
+  // É o caminho de volta das leituras fromSyx()/fromMdp(): vale o que elas entendem. Fora do .syx/.mdp ficam efeitos, arpejo, LFO 2 e glide (.syx).
+  const MDP_BASE={"ctrlout_mono_poly_t":0.0,"ctrl_legato_t":1.0,"contour_shape_t":1.0,"syn_modWheel_k":0.0,"velocity_selector_k":1.0,"velocity_amount_k":0.5,"velocity_offset_k":0.5,"aftertouch_selector_k":0.0,"aftertouch_amount_k":1.0,"aftertouch_offset_k":0.0,"syn_glide_k":0.0,"syn_volume_k":0.393701,"standard_keyboard_scroller_s":27.947731,"lfo_rate_k":0.352321,"lfo_wave_k":1.0,"glide_enable_t":0.0,"decay_enable_t":1.0,"osc3_filtereg_t":0.0,"noise_lfo_t":1.0,"modulation_mix_k":0.0,"osc_modulation_t":0.0,"osc3_control_t":1.0,"driver_semi_k":-0.001281,"driver_range_t":0.0,"vco0_range_k":2.0,"vco0_wave_k":4.0,"vco1_semi_k":0.006798,"vco1_range_k":3.0,"vco1_wave_k":4.0,"vco2_semi_k":-0.00375,"vco2_range_k":2.0,"vco2_wave_k":4.0,"mixer_gain_k":1.0,"mixer_gain_vco0_k":1.0,"mixer_gain_vco1_k":0.780983,"mixer_gain_vco2_k":0.604711,"mixer_gain_external_k":0.0,"mixer_gain_noise_k":0.512101,"mixer_enable_vco0_t":1.0,"mixer_enable_vco1_t":0.0,"mixer_enable_vco2_t":0.0,"mixer_enable_external_t":0.0,"mixer_enable_noise_t":0.0,"noise_color_t":0.0,"filter_modulation_t":0.0,"keyboard_control1_t":0.0,"keyboard_control2_t":0.53334,"vcf_freq_k":0.125984,"vcf_regen_k":0.0,"amount_contour_k":0.117717,"adsr0_att_k":0.007918,"adsr0_dec_k":0.304196,"adsr0_sus_k":0.590355,"adsr1_att_k":0.0,"adsr1_dec_k":0.307079,"adsr1_sus_k":0.600386,"bender_rate_k":0.031081,"bender_depth_k":0.045565,"bender_mix_k":0.139718,"bender_time_k":0.035218,"bender_fed_k":0.0,"bender_on_t":0.0,"delay_mix_k":0.099038,"delay_time_k":0.094285,"delay_fed_k":0.205122,"delay_clocksync_t":1.0,"delay_on_t":0.0,"syn_hold_t":0.0,"arp_on_t":0.0,"arp_latch_t":0.0,"arp_rate_k":2.0,"arp_gatelength_k":0.5,"arp_pattern_k":1.0,"arp_octave_k":1.0,"arp_step1_t":1.0};
+  const clampI=(x,lo,hi)=>Math.round(Math.max(lo,Math.min(hi,x)));
+  function toSyx(p){
+    const v=new Array(132).fill(0), tm=(t,lo,hi)=>clampI(16383*Math.log10(Math.min(hi,Math.max(lo,t))/0.001)/4,0,16383);
+    const wv=(w,pw)=>w==='triangle'?clampI(0.08*16383,0,16383):(w==='square'?clampI(16383*(pw>=0.5?0.6:Math.min(1,2/3+(0.5-pw)/(3*0.45))),0,16383):clampI(0.33*16383,0,16383));
+    const nm=String(p.name||'AURA').slice(0,16); for(let i=0;i<nm.length;i++){ const c=nm.charCodeAt(i); v[1+i]=(c>=32&&c<127)?c:63; }
+    const o1=({'-3':0,'-2':0,'-1':1,'0':2,'1':2})[String(p.oct)]; const I=(x)=>clampI(x,0,16383);
+    v[18]=tm(p.a,.002,1); v[19]=tm(p.d,.02,2); v[20]=I(p.s*16383); v[21]=tm(p.r,.02,2);
+    v[22]=tm(p.fa,.002,1); v[23]=tm(p.fd,.02,2); v[24]=I(p.fs*16383); v[25]=tm(p.fr,.02,2);
+    v[26]=I(p.lvl*16383); v[27]=I(p.l2*16383); v[28]=I(p.nz*16383); v[29]=I(p.sub*16383);
+    v[30]=wv(p.wave,p.pw1); v[31]=wv(p.w2,p.pw2); v[32]=I(8192+p.d2/7*8192); v[33]=8192; v[34]=p.sync?1:0;
+    v[36]=I(16383*Math.log(30*Math.pow(600,p.cut)/20)/Math.log(1000)); v[37]=I(p.res*16383); v[38]=I(8192+p.fenv/6*8192); v[39]=I(p.kt*8192); v[40]=I(p.drv*16383);
+    v[90]=o1; v[91]=Math.max(0,o1+p.o2); v[92]=Math.max(0,Math.min(3,p.pol-1));
+    const d=[0xF0,0x04,0x06,0x04,0x06,0,0,0,0,0,0,0,0,0,0x60,0,0,0,0,0,0,0,1];
+    for(const x of v){ d.push((x>>12)&3,(x>>6)&0x3f,x&0x3f); }
+    d.length=419; d.push(0xF7); return new Uint8Array(d);
+  }
+  function toMdp(p){
+    const q=Object.assign({},MDP_BASE), S=(k,x)=>{ q[k]=x; };
+    const M=[[0,0.001],[1/6,0.010],[1/3,0.2],[0.5,0.6],[2/3,1],[5/6,5],[1,10]];
+    const inv=t=>{ t=Math.max(0.001,Math.min(10,t)); for(let i=1;i<M.length;i++){ if(t<=M[i][1]){ const a=M[i-1],b=M[i]; return a[0]+(b[0]-a[0])*Math.log(t/a[1])/Math.log(b[1]/a[1]); } } return 1; };
+    const wk=(w,pw)=>w==='triangle'?1:(w==='square'?(pw>=0.4?4:(pw>=0.2?5:6)):3), cl=(x,a,b)=>Math.max(a,Math.min(b,x));
+    const o1=cl(p.oct+4,1,5); S('vco0_range_k',o1); S('vco0_wave_k',wk(p.wave,p.pw1));
+    S('vco1_range_k',cl(o1+p.o2,1,6)); S('vco1_wave_k',wk(p.w2,p.pw2)); S('vco1_semi_k',cl(p.d2/7,-1,1));
+    let l3=p.l3, w3=p.w3, o3=o1+p.o3, d3=p.d3;
+    if(!(l3>0) && p.sub>0){ l3=p.sub; w3='triangle'; o3=o1-1; d3=0; }      // o Model D não tem sub: vira o oscilador 3, uma oitava abaixo
+    S('vco2_range_k',cl(o3,1,6)); S('vco2_wave_k',wk(w3,0.5)); S('vco2_semi_k',cl(d3/7,-1,1));
+    [['vco0',p.lvl],['vco1',p.l2],['vco2',l3]].forEach(([k,g])=>{ S('mixer_enable_'+k+'_t',g>0?1:0); S('mixer_gain_'+k+'_k',g||0); });
+    S('mixer_enable_noise_t',p.nz>0?1:0); S('mixer_gain_noise_k',Math.min(1,p.nz/0.6)); S('noise_color_t',p.nc?1:0);
+    S('mixer_enable_external_t',p.ovl>0?1:0); S('mixer_gain_external_k',p.ovl||0);
+    S('vcf_freq_k',cl(Math.log(30*Math.pow(600,p.cut)/20)/Math.log(1000),0,1)); S('vcf_regen_k',Math.min(0.9,p.res)); S('amount_contour_k',Math.min(1,p.fenv/8));
+    const kt=[0,1/3,2/3,1].reduce((a,b)=>Math.abs(b-p.kt)<Math.abs(a-p.kt)?b:a); S('keyboard_control1_t',(kt===1/3||kt===1)?1:0); S('keyboard_control2_t',(kt===2/3||kt===1)?1:0);
+    S('adsr0_att_k',inv(p.fa)); S('adsr0_dec_k',inv(p.fd)); S('adsr0_sus_k',p.fs); S('adsr1_att_k',inv(p.a)); S('adsr1_dec_k',inv(p.d)); S('adsr1_sus_k',p.s);
+    S('decay_enable_t',p.r>=0.5*p.d?1:0); S('ctrl_legato_t',p.leg?1:0); S('glide_enable_t',p.glide>0?1:0); S('syn_glide_k',Math.min(1,(p.glide||0)/0.4));
+    S('bender_on_t',p.pa>0?1:0); if(p.pa>0){ S('bender_depth_k',Math.min(1,p.pa/24)); S('bender_time_k',inv(p.pd)); }
+    S('delay_on_t',0); S('osc_modulation_t',0); S('filter_modulation_t',0); S('arp_on_t',0); S('syn_volume_k',Math.min(1,p.vol/4.267));
+    const nm=String(p.name).replace(/"/g,''), f6=x=>(+x).toFixed(6);
+    return '{\n\t"globals": {\n\t\t"ver": 1,\n\t\t"description": "AURA Synth Bass",\n\t\t"bank": "AURA",\n\t\t"name": "'+nm+'",\n\t\t"octave": 48,\n\t\t"tempo": 120.000000,\n\t\t"pbrange": 2,\n\t\t"mwrange": 1.000000,\n\t},\n'
+      +'\t"arpeggiator": {\n\t\t"sortOrder": 2,\n\t\t"velocityMode": 0,\n\t\t"direction": 0,\n\t\t"stepSize": 4,\n\t\t"octaveRange": 0,\n\t\t"patternLength": 0,\n\t},\n'
+      +'\t"mapping": {\n\t\t"syn_glide_k": [72, 0],\n\t\t"syn_volume_k": [7, 0],\n\t\t"vcf_freq_k": [74, 0],\n\t\t"vcf_regen_k": [71, 0],\n\t\t"amount_contour_k": [24, 0],\n\t\t"syn_hold_t": [64, 0],\n\t},\n'
+      +'\t"params": {\n'+Object.keys(q).map(k=>'\t\t"'+k+'": '+f6(q[k])+',\n').join('')+'\t}\n}\n';
+  }
+  function zipStore(files){            // .zip sem compressão (suficiente para arquivos pequenos)
+    const enc=new TextEncoder(), parts=[], cen=[]; let off=0;
+    const crcT=(()=>{ const t=[]; for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[n]=c>>>0; } return t; })();
+    const crc=b=>{ let c=0xFFFFFFFF; for(let i=0;i<b.length;i++) c=crcT[(c^b[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; };
+    for(const f of files){
+      const nb=enc.encode(f.name), d=f.data, c=crc(d), h=new DataView(new ArrayBuffer(30)); 
+      h.setUint32(0,0x04034b50,true); h.setUint16(4,20,true); h.setUint16(6,0x0800,true); h.setUint32(14,c,true); h.setUint32(18,d.length,true); h.setUint32(22,d.length,true); h.setUint16(26,nb.length,true);
+      parts.push(new Uint8Array(h.buffer),nb,d);
+      const e=new DataView(new ArrayBuffer(46)); e.setUint32(0,0x02014b50,true); e.setUint16(4,20,true); e.setUint16(6,20,true); e.setUint16(8,0x0800,true); e.setUint32(16,c,true); e.setUint32(20,d.length,true); e.setUint32(24,d.length,true); e.setUint16(28,nb.length,true); e.setUint32(42,off,true);
+      cen.push(new Uint8Array(e.buffer),nb); off+=30+nb.length+d.length;
+    }
+    const cl=cen.reduce((n,x)=>n+x.length,0), z=new DataView(new ArrayBuffer(22)); z.setUint32(0,0x06054b50,true); z.setUint16(8,files.length,true); z.setUint16(10,files.length,true); z.setUint32(12,cl,true); z.setUint32(16,off,true);
+    return new Blob(parts.concat(cen,[new Uint8Array(z.buffer)]),{type:'application/zip'});
+  }
+  function exportFmt(kind){
+    if((window.AuraLic && window.AuraLic.status()==='trial') || window.AuraDemo){ say('Exportar presets é um recurso da licença ativa'); return; }
+    try{
+      const lista=FACTORY.concat(USER), usados=new Set(), files=[];
+      lista.forEach(p=>{
+        let b=String(p.name).replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'')||'preset', n=b, i=2; while(usados.has(n)) n=b+'_'+(i++); usados.add(n);
+        files.push(kind==='syx' ? {name:'AURA_'+n+'.syx', data:toSyx(p)} : {name:'AURA_'+n+'.mdp', data:new TextEncoder().encode(toMdp(p))});
+      });
+      const a=document.createElement('a'); a.href=URL.createObjectURL(zipStore(files)); a.download=kind==='syx'?'AURA-presets-SYX.zip':'AURA-presets-ModelD.zip';
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+      say(files.length+' preset(s) em .'+kind);
+    }catch(e){ say('Não foi possível exportar'); }
+  }
+
   function exportAll(){
     // No teste (desktop) e na demonstração do site, a exportação fica bloqueada
     // em qualquer hipótese — só depois de uma licença ativa.
@@ -1503,6 +1580,8 @@
   $('mSave').addEventListener('click',()=>{ closeD('dlgMenu'); openSave(); });
   $('mImport').addEventListener('click',()=>{ closeD('dlgMenu'); $('fileIn').click(); });
   $('mExport').addEventListener('click',()=>{ closeD('dlgMenu'); exportAll(); });
+  $('mExpSyx').addEventListener('click',()=>{ closeD('dlgMenu'); exportFmt('syx'); });
+  $('mExpMdp').addEventListener('click',()=>{ closeD('dlgMenu'); exportFmt('mdp'); });
   $('mLearn').addEventListener('click',()=>{ closeD('dlgMenu'); setLearn(true); });
   confirmTap($('mClear'),()=>{ ccMap={}; actMap={}; LS.set(MAPKEY,ccMap); LS.set(ACTKEY,actMap); drawMap(); closeD('dlgMenu'); say('Mapeamento apagado'); });
   $('mMidi').addEventListener('click',()=>{ closeD('dlgMenu'); connectMidi(); });
@@ -1982,6 +2061,7 @@
   // iOS 17+ aceita navigator.audioSession; nos anteriores, um <audio> mudo em laço faz o mesmo. Só no iOS (no Android um <audio> abriria notificação de mídia).
   const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
   let silentEl=null;
+  let unlockChk=0;
   function iosAudioSession(){
     if(!IOS) return;
     try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
@@ -1999,6 +2079,8 @@
   }
   function unlock(){
     iosAudioSession(); initAudio(); if(!ctx) return; if(ctx.state!=='running') ctx.resume().catch(()=>{}); keepAwake();
+    // se o áudio continuar parado depois do toque (modo silencioso, outro app usando o som, aba em segundo plano), avisa em vez de ficar mudo sem explicação
+    clearTimeout(unlockChk); unlockChk=setTimeout(()=>{ if(ctx && ctx.state!=='running' && ctx.state!=='closed') say(IOS?'Sem som? Toque de novo e confira se o celular não está no modo silencioso':'Sem som? Toque de novo na tela e confira o volume do aparelho',5000); },900);
     if(!triedMidi){ triedMidi=true; connectMidi(true); }
   }
   ['pointerdown','touchstart','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,unlock,{passive:true}));
@@ -2012,6 +2094,7 @@
     // exportar é recurso de licença ativa: sem licença, o botão avisa em vez de baixar
     const semLicenca=!!((window.AuraLic && window.AuraLic.status()==='trial') || window.AuraDemo);
     $('mExport').classList.toggle('dim', semLicenca);
+    $('mExpSyx').classList.toggle('dim', semLicenca); $('mExpMdp').classList.toggle('dim', semLicenca);
     $('mExport').innerHTML = semLicenca ? 'Exportar backup<em>só com licença</em>' : 'Exportar backup';
   }
   $('mPrio').addEventListener('click',()=>{ prio=(prio+1)%3; LS.set(PRIOK,prio); drawMenuSt(); });
@@ -2322,6 +2405,7 @@
   document.addEventListener('fullscreenchange',fsChange); document.addEventListener('webkitfullscreenchange',fsChange);
   let wake=null;
   async function keepAwake(){ try{ if('wakeLock' in navigator && !wake){ wake=await navigator.wakeLock.request('screen'); wake.addEventListener('release',()=>{wake=null;}); } }catch(e){} }
+  window.addEventListener('pageshow',()=>{ if(ctx && ctx.state!=='running') ctx.resume().catch(()=>{}); });
   document.addEventListener('visibilitychange',()=>{ if(document.hidden) allOff(); else if(ctx){ keepAwake(); if(ctx.state!=='running') ctx.resume().catch(()=>{}); } });
   if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
 

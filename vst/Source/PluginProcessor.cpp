@@ -101,9 +101,20 @@ void AuraProcessor::setCurrentProgram(int idx) {
     if (idx < aura::kNumFactory) {
         applyValues(aura::kFactory[idx].v);
         if (aura::kFactory[idx].temFx) applyFx(aura::kFactory[idx].fx);
+        if (aura::kFactory[idx].temArp) { applyArp(aura::kFactory[idx].arp); arpDoPreset = true; }
+        else if (arpDoPreset) { setParamNorm("arpon", 0.f); arpDoPreset = false; }
     } else {
         applyValues(user[(size_t)(idx - aura::kNumFactory)].v);
+        if (arpDoPreset) { setParamNorm("arpon", 0.f); arpDoPreset = false; }
     }
+}
+
+void AuraProcessor::setParamNorm(const char* id, float real) {
+    if (auto* p = apvts.getParameter(id)) { p->beginChangeGesture(); p->setValueNotifyingHost(p->convertTo0to1(real)); p->endChangeGesture(); }
+}
+
+void AuraProcessor::applyArp(const float* a) {
+    for (int i = 0; i < aura::kNumArp; i++) setParamNorm(aura::kArpIds[i], a[i]);
 }
 
 void AuraProcessor::applyFx(const float* f) {

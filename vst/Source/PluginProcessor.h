@@ -44,6 +44,8 @@ private:
     static juce::AudioProcessorValueTreeState::ParameterLayout makeLayout();
     void applyValues(const float* v);
     void applyFx(const float* f);
+    void applyArp(const float* a);
+    void setParamNorm(const char* id, float real);
     aura::Engine engine; aura::Arp arp;
     std::atomic<float>* raw[aura::NP] = {};
     std::atomic<float>* pArpSw = nullptr;
@@ -52,6 +54,6 @@ private:
     std::vector<float> extIn; double tonePh = 0;
     std::atomic<float> *pVelSens, *pVelDest, *pPrio, *pAtDest, *pHold, *pArpOn, *pArpPat, *pArpDiv, *pArpOct, *pArpGate, *pArpLatch, *pArpSync, *pArpBpm;
     std::vector<UserPreset> user;
-    int program = 0; bool pedal = false, lastArpOn = false;
+    int program = 0; bool pedal = false, lastArpOn = false, arpDoPreset = false;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AuraProcessor)
 };
