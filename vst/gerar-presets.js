@@ -41,11 +41,14 @@ const num = (k, v) => {
 };
 const f = v => (Number.isInteger(v) ? v.toFixed(1) : String(+v.toFixed(6))) + 'f';
 
+// Arpejador que viaja com o preset: on, padrão, divisão, oitavas, duração, swing, andamento
+const ARP_PADRAO = { pat: 0, div: 1, oct: 1, gate: 0.6, sw: 0, bpm: 100 };
 const linhas = ctx.FACTORY.map(p => {
   const vals = ctx.PKEYS.map(k => f(num(k, p[k]))).join(',');
-  if (!p.efx) return `{"${p.name}",{${vals}},false,{}}`;
-  const fx = FX_IDS.map(k => f(k in p.efx ? +p.efx[k] : ctx.FXD[k])).join(',');
-  return `{"${p.name}",{${vals}},true,{${fx}}}`;
+  const fx = p.efx ? FX_IDS.map(k => f(k in p.efx ? +p.efx[k] : ctx.FXD[k])).join(',') : '';
+  const A = p.arp ? Object.assign({}, ARP_PADRAO, p.arp) : null;
+  const arp = A ? [A.on === 0 ? 0 : 1, A.pat, A.div, A.oct, A.gate, A.sw, A.bpm].map(x => f(+x)).join(',') : '';
+  return `{"${p.name}",{${vals}},${p.efx ? 'true' : 'false'},{${fx}},${A ? 'true' : 'false'},{${arp}}}`;
 });
 
 const saida = `// Gerado por vst/gerar-presets.js a partir dos presets de fábrica do index.html.
@@ -59,7 +62,10 @@ static const char* const kParamIds[kNumParams] = {${ctx.PKEYS.map(k => `"${k}"`)
 // temFx em false e os efeitos continuam como o usuário deixou.
 static const int kNumFx = 18;
 static const char* const kFxIds[kNumFx] = {${FX_IDS.map(k => `"fx${k}"`).join(',')}};
-struct FactoryPreset { const char* name; float v[kNumParams]; bool temFx; float fx[kNumFx]; };
+// Sub Arp e Sub Agro Arp ligam o arpejador; ao trocar para um preset sem arpejo, o plugin desliga o que o preset ligou.
+static const int kNumArp = 7;
+static const char* const kArpIds[kNumArp] = {"arpon","arppat","arpdiv","arpoct","arpgate","arpsw","arpbpm"};
+struct FactoryPreset { const char* name; float v[kNumParams]; bool temFx; float fx[kNumFx]; bool temArp; float arp[kNumArp]; };
 static const int kNumFactory = ${linhas.length};
 static const FactoryPreset kFactory[kNumFactory] = {
 ${linhas.join(',\n')}
