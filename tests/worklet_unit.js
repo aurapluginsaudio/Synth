@@ -1,5 +1,5 @@
 const fs=require('fs');
-const html=fs.readFileSync('/home/claude/synthbass/index.html','utf8');
+const html=fs.readFileSync(__dirname+'/../index.html','utf8');
 const a=html.indexOf('const WORKLET = `')+'const WORKLET = `'.length, b=html.indexOf('`;',a);
 const src=html.slice(a,b).replace(/\\\\/g,'\\');
 global.sampleRate=48000; global.AudioWorkletProcessor=class{ constructor(){ this.port={}; } };
