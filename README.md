@@ -2,7 +2,7 @@
 
 Sintetizador de baixo monofônico que roda no navegador (Web Audio + Web MIDI), feito para ser tocado por um controlador MIDI.
 
-Abra em: https://thiagorgalvao-sketch.github.io/SynthBass/
+Abra em: https://aurapluginsaudio.github.io/Synth/
 
 - Três osciladores (o terceiro pode servir de fonte de modulação), sync e largura de pulso, sub-oscilador, ruído branco ou rosa, overload, filtro de 6 a 24 dB com ressonância e drive, LFO com fonte LFO, OSC 3 ou aleatória, envelopes de filtro, volume e afinação, com curva exponencial ou linear.
 - Delay por preset, arpejador, hold, prioridade de nota (última, mais grave ou mais aguda), aftertouch e força da tecla com destinos à escolha.
