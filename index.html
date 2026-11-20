@@ -2492,6 +2492,7 @@
 /* AURA SYNTH BASS — licenciamento (somente no app desktop). © 2026 Thiago R. Galvão. Todos os direitos reservados. ID: AURA-SB-TRG-2026
    Fluxo: teste grátis de 15 dias -> chave de ativação (limite de aparelhos no servidor) -> revalidação periódica com tolerância offline. */
 (function(){
+  const dbg=function(e){ try{ if(window.auraDbg) window.auraDbg(e); }catch(_){ /* só registro */ } };
   const D=window.auraDesktop; if(!D) return;           // app web: sem licenciamento
   const CFG=Object.assign({ api:'https://api.lemonsqueezy.com/v1/licenses', trialDays:15, graceDays:30, buyUrl:'https://fervor.website/aura' }, D.config||{});
   const DAY=86400000, $=id=>document.getElementById(id);
@@ -2514,10 +2515,10 @@
    <div class="fn" id="licFn"></div></div>`; document.body.appendChild(ov);
   const chip=document.createElement('div'); chip.id='licChip'; chip.hidden=true; document.body.appendChild(chip);
 
-  async function load(){ try{ const s=await D.store.get('lic'); if(s) st=Object.assign(st,JSON.parse(s)); }catch(e){}
-    try{ const b=JSON.parse(localStorage.getItem('aura_lic_b')||'null'); if(b&&b.t0&&(!st.t0||b.t0<st.t0)) st.t0=b.t0; if(b&&b.seen>st.seen) st.seen=b.seen; }catch(e){} }
-  async function save(){ const j=JSON.stringify(st); try{ await D.store.set('lic',j); }catch(e){} try{ localStorage.setItem('aura_lic_b',JSON.stringify({t0:st.t0,seen:st.seen})); }catch(e){} }
-  async function call(path,body){ if(D.http) return D.http(CFG.api+path,body); const r=await fetch(CFG.api+path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(body)}); let j={}; try{ j=await r.json(); }catch(e){} j._http=r.status; return j; }
+  async function load(){ try{ const s=await D.store.get('lic'); if(s) st=Object.assign(st,JSON.parse(s)); }catch(e){ dbg(e); }
+    try{ const b=JSON.parse(localStorage.getItem('aura_lic_b')||'null'); if(b&&b.t0&&(!st.t0||b.t0<st.t0)) st.t0=b.t0; if(b&&b.seen>st.seen) st.seen=b.seen; }catch(e){ dbg(e); } }
+  async function save(){ const j=JSON.stringify(st); try{ await D.store.set('lic',j); }catch(e){ dbg(e); } try{ localStorage.setItem('aura_lic_b',JSON.stringify({t0:st.t0,seen:st.seen})); }catch(e){ dbg(e); } }
+  async function call(path,body){ if(D.http) return D.http(CFG.api+path,body); const r=await fetch(CFG.api+path,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(body)}); let j={}; try{ j=await r.json(); }catch(e){ dbg(e); } j._http=r.status; return j; }
   const devName=()=> (D.deviceName||'Aparelho')+' · '+(D.deviceId||'').slice(0,8);
 
   function evalStatus(){
@@ -2554,18 +2555,18 @@
       if(status==='licensed'){ const j=await call('/deactivate',{license_key:st.key,instance_id:st.inst}); if(j.deactivated||j._http===404){ st.key=st.inst=''; st.val=0; await save(); evalStatus(); paint(); show(); } else er.textContent=j.error||'Não foi possível desativar agora.'; return; }
       const key=($('licKey').value||'').trim(); if(!key){ er.textContent='Cole a chave de ativação.'; return; }
       const j=await call('/activate',{license_key:key,instance_name:devName()});
-      if(j.activated){ st.key=key; st.inst=j.instance&&j.instance.id; st.name=devName(); st.val=Date.now(); await save(); evalStatus(); paint(); hide(); try{ window.dispatchEvent(new Event('aura-licensed')); }catch(e){} }
+      if(j.activated){ st.key=key; st.inst=j.instance&&j.instance.id; st.name=devName(); st.val=Date.now(); await save(); evalStatus(); paint(); hide(); try{ window.dispatchEvent(new Event('aura-licensed')); }catch(e){ dbg(e); } }
       else if(/limit/i.test(j.error||'')) er.textContent='Esta chave já está ativa em 3 aparelhos. Desative um deles (no AURA do outro aparelho: Ativação → Desativar) ou fale com o suporte.';
       else er.textContent=(j.error||'Chave inválida.')+(j._http===0?'':''); }
     catch(e){ er.textContent='Sem conexão com o servidor de licenças. Verifique a internet e tente de novo.'; }
     finally{ b.disabled=false; } };
   async function revalidate(){ if(!(st.key&&st.inst)) return; try{ const j=await call('/validate',{license_key:st.key,instance_id:st.inst});
-      if(j.valid){ st.val=Date.now(); await save(); } else if(j._http && j._http<500 && j.valid===false){ st.key=st.inst=''; st.val=0; await save(); } }catch(e){} evalStatus(); paint(); if(!ok()) show(); }
+      if(j.valid){ st.val=Date.now(); await save(); } else if(j._http && j._http<500 && j.valid===false){ st.key=st.inst=''; st.val=0; await save(); } }catch(e){ dbg(e); } evalStatus(); paint(); if(!ok()) show(); }
 
   const api={ ok, show:()=>show(false), status:()=>status, _st:()=>st, _reload:async()=>{ await load(); evalStatus(); paint(); } };
   window.AuraLic=api;
   (async()=>{ await load(); const now=Date.now(); if(!st.t0) st.t0=now; if(now>st.seen) st.seen=now; await save(); evalStatus(); paint(); if(!ok()) show(); else await revalidate(); window.__licReady=true; })();
-  setInterval(()=>{ const now=Date.now(); if(now>st.seen){ st.seen=now; save(); } evalStatus(); paint(); if(!ok()){ show(); try{ if(window.panicAll) window.panicAll(); }catch(e){} } },60000);
+  setInterval(()=>{ const now=Date.now(); if(now>st.seen){ st.seen=now; save(); } evalStatus(); paint(); if(!ok()){ show(); try{ if(window.panicAll) window.panicAll(); }catch(e){ dbg(e); } } },60000);
 })();
 </script>
 <script>document.querySelectorAll(".seg.lever").forEach(function(g){if(g.querySelectorAll("button").length===2)g.classList.add("rk")});</script>
