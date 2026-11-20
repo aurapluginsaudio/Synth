@@ -3,7 +3,7 @@ name: Testes do plugin (presets e arpejo)
 on:
   push:
     branches: [main, comercial]
-    paths: ['index.html', 'vst/**', 'tests/**', '.github/workflows/testes-plugin.yml']
+    paths: ['index.html', 'sw.js', 'manifest.json', 'tools/**', 'vst/**', 'tests/**', '.github/workflows/testes-plugin.yml']
   workflow_dispatch:
 jobs:
   testes:
@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
+      - name: Cache do service worker em dia (sw.js carimbado com o conteúdo)
+        run: python3 tools/versionar_sw.py --check
       - name: Presets.h igual ao app, arpejo e parâmetros no plugin
         run: node tests/plugin_presets.js
       - name: Motor C++ (presets de fábrica, arpejador, filtros, efeitos)

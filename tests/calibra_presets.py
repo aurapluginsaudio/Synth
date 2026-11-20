@@ -1,6 +1,6 @@
-import json,re,sys
+import json,re,sys,os
 from playwright.sync_api import sync_playwright
-IDX='/home/claude/synthbass/index.html'; APPLY=len(sys.argv)>1 and sys.argv[1]=='apply'
+IDX=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','index.html'); APPLY=len(sys.argv)>1 and sys.argv[1]=='apply'
 INIT="""window.__inp={name:'SMK',onmidimessage:null};
   navigator.requestMIDIAccess=async()=>({inputs:new Map([['1',window.__inp]]),onstatechange:null});
   window.__send=(a)=>window.__inp.onmidimessage({data:new Uint8Array(a)});

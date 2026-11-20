@@ -1,5 +1,5 @@
-import sys,numpy as np
-exec(open('/home/claude/synthbass/tests/_fxhead.py').read())
+import sys,os,numpy as np
+exec(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'_fxhead.py')).read())
 with sync_playwright() as p:
     b=p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
     pg=b.new_page(viewport={'width':1440,'height':1200}); errs=[]
