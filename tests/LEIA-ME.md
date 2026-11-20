@@ -19,3 +19,6 @@ O motor existe em dois lugares: `index.html` (AudioWorklet `AuraVoice`/`AuraComp
 - `tests/plugin_presets.js`: Presets.h tem de ser igual ao gerado a partir do index.html, com os mesmos 33 nomes na mesma ordem, e o plugin tem de aplicar e desligar o arpejo do preset.
 - `tests/motor_cpp_presets_arp.cpp`: os 33 presets tocam no motor do plugin (sem mudo, sem NaN) e o arpejador do plugin toca no andamento do Sub Arp e do Sub Agro Arp.
 - `.github/workflows/testes-plugin.yml` roda o Node e o C++ a cada push.
+
+- `orientacao.py` — celular e tablet em pé mostram o aviso "Gire o aparelho"; deitados e no computador funcionam; teclas com nome; ids únicos; registro de erros.
+- `../tools/versionar_sw.py` — carimba o cache do service worker com o conteúdo dos arquivos (o `rodar_tudo.sh` roda sozinho; o CI usa `--check`).
