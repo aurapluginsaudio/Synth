@@ -2576,7 +2576,7 @@
 (function(){
   const dbg=function(e){ try{ if(window.auraDbg) window.auraDbg(e); }catch(_){ /* só registro */ } };
   if(window.auraDesktop || !/[?&]demo=1(&|$)/.test(location.search)) return;
-  var LIM=300, KEY='aura_demo_v1', JANELA=12*3600*1000, BUY='https://fervor.website/plugins/aurasynthbass/#baixar';
+  var LIM=300, KEY='aura_demo_v1', JANELA=12*3600*1000, BUY='https://ledixplugins.com.br/aurasynthbass/#baixar';
   function ld(){ try{ var o=JSON.parse(localStorage.getItem(KEY)||'null'); if(o && Date.now()-o.t0<JANELA) return o; }catch(e){ dbg(e); } return {t0:Date.now(),used:0}; }
   function sv(o){ try{ localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){ dbg(e); } }
   var st=ld(), ctxD=null, ended=false, chip=null, ov=null;
