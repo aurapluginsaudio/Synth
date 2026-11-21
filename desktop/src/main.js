@@ -56,11 +56,11 @@ app.whenReady().then(() => {
   protocol.handle('aura', req => { const p = decodeURIComponent(new URL(req.url).pathname); const f = path.normalize(path.join(root, p)); if (!f.startsWith(root)) return new Response('', { status: 403 }); return net.fetch(pathToFileURL(f).toString()); });
   session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(['midi', 'midiSysex', 'media', 'audioCapture', 'fullscreen'].includes(perm)));
   session.defaultSession.setPermissionCheckHandler((wc, perm) => ['midi', 'midiSysex', 'media', 'audioCapture', 'fullscreen'].includes(perm));
-  const about = () => dialog.showMessageBox({ type: 'info', title: 'Sobre o AURA Synth Bass', message: 'AURA Synth Bass ' + app.getVersion(), detail: 'Criado por Thiago R. Galvão\n© 2026 · Todos os direitos reservados\nID: AURA-SB-TRG-2026\n\nhttps://fervor.website/aura' });
+  const about = () => dialog.showMessageBox({ type: 'info', title: 'Sobre o AURA Synth Bass', message: 'AURA Synth Bass ' + app.getVersion(), detail: 'Criado por Thiago R. Galvão\n© 2026 · Todos os direitos reservados\nID: AURA-SB-TRG-2026\n\nhttps://ledixplugins.com.br/aurasynthbass/' });
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [{ label: 'AURA Synth Bass', submenu: [{ label: 'Sobre o AURA Synth Bass', click: about }, { type: 'separator' }, { role: 'hide', label: 'Ocultar' }, { role: 'hideOthers', label: 'Ocultar outros' }, { type: 'separator' }, { role: 'quit', label: 'Sair' }] }] : []),
     { label: 'Exibir', submenu: [{ role: 'togglefullscreen', label: 'Tela cheia' }, { role: 'reload', label: 'Recarregar' }, { role: 'zoomIn', label: 'Aumentar' }, { role: 'zoomOut', label: 'Diminuir' }, { role: 'resetZoom', label: 'Tamanho normal' }] },
-    { label: 'Ajuda', submenu: [{ label: 'Site do AURA', click: () => shell.openExternal('https://fervor.website/aura') }, ...(process.platform !== 'darwin' ? [{ label: 'Sobre', click: about }] : [])] }]));
+    { label: 'Ajuda', submenu: [{ label: 'Site do AURA', click: () => shell.openExternal('https://ledixplugins.com.br/aurasynthbass/') }, ...(process.platform !== 'darwin' ? [{ label: 'Sobre', click: about }] : [])] }]));
   createWindow();
   app.on('activate', () => { if (!BrowserWindow.getAllWindows().length) createWindow(); });
 });
