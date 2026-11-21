@@ -34,7 +34,7 @@ function mergeLic(a, b) {
 ipcMain.on('aura:sync', e => { e.returnValue = { deviceId: DEVICE_ID, deviceName: os.hostname().slice(0, 24), version: app.getVersion(), platform: process.platform }; });
 ipcMain.handle('aura:store:get', () => { const m = mergeLic(readJ(f1()), readJ(f2())); return m ? JSON.stringify(m) : null; });
 ipcMain.handle('aura:store:set', (e, k, v) => { let j; try { j = JSON.parse(v); } catch (x) { return false; } writeJ(f1(), j); writeJ(f2(), j); return true; });
-ipcMain.handle('aura:open', (e, u) => { if (/^https:\/\/(fervor\.website|[a-z0-9.-]+\.lemonsqueezy\.com)\//.test(u)) shell.openExternal(u); });
+ipcMain.handle('aura:open', (e, u) => { if (/^https:\/\/(ledixplugins\.com\.br|[a-z0-9.-]+\.lemonsqueezy\.com)\//.test(u)) shell.openExternal(u); });
 ipcMain.handle('aura:http', async (e, url, body) => {          // pedidos ao servidor de licenças feitos pelo processo principal (sem CORS)
   if (!/^https:\/\//.test(url)) return { error: 'URL inválida', _http: 0 };
   try {
@@ -48,7 +48,7 @@ function createWindow() {
     icon: path.join(__dirname, '..', 'app', 'icon-512.png'),
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false, autoplayPolicy: 'no-user-gesture-required' } });
   win.loadURL('aura://app/index.html');
-  win.webContents.setWindowOpenHandler(({ url }) => { if (/^https:\/\/fervor\.website\//.test(url)) shell.openExternal(url); return { action: 'deny' }; });
+  win.webContents.setWindowOpenHandler(({ url }) => { if (/^https:\/\/ledixplugins\.com\.br\//.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('aura://')) e.preventDefault(); });
 }
 app.whenReady().then(() => {

@@ -18,7 +18,7 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "website.fervor.aurasynthbass",
+    "appId": "br.com.ledixplugins.aurasynthbass",
     "productName": "AURA Synth Bass",
     "copyright": "© 2026 Thiago R. Galvão. Todos os direitos reservados.",
     "directories": {
